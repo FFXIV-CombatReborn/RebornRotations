@@ -1,8 +1,8 @@
 namespace DefaultRotations.Ranged;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "6.58", Description = "Additonal contributions to this rotation thanks to Toshi!")]
+[Rotation("Default", CombatType.PvE, GameVersion = "6.58", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/MCH_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class MCH_Default : MachinistRotation
 {
     #region Config Options
@@ -97,7 +97,7 @@ public sealed class MCH_Default : MachinistRotation
             if (UseBurstMedicine(out act)) return true;
 
             {
-                if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50) && !CombatElapsedLess(10) && CanUseHyperchargePvE(out _)
+                if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && !CombatElapsedLess(10) && CanUseHyperchargePvE(out _)
                 && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
             }
         }
@@ -150,7 +150,7 @@ public sealed class MCH_Default : MachinistRotation
             if (ChainSawPvE.CanUse(out act)) return true;
         }
         if (SpreadShotPvE.CanUse(out act)) return true;
-
+        if (FullMetalFieldPvE.CanUse(out act)) return true;
         // Single target actions: CleanShot, SlugShot, and SplitShot based on their usability.
         if (CleanShotPvE.CanUse(out act)) return true;
         if (SlugShotPvE.CanUse(out act)) return true;
