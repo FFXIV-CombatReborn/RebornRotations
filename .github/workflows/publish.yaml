@@ -31,7 +31,7 @@ jobs:
           Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
 
       - name: Restore Nuget Packages
-        run: dotnet restore BasicRotations/DefaultRotations.csproj
+        run: dotnet restore BasicRotations/RebornRotations.csproj
 
       - name: Build Rotations
         run: dotnet build --no-restore -c Release BasicRotations/RebornRotations.csproj -p:AssemblyVersion=${{ env.tag }} -p:FileVersion=${{ env.tag }} -p:InformationalVersion=${{ env.tag }} --output .\build
