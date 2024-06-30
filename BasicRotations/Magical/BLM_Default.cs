@@ -4,7 +4,7 @@
 [SourceCode(Path = "main/DefaultRotations/Magical/BLM_Default.cs")]
 [Api(1)]
 public class BLM_Default : BlackMageRotation
-{
+{/*
     private bool NeedToGoIce
     {
         get
@@ -368,4 +368,4 @@ public class BLM_Default : BlackMageRotation
 
         return base.HealSingleAbility(nextGCD, out act);
     }
-}
+*/}

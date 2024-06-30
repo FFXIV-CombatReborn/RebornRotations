@@ -4,7 +4,7 @@
 [SourceCode(Path = "main/DefaultRotations/Tank/PLD_Default.cs")]
 [Api(1)]
 public class PLD_Default : PaladinRotation
-{
+{/*
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use Divine Veil at 15 seconds remaining on Countdown")]
     public bool UseDivineVeilPre { get; set; } = false;
@@ -163,4 +163,4 @@ public class PLD_Default : PaladinRotation
         return false;
     }
     #endregion
-}
+*/}

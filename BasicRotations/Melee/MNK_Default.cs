@@ -4,7 +4,7 @@ namespace DefaultRotations.Melee;
 [SourceCode(Path = "main/DefaultRotations/Melee/MNK_Default.cs")]
 [Api(1)]
 public sealed class MNK_Default : MonkRotation
-{
+{/*
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use Form Shift")]
     public bool AutoFormShift { get; set; } = true;
@@ -210,4 +210,4 @@ public sealed class MNK_Default : MonkRotation
         return CoerlForm(out act);
     }
     #endregion
-}
+*/}

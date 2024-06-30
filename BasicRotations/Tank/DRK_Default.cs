@@ -4,7 +4,7 @@ namespace DefaultRotations.Tank;
 [SourceCode(Path = "main/DefaultRotations/Tank/DRK_Balance.cs")]
 [Api(1)]
 public sealed class DRK_Default : DarkKnightRotation
-{
+{/*
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Keep at least 3000 MP")]
     public bool TheBlackestNight { get; set; } = true;
@@ -209,4 +209,4 @@ public sealed class DRK_Default : DarkKnightRotation
         }
     }
     #endregion
-}
+*/}
