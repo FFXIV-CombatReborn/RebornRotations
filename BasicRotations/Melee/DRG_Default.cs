@@ -5,9 +5,9 @@ namespace DefaultRotations.Melee;
 [Api(1)]
 
 public sealed class DRG_Default : DragoonRotation
-{
+{/*
     #region Config Options
-    [RotationDesc(ActionID.SpineshatterDivePvE, ActionID.DragonfireDivePvE)]
+    [RotationDesc(ActionID.WingedGlidePvE, ActionID.DragonfireDivePvE)]
 
     [RotationConfig(CombatType.PvE, Name = "Break Single Target Combo to AOE when time to AOE")]
     public bool DoomSpikeWhenever { get; set; } = true;
@@ -112,4 +112,4 @@ public sealed class DRG_Default : DragoonRotation
         return base.GeneralGCD(out act);
     }
     #endregion
-}
+*/}

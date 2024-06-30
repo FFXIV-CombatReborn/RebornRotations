@@ -4,7 +4,7 @@ namespace DefaultRotations.Melee;
 [SourceCode(Path = "main/DefaultRotations/Melee/NIN_Default.cs")]
 [Api(1)]
 public sealed class NIN_Default : NinjaRotation
-{
+{/*
     #region Config Options
     // Configuration properties for rotation behavior.
     [RotationConfig(CombatType.PvE, Name = "Use Hide")]
@@ -459,4 +459,4 @@ public sealed class NIN_Default : NinjaRotation
         base.DisplayStatus();
     }
     #endregion
-}
+*/}

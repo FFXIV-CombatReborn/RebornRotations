@@ -4,7 +4,7 @@
 [SourceCode(Path = "main/DefaultRotations/Melee/SAM_Default.cs")]
 [Api(1)]
 public sealed class SAM_Default : SamuraiRotation
-{
+{/*
     #region Config Options
 
     [Range(0, 85, ConfigUnitType.None, 5)]
@@ -131,4 +131,4 @@ public sealed class SAM_Default : SamuraiRotation
     private static bool HaveMeikyoShisui => Player.HasStatus(true, StatusID.MeikyoShisui);
 
     #endregion
-}
+*/}

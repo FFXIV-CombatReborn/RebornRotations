@@ -4,7 +4,7 @@ namespace DefaultRotations.Tank;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "6.58")]
 [SourceCode(Path = "main/DefaultRotations/Tank/GNB_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class GNB_Default : GunbreakerRotation
 {
     #region Countdown Logic
@@ -83,17 +83,18 @@ public sealed class GNB_Default : GunbreakerRotation
 
         if (Player.HasStatus(true, StatusID.NoMercy) && CanUseBowShock(out act)) return true;
 
-        if (RoughDividePvE.CanUse(out act) && !IsMoving) return true;
+        //if (TrajectoryPvE.CanUse(out act) && !IsMoving) return true;
         if (GnashingFangPvE.Cooldown.IsCoolingDown && DoubleDownPvE.Cooldown.IsCoolingDown && Ammo == 0 && BloodfestPvE.CanUse(out act)) return true;
 
         if (AbdomenTearPvE.CanUse(out act)) return true;
 
         if (Player.HasStatus(true, StatusID.NoMercy))
         {
-            if (RoughDividePvE.CanUse(out act, usedUp: true) && !IsMoving) return true;
+           // if (TrajectoryPvE.CanUse(out act, usedUp: true) && !IsMoving) return true;
         }
 
         if (EyeGougePvE.CanUse(out act)) return true;
+        if (FatedBrandPvE.CanUse(out act)) return true;
         if (HypervelocityPvE.CanUse(out act)) return true;
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         return base.AttackAbility(nextGCD, out act);
@@ -104,6 +105,7 @@ public sealed class GNB_Default : GunbreakerRotation
     protected override bool GeneralGCD(out IAction? act)
     {
         if (FatedCirclePvE.CanUse(out act)) return true;
+        if (CanUseReignOfBeasts(out act)) return true;
         if (CanUseGnashingFang(out act)) return true;
 
         if (DemonSlaughterPvE.CanUse(out act)) return true;
@@ -154,6 +156,18 @@ public sealed class GNB_Default : GunbreakerRotation
     //    return false;
     //}
 
+    private bool CanUseReignOfBeasts(out IAction? act)
+    {
+        if (ReignOfBeastsPvE.CanUse(out act))
+        { 
+            if (DemonSlicePvE.CanUse(out _)) return true;
+
+            if (Player.HasStatus(true, StatusID.ReadyToReign)) return true;                     
+
+        }
+        return false;
+    }
+
     private bool CanUseGnashingFang(out IAction? act)
     {
         if (GnashingFangPvE.CanUse(out act))
@@ -178,8 +192,6 @@ public sealed class GNB_Default : GunbreakerRotation
         if (SonicBreakPvE.CanUse(out act))
         {
             if (DemonSlicePvE.CanUse(out _)) return false;
-
-            //if (!IsFullParty && !SonicBreak.IsTargetBoss) return false;
 
             if (!GnashingFangPvE.EnoughLevel && Player.HasStatus(true, StatusID.NoMercy)) return true;
 
