@@ -138,16 +138,18 @@ public sealed class MCH_Default : MachinistRotation
             if (!AirAnchorPvE.EnoughLevel && HotShotPvE.CanUse(out act)) return true;
 
             // Check if Drill can be used
-            if (DrillPvE.CanUse(out act)) return true;
+            if (DrillPvE.CanUse(out act, usedUp: true)) return true;
         }
 
         // Special condition for using ChainSaw outside of AoE checks if no action is chosen within 4 GCDs.
         if (!CombatElapsedLessGCD(4) && ChainSawPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (!CombatElapsedLessGCD(4) && ExcavatorPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         // AoE actions: ChainSaw and SpreadShot based on their usability.
         if (SpreadShotPvE.CanUse(out _))
         {
             if (ChainSawPvE.CanUse(out act)) return true;
+            if (ExcavatorPvE.CanUse(out act)) return true;
         }
         if (SpreadShotPvE.CanUse(out act)) return true;
         if (FullMetalFieldPvE.CanUse(out act)) return true;
