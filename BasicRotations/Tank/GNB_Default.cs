@@ -2,7 +2,7 @@ using RotationSolver.Basic.Data;
 
 namespace DefaultRotations.Tank;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "6.58")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Tank/GNB_Default.cs")]
 [Api(2)]
 public sealed class GNB_Default : GunbreakerRotation

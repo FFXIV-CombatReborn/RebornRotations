@@ -1,6 +1,6 @@
 ﻿namespace DefaultRotations.Tank;
 
-[Rotation("Beta", CombatType.PvE, GameVersion = "6.58")]
+[Rotation("Beta", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Tank/PLD_zBeta.cs")]
 [Api(1)]
 public class PLD_zBeta : PaladinRotation

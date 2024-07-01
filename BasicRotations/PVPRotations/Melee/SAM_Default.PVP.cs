@@ -1,6 +1,6 @@
 ﻿namespace DefaultRotations.Melee;
 
-[Rotation("Default PVP", CombatType.PvP, GameVersion = "6.58", Description = "Beta Rotation")]
+[Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/SAM_Default.PvP.cs")]
 [Api(1)]
 public sealed class SAM_DefaultPvP : SamuraiRotation
