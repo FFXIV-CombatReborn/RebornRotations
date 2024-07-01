@@ -1,8 +1,8 @@
 namespace DefaultRotations.Ranged;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "Additonal contributions to this rotation thanks to Toshi!")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/DNC_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class DNC_Default : DancerRotation
 {
     #region Config Options
@@ -151,6 +151,7 @@ public sealed class DNC_Default : DancerRotation
         }
 
         if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (LastDancePvE.CanUse(out act)) return true;
 
         if (HoldStepForTargets)
         {
