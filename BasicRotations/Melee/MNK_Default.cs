@@ -1,6 +1,6 @@
 namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "6.58", Description = "Uses Lunar Solar Opener from The Balance")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "Uses Lunar Solar Opener from The Balance")]
 [SourceCode(Path = "main/DefaultRotations/Melee/MNK_Default.cs")]
 [Api(1)]
 public sealed class MNK_Default : MonkRotation

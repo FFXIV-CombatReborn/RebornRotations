@@ -1,6 +1,6 @@
 ﻿namespace DefaultRotations.Healer;
 
-[Rotation("Default PVP", CombatType.PvP, GameVersion = "6.58", Description = "Beta Rotation")]
+[Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Healer/SGE_Default.PVP.cs")]
 [Api(1)]
 public class SGE_DefaultPVP : SageRotation

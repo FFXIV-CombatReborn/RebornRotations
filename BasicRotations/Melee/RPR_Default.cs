@@ -1,8 +1,8 @@
 ﻿namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "6.58", Description = "Additonal contributions to this rotation thanks to Toshi!")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Melee/RPR_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class RPR_Default : ReaperRotation
 {
     #region Config Options
@@ -29,6 +29,7 @@ public sealed class RPR_Default : ReaperRotation
         bool IsTargetDying = HostileTarget?.IsDying() ?? false;
         bool NoEnshroudPooling = !EnshroudPooling && Shroud >= 50;
         bool YesEnshroudPooling = EnshroudPooling && Shroud >= 50 && (!PlentifulHarvestPvE.EnoughLevel || Player.HasStatus(true, StatusID.ArcaneCircle) || ArcaneCirclePvE.Cooldown.WillHaveOneCharge(8) || !Player.HasStatus(true, StatusID.ArcaneCircle) && ArcaneCirclePvE.Cooldown.WillHaveOneCharge(65) && !ArcaneCirclePvE.Cooldown.WillHaveOneCharge(50) || !Player.HasStatus(true, StatusID.ArcaneCircle) && Shroud >= 90);
+        bool IsIdealHost = Player.HasStatus(true, StatusID.IdealHost);
 
         if (IsBurst)
         {
@@ -47,13 +48,14 @@ public sealed class RPR_Default : ReaperRotation
                 && ArcaneCirclePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        if (IsTargetBoss && IsTargetDying || NoEnshroudPooling || YesEnshroudPooling)
+        if (IsTargetBoss && IsTargetDying || NoEnshroudPooling || YesEnshroudPooling || IsIdealHost)
         {
             if (EnshroudPvE.CanUse(out act)) return true;
         }
 
         if (HasEnshrouded && (Player.HasStatus(true, StatusID.ArcaneCircle) || LemureShroud < 3))
         {
+            if (SacrificiumPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (LemuresScythePvE.CanUse(out act, usedUp: true)) return true;
             if (LemuresSlicePvE.CanUse(out act, usedUp: true)) return true;
         }
@@ -80,6 +82,8 @@ public sealed class RPR_Default : ReaperRotation
 
         if (WhorlOfDeathPvE.CanUse(out act)) return true;
         if (ShadowOfDeathPvE.CanUse(out act)) return true;
+
+        if (PerfectioPvE.CanUse(out act)) return true;
 
         if (HasEnshrouded)
         {
