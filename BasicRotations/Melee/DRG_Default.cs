@@ -2,10 +2,10 @@ namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Melee/DRG_Default.cs")]
-[Api(1)]
+[Api(2)]
 
 public sealed class DRG_Default : DragoonRotation
-{/*
+{
     #region Config Options
     [RotationDesc(ActionID.WingedGlidePvE, ActionID.DragonfireDivePvE)]
 
@@ -16,7 +16,6 @@ public sealed class DRG_Default : DragoonRotation
     #region Move Logic
     protected override bool MoveForwardAbility(IAction nextGCD, out IAction act)
     {
-        if (SpineshatterDivePvE.CanUse(out act)) return true;
         if (DragonfireDivePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         return false;
@@ -45,7 +44,6 @@ public sealed class DRG_Default : DragoonRotation
             if (LanceChargePvE.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.PowerSurge)) return true;
             if (LanceChargePvE.CanUse(out act, skipAoeCheck: true) && !Player.HasStatus(true, StatusID.PowerSurge)) return true;
 
-            if (DragonSightPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (BattleLitanyPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
@@ -63,11 +61,9 @@ public sealed class DRG_Default : DragoonRotation
 
         if (GeirskogulPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-        if (SpineshatterDivePvE.CanUse(out act, usedUp: true))
         {
             if (Player.HasStatus(true, StatusID.LanceCharge) && LanceChargePvE.Cooldown.ElapsedOneChargeAfterGCD(3)) return true;
         }
-        if (Player.HasStatus(true, StatusID.PowerSurge) && SpineshatterDivePvE.Cooldown.CurrentCharges != 1 && SpineshatterDivePvE.CanUse(out act)) return true;
 
         if (MirageDivePvE.CanUse(out act)) return true;
 
@@ -93,6 +89,7 @@ public sealed class DRG_Default : DragoonRotation
         if (DoomSpikePvE.CanUse(out act, skipComboCheck: doomSpikeRightNow)) return true;
 
 
+        if (DrakesbanePvE.CanUse(out act)) return true;
         if (WheelingThrustPvE.CanUse(out act)) return true;
         if (FangAndClawPvE.CanUse(out act)) return true;
 
@@ -112,4 +109,4 @@ public sealed class DRG_Default : DragoonRotation
         return base.GeneralGCD(out act);
     }
     #endregion
-*/}
+}
