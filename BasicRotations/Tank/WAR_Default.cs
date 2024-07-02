@@ -73,7 +73,7 @@ public sealed class WAR_Default : WarriorRotation
 
         if (UpheavalPvE.CanUse(out act)) return true;
 
-        if (Player.HasStatus(false, StatusID.Wrathful) && PrimalWrathPvE.CanUse(out act)) return true;
+        if (Player.HasStatus(false, StatusID.Wrathful) && PrimalWrathPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (OnslaughtPvE.CanUse(out act, usedUp: IsBurstStatus) &&
            !IsMoving &&
@@ -153,7 +153,7 @@ public sealed class WAR_Default : WarriorRotation
             // New check for Primal Ruination
             if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease))
             {
-                if (PrimalRuinationPvE.CanUse(out act)) return true;
+                if (PrimalRuinationPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
             if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
             {
