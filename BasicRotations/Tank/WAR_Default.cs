@@ -82,7 +82,7 @@ public sealed class WAR_Default : WarriorRotation
             return true;
         }
 
-        if (Player.HasStatus(false, StatusID.Wrathful) && PrimalWrathPvE.CanUse(out act)) return true;
+        if (Player.HasStatus(false, StatusID.Wrathful) && PrimalWrathPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         return base.AttackAbility(nextGCD, out act);
@@ -158,7 +158,7 @@ public sealed class WAR_Default : WarriorRotation
             // New check for Primal Ruination
             if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease))
             {
-                if (PrimalRuinationPvE.CanUse(out act)) return true;
+                if (PrimalRuinationPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
 
             if (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80)
