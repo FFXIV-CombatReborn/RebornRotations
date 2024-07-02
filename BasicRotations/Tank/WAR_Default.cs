@@ -25,6 +25,7 @@ public sealed class WAR_Default : WarriorRotation
     [Range(0, 1, ConfigUnitType.Percent)]
     [RotationConfig(CombatType.PvE, Name = "Equilibrium Heal Threshold")]
     public float EquilibriumHeal { get; set; } = 0.6f;
+
     #endregion
 
     #region Countdown Logic
@@ -49,30 +50,41 @@ public sealed class WAR_Default : WarriorRotation
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         if (InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
+
         if (CombatElapsedLessGCD(1)) return false;
+
         if (UseBurstMedicine(out act)) return true;
 
-        if ((Player.HasStatus(false, StatusID.SurgingTempest) && !Player.WillStatusEndGCD(6, 0, true, StatusID.SurgingTempest))
+        if (Player.HasStatus(false, StatusID.SurgingTempest)
+            && !Player.WillStatusEndGCD(6, 0, true, StatusID.SurgingTempest)
             || !MythrilTempestPvE.EnoughLevel)
         {
             if (BerserkPvE.CanUse(out act)) return true;
         }
 
-        if (IsBurstStatus && InfuriatePvE.CanUse(out act, usedUp: true)) return true;
+        if (IsBurstStatus)
+        {
+            if (InfuriatePvE.CanUse(out act, usedUp: true)) return true;
+        }
+
         if (CombatElapsedLessGCD(4)) return false;
+
         if (OrogenyPvE.CanUse(out act)) return true;
+
         if (UpheavalPvE.CanUse(out act)) return true;
+
         if (Player.HasStatus(false, StatusID.Wrathful) && PrimalWrathPvE.CanUse(out act)) return true;
 
         if (OnslaughtPvE.CanUse(out act, usedUp: IsBurstStatus) &&
             !IsMoving &&
-            !IsLastAction(true, OnslaughtPvE) && // Prevent triple weaving, temp. fix
-            !IsLastAction(true, InfuriatePvE) && // Prevent triple weaving, temp. fix
-            !IsLastAction(true, UpheavalPvE) && // Prevent triple weaving, temp. fix
+            !IsLastAction(true, OnslaughtPvE) &&
+            !IsLastAction(true, InfuriatePvE) && // Prevent triple weave
+            !IsLastAction(true, UpheavalPvE) && // same
             Player.HasStatus(false, StatusID.SurgingTempest))
         {
             return true;
         }
+
 
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         return base.AttackAbility(nextGCD, out act);
@@ -80,12 +92,18 @@ public sealed class WAR_Default : WarriorRotation
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
-        if (Player.GetHealthRatio() < ThrillOfBattleHeal && ThrillOfBattlePvE.CanUse(out act)) return true;
+        if (Player.GetHealthRatio() < ThrillOfBattleHeal)
+        {
+            if (ThrillOfBattlePvE.CanUse(out act)) return true;
+        }
 
-        if (!Player.HasStatus(true, StatusID.Holmgang_409) &&
-            Player.GetHealthRatio() < EquilibriumHeal &&
-            EquilibriumPvE.CanUse(out act)) return true;
-
+        if (!Player.HasStatus(true, StatusID.Holmgang_409))
+        {
+            if (Player.GetHealthRatio() < EquilibriumHeal)
+            {
+                if (EquilibriumPvE.CanUse(out act)) return true;
+            }
+        }
         return base.GeneralAbility(nextGCD, out act);
     }
 
@@ -96,11 +114,15 @@ public sealed class WAR_Default : WarriorRotation
         act = null;
 
         if (Player.HasStatus(true, StatusID.Holmgang_409) && Player.GetHealthRatio() < 0.3f) return false;
+
         if (RawIntuitionPvE.CanUse(out act) && (RawSingleTargets || NumberOfHostilesInRange > 2)) return true;
+
         if (!Player.WillStatusEndGCD(0, 0, true, StatusID.Bloodwhetting, StatusID.RawIntuition)) return false;
+
         if (ReprisalPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if ((!RampartPvE.Cooldown.IsCoolingDown || RampartPvE.Cooldown.ElapsedAfter(60)) && VengeancePvE.CanUse(out act)) return true;
+
         if (((VengeancePvE.Cooldown.IsCoolingDown && VengeancePvE.Cooldown.ElapsedAfter(60)) || !VengeancePvE.EnoughLevel) && RampartPvE.CanUse(out act)) return true;
 
         return base.DefenseAreaAbility(nextGCD, out act);
@@ -111,8 +133,8 @@ public sealed class WAR_Default : WarriorRotation
     {
         act = null;
 
-        if ((ShakeItOffPvE.Cooldown.IsCoolingDown && !ShakeItOffPvE.Cooldown.WillHaveOneCharge(60)) ||
-            (ReprisalPvE.Cooldown.IsCoolingDown && !ReprisalPvE.Cooldown.WillHaveOneCharge(50))) return false;
+        if (ShakeItOffPvE.Cooldown.IsCoolingDown && !ShakeItOffPvE.Cooldown.WillHaveOneCharge(60)
+            || ReprisalPvE.Cooldown.IsCoolingDown && !ReprisalPvE.Cooldown.WillHaveOneCharge(50)) return false;
 
         if (ShakeItOffPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
@@ -123,13 +145,23 @@ public sealed class WAR_Default : WarriorRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
-        if (IsLastAction(false, InnerReleasePvE) && FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (IsLastAction(false, InnerReleasePvE))
+        {
+            if (FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        }
 
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
         {
-            if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease) && PrimalRuinationPvE.CanUse(out act)) return true;
+            // New check for Primal Ruination
+            if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease))
+            {
+                if (PrimalRuinationPvE.CanUse(out act)) return true;
+            }
+            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
+            {
+                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
+            }
 
-            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true) && PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
 
             if (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80)
             {
@@ -144,6 +176,7 @@ public sealed class WAR_Default : WarriorRotation
         if (StormsPathPvE.CanUse(out act)) return true;
         if (MaimPvE.CanUse(out act)) return true;
         if (HeavySwingPvE.CanUse(out act)) return true;
+
         if (TomahawkPvE.CanUse(out act)) return true;
 
         return base.GeneralGCD(out act);
@@ -152,11 +185,11 @@ public sealed class WAR_Default : WarriorRotation
     [RotationDesc(ActionID.NascentFlashPvE)]
     protected override bool HealSingleGCD(out IAction? act)
     {
-        if (!NeverscentFlash && NascentFlashPvE.CanUse(out act) &&
-            (InCombat && NascentFlashPvE.Target.Target?.GetHealthRatio() < FlashHeal)) return true;
+        if (!NeverscentFlash && NascentFlashPvE.CanUse(out act)
+            && (InCombat && NascentFlashPvE.Target.Target?.GetHealthRatio() < FlashHeal)) return true;
 
-        if (NeverscentFlash && NascentFlashPvE.CanUse(out act) &&
-            (InCombat && !Player.HasStatus(true, StatusID.Defiance) && NascentFlashPvE.Target.Target?.GetHealthRatio() < FlashHeal)) return true;
+        if (NeverscentFlash && NascentFlashPvE.CanUse(out act)
+            && (InCombat && !Player.HasStatus(true, StatusID.Defiance) && NascentFlashPvE.Target.Target?.GetHealthRatio() < FlashHeal)) return true;
 
         return base.HealSingleGCD(out act);
     }

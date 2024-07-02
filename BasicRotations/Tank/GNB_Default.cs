@@ -1,4 +1,4 @@
-using RotationSolver.Basic.Data;
+/*using RotationSolver.Basic.Data;
 
 namespace DefaultRotations.Tank;
 
@@ -253,4 +253,4 @@ public sealed class GNB_Default : GunbreakerRotation
         return false;
     }
 #endregion
-}
+}*/
