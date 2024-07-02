@@ -49,18 +49,20 @@ public sealed class WAR_Default : WarriorRotation
     #region oGCD Logic
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        if (InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
-
-        if (CombatElapsedLessGCD(1)) return false;
-
-        if (UseBurstMedicine(out act)) return true;
-
         if (Player.HasStatus(false, StatusID.SurgingTempest)
             && !Player.WillStatusEndGCD(6, 0, true, StatusID.SurgingTempest)
             || !MythrilTempestPvE.EnoughLevel)
         {
             if (BerserkPvE.CanUse(out act)) return true;
         }
+
+        if (UpheavalPvE.CanUse(out act)) return true;
+
+        if (InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
+
+        if (CombatElapsedLessGCD(1)) return false;
+
+        if (UseBurstMedicine(out act)) return true;
 
         if (IsBurstStatus)
         {
@@ -71,20 +73,16 @@ public sealed class WAR_Default : WarriorRotation
 
         if (OrogenyPvE.CanUse(out act)) return true;
 
-        if (UpheavalPvE.CanUse(out act)) return true;
-
-        if (Player.HasStatus(false, StatusID.Wrathful) && PrimalWrathPvE.CanUse(out act)) return true;
-
         if (OnslaughtPvE.CanUse(out act, usedUp: IsBurstStatus) &&
             !IsMoving &&
             !IsLastAction(true, OnslaughtPvE) &&
-            !IsLastAction(true, InfuriatePvE) && // Prevent triple weave
-            !IsLastAction(true, UpheavalPvE) && // same
+            !IsLastAction(true, UpheavalPvE) && //Triple weave fix
             Player.HasStatus(false, StatusID.SurgingTempest))
         {
             return true;
         }
 
+        if (Player.HasStatus(false, StatusID.Wrathful) && PrimalWrathPvE.CanUse(out act)) return true;
 
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         return base.AttackAbility(nextGCD, out act);
@@ -150,6 +148,11 @@ public sealed class WAR_Default : WarriorRotation
             if (FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         }
 
+        if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
+        {
+            if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
+        }
+
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
         {
             // New check for Primal Ruination
@@ -157,11 +160,6 @@ public sealed class WAR_Default : WarriorRotation
             {
                 if (PrimalRuinationPvE.CanUse(out act)) return true;
             }
-            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
-            {
-                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
-            }
-
 
             if (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80)
             {
