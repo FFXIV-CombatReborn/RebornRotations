@@ -66,9 +66,9 @@ public sealed class WAR_Default : WarriorRotation
 
         if (OnslaughtPvE.CanUse(out act, usedUp: IsBurstStatus) &&
             !IsMoving &&
-            !IsLastAction(true, OnslaughtPvE) &&
-            !IsLastAction(true, InfuriatePvE) &&
-            !IsLastAction(true, UpheavalPvE) &&
+            !IsLastAction(true, OnslaughtPvE) && // Prevent triple weaving, temp. fix
+            !IsLastAction(true, InfuriatePvE) && // Prevent triple weaving, temp. fix
+            !IsLastAction(true, UpheavalPvE) && // Prevent triple weaving, temp. fix
             Player.HasStatus(false, StatusID.SurgingTempest))
         {
             return true;
