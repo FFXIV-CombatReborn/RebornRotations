@@ -2,9 +2,9 @@ namespace DefaultRotations.Tank;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Tank/DRK_Balance.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class DRK_Default : DarkKnightRotation
-{/*
+{
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Keep at least 3000 MP")]
     public bool TheBlackestNight { get; set; } = true;
@@ -124,13 +124,13 @@ public sealed class DRK_Default : DarkKnightRotation
 
         }
 
-        if (PlungePvE.CanUse(out act, skipAoeCheck: true) && !IsMoving) return true;
+        if (ShadowstridePvE.CanUse(out act, skipAoeCheck: true) && !IsMoving) return true;
 
         if (SaltAndDarknessPvE.CanUse(out act)) return true;
 
         if (InTwoMIsBurst)
         {
-            if (PlungePvE.CanUse(out act, usedUp: true, skipAoeCheck: true) && !IsMoving) return true;
+            if (ShadowstridePvE.CanUse(out act, usedUp: true, skipAoeCheck: true) && !IsMoving) return true;
         }
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         return base.AttackAbility(nextGCD, out act);
@@ -209,4 +209,4 @@ public sealed class DRK_Default : DarkKnightRotation
         }
     }
     #endregion
-*/}
+}

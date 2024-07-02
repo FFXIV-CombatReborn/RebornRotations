@@ -2,7 +2,7 @@ namespace DefaultRotations.Healer;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Healer/SCH_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class SCH_Default : ScholarRotation
 {
     #region Config Options

@@ -2,9 +2,9 @@ namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "Uses Lunar Solar Opener from The Balance")]
 [SourceCode(Path = "main/DefaultRotations/Melee/MNK_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class MNK_Default : MonkRotation
-{/*
+{
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use Form Shift")]
     public bool AutoFormShift { get; set; } = true;
@@ -118,7 +118,7 @@ public sealed class MNK_Default : MonkRotation
 
         if (OpoOpoForm(out act)) return true; // Fallback to Use OpoOpo Form GCDs 
 
-        if (Chakra < 5 && MeditationPvE.CanUse(out act)) return true;
+        if (Chakra < 5 && ForbiddenMeditationPvE.CanUse(out act)) return true;
 
         if (AutoFormShift && FormShiftPvE.CanUse(out act)) return true; // Form Shift GCD use
 
@@ -210,4 +210,4 @@ public sealed class MNK_Default : MonkRotation
         return CoerlForm(out act);
     }
     #endregion
-*/}
+}

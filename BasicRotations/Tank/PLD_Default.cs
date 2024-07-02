@@ -2,9 +2,9 @@
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Tank/PLD_Default.cs")]
-[Api(1)]
+[Api(2)]
 public class PLD_Default : PaladinRotation
-{/*
+{
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use Divine Veil at 15 seconds remaining on Countdown")]
     public bool UseDivineVeilPre { get; set; } = false;
@@ -157,10 +157,10 @@ public class PLD_Default : PaladinRotation
     #region Extra Methods
     private bool UseOath(out IAction act, bool onLast = false)
     {
-        if (SheltronPvE.CanUse(out act, onLastAbility: onLast)) return true;
-        if (InterventionPvE.CanUse(out act, onLastAbility: onLast)) return true;
+        if (SheltronPvE.CanUse(out act)) return true;
+        if (InterventionPvE.CanUse(out act)) return true;
 
         return false;
     }
     #endregion
-*/}
+}
