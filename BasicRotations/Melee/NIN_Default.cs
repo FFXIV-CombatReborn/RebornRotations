@@ -2,9 +2,9 @@ namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Melee/NIN_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class NIN_Default : NinjaRotation
-{/*
+{
     #region Config Options
     // Configuration properties for rotation behavior.
     [RotationConfig(CombatType.PvE, Name = "Use Hide")]
@@ -126,14 +126,14 @@ public sealed class NIN_Default : NinjaRotation
             // Chooses buffs or AoE actions based on combat conditions and cooldowns.
             // For instance, setting Huton for speed buff or choosing AoE Ninjutsu like Katon or Doton based on enemy positioning.
             // Also considers using Suiton for vulnerability debuff on the enemy if conditions are optimal.
-            if (HuraijinPvE.CanUse(out act)) return true;
+
             if (!HutonEndAfterGCD() && _ninActionAim?.ID == HutonPvE.ID)
             {
                 ClearNinjutsu();
                 return false;
             }
             if (TenPvE.CanUse(out _, usedUp: true)
-               && (!InCombat || !HuraijinPvE.EnoughLevel) && HutonPvE.CanUse(out _)
+               && (!InCombat) && HutonPvE.CanUse(out _)
                && !IsLastAction(false, HutonPvE))
             {
                 SetNinjutsu(HutonPvE);
@@ -409,7 +409,7 @@ public sealed class NIN_Default : NinjaRotation
             if (hasRaijuReady) return false;
         }
 
-        if (HuraijinPvE.CanUse(out act)) return true;
+
 
         //AOE
         if (HakkeMujinsatsuPvE.CanUse(out act)) return true;
@@ -459,4 +459,4 @@ public sealed class NIN_Default : NinjaRotation
         base.DisplayStatus();
     }
     #endregion
-*/}
+}
