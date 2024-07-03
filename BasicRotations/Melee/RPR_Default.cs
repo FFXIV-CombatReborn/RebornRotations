@@ -8,6 +8,8 @@ public sealed class RPR_Default : ReaperRotation
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "[Beta Option] Pool Shroud for Arcane Circle.")]
     public bool EnshroudPooling { get; set; } = false;
+
+    public static bool HasExecutioner => Player.HasStatus(true, StatusID.Executioner);
     #endregion
 
     #region Countdown Logic
@@ -45,7 +47,7 @@ public sealed class RPR_Default : ReaperRotation
                 }
             }
             if ((HostileTarget?.HasStatus(true, StatusID.DeathsDesign) ?? false)
-                && ArcaneCirclePvE.CanUse(out act, skipAoeCheck: true)) return true;
+                && !CombatElapsedLess(3.5f) && ArcaneCirclePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
         if (IsTargetBoss && IsTargetDying || NoEnshroudPooling || YesEnshroudPooling || IsIdealHost)
@@ -61,7 +63,7 @@ public sealed class RPR_Default : ReaperRotation
             if (LemuresSlicePvE.CanUse(out act, usedUp: true)) return true;
         }
 
-        if (PlentifulHarvestPvE.EnoughLevel && !Player.HasStatus(true, StatusID.ImmortalSacrifice) && !Player.HasStatus(true, StatusID.BloodsownCircle_2972) || !PlentifulHarvestPvE.EnoughLevel)
+        if (PlentifulHarvestPvE.EnoughLevel && !Player.HasStatus(true, StatusID.ImmortalSacrifice) /*&& !Player.HasStatus(true, StatusID.BloodsownCircle_2972) */|| !PlentifulHarvestPvE.EnoughLevel)
         {
             if (GluttonyPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
@@ -79,9 +81,14 @@ public sealed class RPR_Default : ReaperRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        if (IsLastAction(true, GluttonyPvE) || Player.HasStatus(true, StatusID.Executioner))
+        {
+            return ItsGluttonyTime(out act);
+        }
+
         if (SoulsowPvE.CanUse(out act)) return true;
 
-        if (!HasExecutioner && !HasSoulReaver)
+        if (!HasExecutioner && !HasSoulReaver )
         {
             if (PerfectioPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
@@ -123,18 +130,7 @@ public sealed class RPR_Default : ReaperRotation
             }
         }
         
-        if (HasExecutioner)
-        {
-            if (ExecutionersGuillotinePvE.CanUse(out act)) return true;
-            if (Player.HasStatus(true, StatusID.EnhancedGallows))
-            {
-                if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
-            }
-            else
-            {
-                if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
-            }
-        }
+
 
         if (HasSoulReaver)
         {
@@ -180,6 +176,24 @@ public sealed class RPR_Default : ReaperRotation
         {
             if (VoidReapingPvE.CanUse(out act)) return true;
         }
+        return false;
+    }
+
+    private bool ItsGluttonyTime(out IAction? act)
+    {
+        if (HasExecutioner)
+        {
+            if (ExecutionersGuillotinePvE.CanUse(out act)) return true;
+            if (Player.HasStatus(true, StatusID.EnhancedGallows))
+            {
+                if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+            else
+            {
+                if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+        }
+        act = null;
         return false;
     }
     #endregion 
