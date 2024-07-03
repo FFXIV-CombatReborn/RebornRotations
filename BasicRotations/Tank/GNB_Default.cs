@@ -16,6 +16,12 @@ public sealed class GNB_Default : GunbreakerRotation
     }
     #endregion
 
+    #region Config Options
+
+    bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
+
+    #endregion
+
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
@@ -87,12 +93,6 @@ public sealed class GNB_Default : GunbreakerRotation
         if (GnashingFangPvE.Cooldown.IsCoolingDown && DoubleDownPvE.Cooldown.IsCoolingDown && Ammo == 0 && BloodfestPvE.CanUse(out act)) return true;
 
         if (AbdomenTearPvE.CanUse(out act)) return true;
-
-        if (Player.HasStatus(true, StatusID.NoMercy))
-        {
-           // if (TrajectoryPvE.CanUse(out act, usedUp: true) && !IsMoving) return true;
-        }
-
         if (EyeGougePvE.CanUse(out act)) return true;
         if (FatedBrandPvE.CanUse(out act)) return true;
         if (HypervelocityPvE.CanUse(out act)) return true;
@@ -113,7 +113,7 @@ public sealed class GNB_Default : GunbreakerRotation
 
         if (Player.HasStatus(true, StatusID.NoMercy) && CanUseSonicBreak(out act)) return true;
 
-        if (Player.HasStatus(true, StatusID.NoMercy) && CanUseDoubleDown(out act)) return true;
+        if (Player.HasStatus(true, StatusID.NoMercy) && areDDTargetsInRange && CanUseDoubleDown(out act)) return true;
 
         if (SavageClawPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (WickedTalonPvE.CanUse(out act, skipComboCheck: true)) return true;
@@ -159,10 +159,10 @@ public sealed class GNB_Default : GunbreakerRotation
     private bool CanUseReignOfBeasts(out IAction? act)
     {
         if (ReignOfBeastsPvE.CanUse(out act))
-        { 
+        {
             if (DemonSlicePvE.CanUse(out _)) return true;
 
-            if (Player.HasStatus(true, StatusID.ReadyToReign)) return true;                     
+            if (Player.HasStatus(true, StatusID.ReadyToReign)) return true;
 
         }
         return false;
@@ -204,10 +204,11 @@ public sealed class GNB_Default : GunbreakerRotation
         return false;
     }
 
-    private bool CanUseDoubleDown(out IAction act)
+    private bool CanUseDoubleDown(out IAction? act)
     {
         if (DoubleDownPvE.CanUse(out act, skipAoeCheck: true))
         {
+
             if (DemonSlicePvE.CanUse(out _) && Player.HasStatus(true, StatusID.NoMercy)) return true;
 
             if (SonicBreakPvE.Cooldown.IsCoolingDown && Player.HasStatus(true, StatusID.NoMercy)) return true;
@@ -229,7 +230,7 @@ public sealed class GNB_Default : GunbreakerRotation
             if (Player.HasStatus(true, StatusID.NoMercy) &&
             AmmoComboStep == 0 &&
                 !GnashingFangPvE.Cooldown.WillHaveOneCharge(1)) return true;
-            
+
             if (!CartridgeChargeIiTrait.EnoughLevel && Ammo == 2) return true;
 
             if (IsLastGCD((ActionID)BrutalShellPvE.ID) &&
@@ -252,5 +253,5 @@ public sealed class GNB_Default : GunbreakerRotation
         }
         return false;
     }
-#endregion
+    #endregion
 }
