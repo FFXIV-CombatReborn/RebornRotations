@@ -53,9 +53,10 @@ public sealed class RPR_Default : ReaperRotation
             if (EnshroudPvE.CanUse(out act)) return true;
         }
 
+        if (SacrificiumPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
+
         if (HasEnshrouded && (Player.HasStatus(true, StatusID.ArcaneCircle) || LemureShroud < 3))
         {
-            if (SacrificiumPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (LemuresScythePvE.CanUse(out act, usedUp: true)) return true;
             if (LemuresSlicePvE.CanUse(out act, usedUp: true)) return true;
         }
@@ -80,10 +81,13 @@ public sealed class RPR_Default : ReaperRotation
     {
         if (SoulsowPvE.CanUse(out act)) return true;
 
+        if (!HasExecutioner && !HasSoulReaver)
+        {
+            if (PerfectioPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        }
+
         if (WhorlOfDeathPvE.CanUse(out act)) return true;
         if (ShadowOfDeathPvE.CanUse(out act)) return true;
-
-        if (PerfectioPvE.CanUse(out act)) return true;
 
         if (HasEnshrouded)
         {
@@ -118,17 +122,30 @@ public sealed class RPR_Default : ReaperRotation
                 }
             }
         }
+        
+        if (HasExecutioner)
+        {
+            if (ExecutionersGuillotinePvE.CanUse(out act)) return true;
+            if (Player.HasStatus(true, StatusID.EnhancedGallows))
+            {
+                if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+            else
+            {
+                if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+        }
 
         if (HasSoulReaver)
         {
             if (GuillotinePvE.CanUse(out act)) return true;
-            if (Player.HasStatus(true, StatusID.EnhancedGibbet))
+            if (Player.HasStatus(true, StatusID.EnhancedGallows))
             {
-                if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
+                if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
             else
             {
-                if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
+                if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
         }
 
