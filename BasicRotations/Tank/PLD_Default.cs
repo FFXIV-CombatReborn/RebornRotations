@@ -14,6 +14,12 @@ public class PLD_Default : PaladinRotation
 
     [RotationConfig(CombatType.PvE, Name = "Use Shield Bash when Low Blow is cooling down")]
     public bool UseShieldBash { get; set; } = true;
+
+    public static bool HasSupplicationReady => Player.HasStatus(true, StatusID.SupplicationReady);
+    public static bool HasSepulchreReady => Player.HasStatus(true, StatusID.SepulchreReady);
+
+    private const ActionID ConfiPvEActionId = (ActionID)16459;
+    private IBaseAction ConfiPvE = new BaseAction(ConfiPvEActionId);
     #endregion
 
     #region Countdown Logic
@@ -112,11 +118,11 @@ public class PLD_Default : PaladinRotation
     {
         if (Player.HasStatus(true, StatusID.Requiescat))
         {
-            if (ConfiteorPvE.CanUse(out act, skipAoeCheck: true))
-            {
-                if (Player.HasStatus(true, StatusID.ConfiteorReady)) return true;
-                if (ConfiteorPvE.ID != ConfiteorPvE.AdjustedID) return true;
-            }
+            if (BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (BladeOfValorPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (BladeOfTruthPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (BladeOfFaithPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (ConfiPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (HolyCirclePvE.CanUse(out act)) return true;
             if (HolySpiritPvE.CanUse(out act)) return true;
         }
@@ -137,6 +143,9 @@ public class PLD_Default : PaladinRotation
         }
         //123
         if (UseShieldBash && ShieldBashPvE.CanUse(out act)) return true;
+
+        if (HasSepulchreReady && SepulchrePvE.CanUse(out act)) return true;
+        if (HasSupplicationReady && SupplicationPvE.CanUse(out act)) return true;
 
         if (RageOfHalonePvE.CanUse(out act)) return true;
         if (RiotBladePvE.CanUse(out act)) return true;
