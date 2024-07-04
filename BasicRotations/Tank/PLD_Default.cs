@@ -117,7 +117,7 @@ public class PLD_Default : PaladinRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
-        if (Player.HasStatus(true, StatusID.Requiescat) && Player.HasStatus(true, StatusID.FightOrFlight))
+        if (Player.HasStatus(true, StatusID.Requiescat))
         {
             if (BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (BladeOfValorPvE.CanUse(out act, skipAoeCheck: true)) return true;
