@@ -81,7 +81,7 @@ public sealed class RPR_Default : ReaperRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
-        if (IsLastAction(true, GluttonyPvE) || Player.HasStatus(true, StatusID.Executioner))
+        if (ExecutionersGuillotinePvE.EnoughLevel && (IsLastAction(true, GluttonyPvE) || Player.HasStatus(true, StatusID.Executioner)))
         {
             return ItsGluttonyTime(out act);
         }
