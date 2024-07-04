@@ -2,7 +2,7 @@ namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Melee/NIN_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class NIN_Default : NinjaRotation
 {
     #region Config Options
@@ -11,6 +11,8 @@ public sealed class NIN_Default : NinjaRotation
     public bool UseHide { get; set; } = true;
     [RotationConfig(CombatType.PvE, Name = "Use Unhide")]
     public bool AutoUnhide { get; set; } = true;
+
+    public bool IsShadowWalking = (Player.HasStatus(true, StatusID.ShadowWalker));
     #endregion
 
     #region CountDown Logic
@@ -20,7 +22,7 @@ public sealed class NIN_Default : NinjaRotation
 
         // Clears ninjutsu setup if countdown is more than 10 seconds or if Huton is the aim but shouldn't be.
         if (remainTime > 10) ClearNinjutsu();
-        var realInHuton = !HutonEndAfterGCD() || IsLastAction(false, HutonPvE);
+        var realInHuton = IsLastAction(false, HutonPvE);
         if (realInHuton && _ninActionAim == HutonPvE) ClearNinjutsu();
 
         // Decision-making for ninjutsu actions based on remaining time until combat starts.
@@ -101,6 +103,12 @@ public sealed class NIN_Default : NinjaRotation
                 return false;
             }
 
+            /*if (HutonPvE.CanUse(out _))
+            {
+                SetNinjutsu(HutonPvE);
+                return false;
+            }*/
+
             if (KatonPvE.CanUse(out _))
             {
                 SetNinjutsu(KatonPvE);
@@ -126,19 +134,6 @@ public sealed class NIN_Default : NinjaRotation
             // Chooses buffs or AoE actions based on combat conditions and cooldowns.
             // For instance, setting Huton for speed buff or choosing AoE Ninjutsu like Katon or Doton based on enemy positioning.
             // Also considers using Suiton for vulnerability debuff on the enemy if conditions are optimal.
-
-            if (!HutonEndAfterGCD() && _ninActionAim?.ID == HutonPvE.ID)
-            {
-                ClearNinjutsu();
-                return false;
-            }
-            if (TenPvE.CanUse(out _, usedUp: true)
-               && (!InCombat) && HutonPvE.CanUse(out _)
-               && !IsLastAction(false, HutonPvE))
-            {
-                SetNinjutsu(HutonPvE);
-                return false;
-            }
 
             //Aoe
             if (KatonPvE.CanUse(out _))
@@ -299,9 +294,6 @@ public sealed class NIN_Default : NinjaRotation
     [RotationDesc(ActionID.ForkedRaijuPvE)]
     protected override bool MoveForwardGCD(out IAction? act)
     {
-        // Initializes the action to null, indicating no action has been chosen yet.
-        act = null;
-
         // Checks if Forked Raiju, a movement-friendly ability, can be used. 
         // If so, sets it as the action to perform, returning true to indicate an action has been selected.
         if (ForkedRaijuPvE.CanUse(out act)) return true;
@@ -328,6 +320,8 @@ public sealed class NIN_Default : NinjaRotation
         // Next, checks if a burst medicine is available and appropriate to use.
         if (UseBurstMedicine(out act)) return true;
 
+        if (TenriJindoPvE.CanUse(out act)) return true;
+
         // If in a burst phase and not just starting combat, checks if Mug is available to generate additional Ninki.
         if (IsBurst && !CombatElapsedLess(5) && MugPvE.CanUse(out act)) return true;
 
@@ -335,7 +329,8 @@ public sealed class NIN_Default : NinjaRotation
         if (!CombatElapsedLess(6))
         {
             // Attempts to use Trick Attack if it's available.
-            if (TrickAttackPvE.CanUse(out act)) return true;
+            if (KunaisBanePvE.CanUse(out act, skipAoeCheck: true, skipStatusProvideCheck: IsShadowWalking)) return true;
+            if (!KunaisBanePvE.EnoughLevel && TrickAttackPvE.CanUse(out act, skipStatusProvideCheck: IsShadowWalking)) return true;
 
             // If Trick Attack is on cooldown but will not be ready soon, considers using Meisui to recover Ninki.
             if (TrickAttackPvE.Cooldown.IsCoolingDown && !TrickAttackPvE.Cooldown.WillHaveOneCharge(19) && MeisuiPvE.CanUse(out act)) return true;
@@ -416,14 +411,16 @@ public sealed class NIN_Default : NinjaRotation
         if (DeathBlossomPvE.CanUse(out act)) return true;
 
         //Single
-        if (ArmorCrushPvE.CanUse(out act)) return true;
+        if (!InTrickAttack && Kazematoi < 5 && ArmorCrushPvE.CanUse(out act)) return true;
         if (AeolianEdgePvE.CanUse(out act)) return true;
         if (GustSlashPvE.CanUse(out act)) return true;
         if (SpinningEdgePvE.CanUse(out act)) return true;
 
         //Range
-
-        if (ThrowingDaggerPvE.CanUse(out act)) return true;
+        if (!Player.HasStatus(true, StatusID.Mudra))
+        {
+            if (ThrowingDaggerPvE.CanUse(out act)) return true;
+        }
 
         if (AutoUnhide)
         {
@@ -452,10 +449,9 @@ public sealed class NIN_Default : NinjaRotation
     // Displays the current status of the rotation, including the aimed ninjutsu action, if any.
     public override void DisplayStatus()
     {
-        if (_ninActionAim != null)
-        {
-            ImGui.Text(_ninActionAim.ToString() + _ninActionAim.AdjustedID.ToString());
-        }
+
+        ImGui.Text(Ninki.ToString());
+
         base.DisplayStatus();
     }
     #endregion
