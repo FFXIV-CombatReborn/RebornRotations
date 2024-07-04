@@ -67,8 +67,9 @@ public class PLD_Default : PaladinRotation
         if (CircleOfScornPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (SpiritsWithinPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-        if (Player.WillStatusEndGCD(6, 0, true, StatusID.FightOrFlight)
-            && RequiescatPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        //if (Player.WillStatusEndGCD(6, 0, true, StatusID.FightOrFlight)
+        //    && RequiescatPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (Player.HasStatus(true, StatusID.FightOrFlight) && RequiescatPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (!IsMoving && IntervenePvE.CanUse(out act, skipAoeCheck: true, usedUp: HasFightOrFlight)) return true;
 
@@ -116,7 +117,7 @@ public class PLD_Default : PaladinRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
-        if (Player.HasStatus(true, StatusID.Requiescat))
+        if (Player.HasStatus(true, StatusID.Requiescat) && Player.HasStatus(true, StatusID.FightOrFlight))
         {
             if (BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (BladeOfValorPvE.CanUse(out act, skipAoeCheck: true)) return true;
