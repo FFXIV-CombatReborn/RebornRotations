@@ -16,12 +16,6 @@ public sealed class GNB_Default : GunbreakerRotation
     }
     #endregion
 
-    #region Config Options
-
-    bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
-
-    #endregion
-
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
@@ -104,6 +98,7 @@ public sealed class GNB_Default : GunbreakerRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
         if (FatedCirclePvE.CanUse(out act)) return true;
         if (CanUseReignOfBeasts(out act)) return true;
         if (CanUseGnashingFang(out act)) return true;
@@ -113,7 +108,10 @@ public sealed class GNB_Default : GunbreakerRotation
 
         if (Player.HasStatus(true, StatusID.NoMercy) && CanUseSonicBreak(out act)) return true;
 
-        if (Player.HasStatus(true, StatusID.NoMercy) && areDDTargetsInRange && CanUseDoubleDown(out act)) return true;
+        if (areDDTargetsInRange)
+        {
+            if (Player.HasStatus(true, StatusID.NoMercy) && CanUseDoubleDown(out act)) return true;
+        }
 
         if (SavageClawPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (WickedTalonPvE.CanUse(out act, skipComboCheck: true)) return true;
