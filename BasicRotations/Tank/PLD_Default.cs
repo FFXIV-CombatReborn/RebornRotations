@@ -17,6 +17,7 @@ public class PLD_Default : PaladinRotation
 
     public static bool HasSupplicationReady => Player.HasStatus(true, StatusID.SupplicationReady);
     public static bool HasSepulchreReady => Player.HasStatus(true, StatusID.SepulchreReady);
+    public static bool HasHonorReady => Player.HasStatus(true, StatusID.BladeOfHonorReady);
 
     private const ActionID ConfiPvEActionId = (ActionID)16459;
     private IBaseAction ConfiPvE = new BaseAction(ConfiPvEActionId);
@@ -117,9 +118,10 @@ public class PLD_Default : PaladinRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        if (HasHonorReady && BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
+
         if (Player.HasStatus(true, StatusID.Requiescat))
         {
-            if (BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (BladeOfValorPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (BladeOfTruthPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (BladeOfFaithPvE.CanUse(out act, skipAoeCheck: true)) return true;
