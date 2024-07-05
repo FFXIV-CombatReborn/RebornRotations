@@ -1,11 +1,16 @@
 namespace DefaultRotations.Healer;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.0")]
 [SourceCode(Path = "main/DefaultRotations/Healer/AST_Default.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class AST_Default : AstrologianRotation
-{/*
+{
     #region Config Options
+
+
+    private const ActionID LoCPvEActionId = (ActionID)7444;
+    private IBaseAction LoCPvE = new BaseAction(LoCPvEActionId);
+
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
 
@@ -31,7 +36,7 @@ public sealed class AST_Default : AstrologianRotation
         if (remainTime is < 4 and > 3 && AspectedBeneficPvE.CanUse(out act)) return act;
         if (remainTime < UseEarthlyStarTime
             && EarthlyStarPvE.CanUse(out act)) return act;
-        if (remainTime < 30 && DrawPvE.CanUse(out act)) return act;
+        if (remainTime < 30 && AstralDrawPvE.CanUse(out act)) return act;
 
         return base.CountDownAction(remainTime);
     }
@@ -41,7 +46,7 @@ public sealed class AST_Default : AstrologianRotation
     [RotationDesc(ActionID.CelestialIntersectionPvE, ActionID.ExaltationPvE)]
     protected override bool DefenseSingleAbility(IAction nextGCD, out IAction? act)
     {
-        if (CelestialIntersectionPvE.CanUse(out act, usedUp:true)) return true;
+        if (CelestialIntersectionPvE.CanUse(out act, usedUp: true)) return true;
         if (ExaltationPvE.CanUse(out act)) return true;
         return base.DefenseSingleAbility(nextGCD, out act);
     }
@@ -77,6 +82,7 @@ public sealed class AST_Default : AstrologianRotation
         if (CombustPvE.CanUse(out act)) return true;
         if (MaleficPvE.CanUse(out act)) return true;
         if (CombustPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+
 
         return base.GeneralGCD(out act);
     }
@@ -125,8 +131,7 @@ public sealed class AST_Default : AstrologianRotation
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
-        if (DrawPvE.CanUse(out act)) return true;
-        if (RedrawPvE.CanUse(out act)) return true;
+        //if (RedrawPvE.CanUse(out act)) return true;
         return base.GeneralAbility(nextGCD, out act);
     }
 
@@ -135,9 +140,15 @@ public sealed class AST_Default : AstrologianRotation
         if (IsBurst && !IsMoving
             && DivinationPvE.CanUse(out act)) return true;
 
-        if (MinorArcanaPvE.CanUse(out act, usedUp:true)) return true;
+        //if (MinorArcanaPvE.CanUse(out act, usedUp:true)) return true;
+        //if (LadyOfCrownsPvE.CanUse(out act, usedUp: true)) return true;
+        //if (LordOfCrownsPvE.CanUse(out act, usedUp: true)) return true;
 
-        if (DrawPvE.CanUse(out act, usedUp: IsBurst)) return true;
+        //Umbral Draw
+        if ((AstralDrawPvE.AdjustedID == 37018) && (AstralDrawPvE.CanUse(out act, usedUp: IsBurst))) return true;
+
+        //Astral Draw
+        if ((AstralDrawPvE.AdjustedID == 37017) && (AstralDrawPvE.CanUse(out act, usedUp: IsBurst))) return true;
 
         if (InCombat)
         {
@@ -149,17 +160,40 @@ public sealed class AST_Default : AstrologianRotation
                 {
                     if (EarthlyStarPvE.CanUse(out act)) return true;
                 }
-                if (AstrodynePvE.CanUse(out act)) return true;
+                //if (AstrodynePvE.CanUse(out act)) return true;
             }
 
-            if (DrawnCrownCard == CardType.LORD || MinorArcanaPvE.Cooldown.WillHaveOneChargeGCD(1, 0))
+            //LordoC 7444 and LadyoC 7445
+            if ((MinorArcanaPvE.AdjustedID == 7444) || MinorArcanaPvE.Cooldown.WillHaveOneChargeGCD(1, 0))
             {
-                if (MinorArcanaPvE.CanUse(out act)) return true;
+                if ((MinorArcanaPvE.AdjustedID != 37022) && MinorArcanaPvE.CanUse(out act, usedUp: true)) return true;
             }
         }
 
-        if (RedrawPvE.CanUse(out act)) return true;
-        if (InCombat && PlayCard(out act)) return true;
+        //if (RedrawPvE.CanUse(out act)) return true;
+        //if (InCombat && PlayCard(out act)) return true;
+
+        //Play1 37019 Orig - Play2 37020 Orig - Play3 37021 Orig
+
+        //Play1 37023 Balance - Play2 37024 Arrow - Play3 37025 Spear
+
+        //Play1 37026 Spear - Play2 37027 Bole - Play3 37028 Ewer
+
+        if (PlayIPvE.AdjustedID != 37019)
+        {
+            if (InCombat && PlayIPvE.CanUse(out act)) return true;
+        }
+
+        if (PlayIiPvE.AdjustedID != 37020)
+        {
+            if (InCombat && PlayIiPvE.CanUse(out act)) return true;
+        }
+
+        if (PlayIiiPvE.AdjustedID != 37021)
+        {
+            if (InCombat && PlayIiiPvE.CanUse(out act)) return true;
+        }
+
 
         return base.AttackAbility(nextGCD, out act);
     }
@@ -169,10 +203,14 @@ public sealed class AST_Default : AstrologianRotation
     protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
     {
         if (EssentialDignityPvE.CanUse(out act)) return true;
-        if (CelestialIntersectionPvE.CanUse(out act, usedUp:true)) return true;
+        if (CelestialIntersectionPvE.CanUse(out act, usedUp: true)) return true;
 
-        if (DrawnCrownCard == CardType.LADY 
-            && MinorArcanaPvE.CanUse(out act)) return true;
+        // LadyoC 7445
+        if ((MinorArcanaPvE.AdjustedID == 7445))
+        {
+            if ((MinorArcanaPvE.AdjustedID != 37022) && MinorArcanaPvE.CanUse(out act, usedUp: true)) return true;
+        };
+
 
         if (CelestialOppositionPvE.CanUse(out act)) return true;
 
@@ -204,7 +242,13 @@ public sealed class AST_Default : AstrologianRotation
 
         if (Player.HasStatus(true, StatusID.HoroscopeHelios) && HoroscopePvE.CanUse(out act)) return true;
 
-        if (DrawnCrownCard == CardType.LADY && MinorArcanaPvE.CanUse(out act)) return true;
+        //LadyoC 7445
+        if ((MinorArcanaPvE.AdjustedID == 7445))
+        {
+            if ((MinorArcanaPvE.AdjustedID != 37022) && MinorArcanaPvE.CanUse(out act, usedUp: true)) return true;
+        };
+
+
 
         return base.HealAreaAbility(nextGCD, out act);
     }
@@ -215,4 +259,4 @@ public sealed class AST_Default : AstrologianRotation
     public override bool CanHealAreaSpell => base.CanHealAreaSpell && (GCDHeal || PartyMembers.GetJobCategory(JobRole.Healer).Count() < 2);
 
     #endregion
-*/}
+}
