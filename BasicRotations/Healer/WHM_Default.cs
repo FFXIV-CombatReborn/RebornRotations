@@ -87,6 +87,7 @@ public sealed class WHM_Default :WhiteMageRotation
     [RotationDesc(ActionID.AsylumPvE)]
     protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
     {
+        if (DivineCaressPvE.CanUse(out act)) return true;
         if (AsylumPvE.CanUse(out act)) return true;
         return base.HealAreaAbility(nextGCD, out act);
     }
@@ -101,7 +102,7 @@ public sealed class WHM_Default :WhiteMageRotation
 
         if (DivineBenisonPvE.CanUse(out act)) return true;
 
-        if (TetragrammatonPvE.CanUse(out act)) return true;
+        if (TetragrammatonPvE.CanUse(out act, usedUp: true)) return true;
         return base.HealSingleAbility(nextGCD, out act);
     }
 
@@ -161,6 +162,8 @@ public sealed class WHM_Default :WhiteMageRotation
         {
             if (UseLily(out act)) return true;
         }
+
+        if (GlareIvPvE.CanUse(out act)) return true;
 
         if (HolyPvE.CanUse(out act)) return true;
 
