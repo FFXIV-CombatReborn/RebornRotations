@@ -1,5 +1,3 @@
-using RotationSolver.Basic.Data;
-
 namespace DefaultRotations.Tank;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
@@ -98,9 +96,20 @@ public sealed class GNB_Default : GunbreakerRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        bool IsReadyToReign = (Player.HasStatus(true, StatusID.ReadyToReign));
         bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
+
+        if (LionHeartPvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (NobleBloodPvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (IsReadyToReign)
+        {
+            if (ReignOfBeastsPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        }
+
         if (FatedCirclePvE.CanUse(out act)) return true;
-        if (CanUseReignOfBeasts(out act)) return true;
+
         if (CanUseGnashingFang(out act)) return true;
 
         if (DemonSlaughterPvE.CanUse(out act)) return true;
@@ -153,18 +162,6 @@ public sealed class GNB_Default : GunbreakerRotation
     //    act = null;
     //    return false;
     //}
-
-    private bool CanUseReignOfBeasts(out IAction? act)
-    {
-        if (ReignOfBeastsPvE.CanUse(out act))
-        {
-            if (DemonSlicePvE.CanUse(out _)) return true;
-
-            if (Player.HasStatus(true, StatusID.ReadyToReign)) return true;
-
-        }
-        return false;
-    }
 
     private bool CanUseGnashingFang(out IAction? act)
     {
