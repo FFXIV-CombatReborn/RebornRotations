@@ -100,7 +100,7 @@ public sealed class GNB_Default : GunbreakerRotation
     {
         bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
         if (FatedCirclePvE.CanUse(out act)) return true;
-        if (CanUseReignOfBeasts(out act)) return true;
+        if (CanUseReignOfBeastsComboChain(out act)) return true;
         if (CanUseGnashingFang(out act)) return true;
 
         if (DemonSlaughterPvE.CanUse(out act)) return true;
@@ -154,15 +154,13 @@ public sealed class GNB_Default : GunbreakerRotation
     //    return false;
     //}
 
-    private bool CanUseReignOfBeasts(out IAction? act)
+    private bool CanUseReignOfBeastsComboChain(out IAction? act)
     {
-        if (ReignOfBeastsPvE.CanUse(out act))
-        {
-            if (DemonSlicePvE.CanUse(out _)) return true;
+        bool IsReadyToReign = (Player.HasStatus(true, StatusID.ReadyToReign));
 
-            if (Player.HasStatus(true, StatusID.ReadyToReign)) return true;
-
-        }
+        if (LionHeartPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (NobleBloodPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (ReignOfBeastsPvE.CanUse(out act, skipAoeCheck: true, skipStatusProvideCheck: IsReadyToReign)) return true;
         return false;
     }
 
