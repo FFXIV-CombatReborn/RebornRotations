@@ -87,7 +87,6 @@ public sealed class RDM_Default : RedMageRotation
 
     protected override bool EmergencyGCD(out IAction? act)
     {
-        if (IsMoving && RangedSwordplay && ReprisePvE.CanUse(out act)) return true;
         
         if (ManaStacks == 3)
         {
@@ -125,6 +124,8 @@ public sealed class RDM_Default : RedMageRotation
             if ((BlackMana >= 50 && WhiteMana >= 50 || Player.HasStatus(true, StatusID.MagickedSwordplay)) && RipostePvE.CanUse(out act)) return true;
         }
         if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
+        
+        if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
 
         return base.EmergencyGCD(out act);
     }
