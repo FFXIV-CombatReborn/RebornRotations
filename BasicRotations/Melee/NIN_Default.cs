@@ -411,7 +411,7 @@ public sealed class NIN_Default : NinjaRotation
         if (DeathBlossomPvE.CanUse(out act)) return true;
 
         //Single
-        if (!InTrickAttack && Kazematoi < 5 && ArmorCrushPvE.CanUse(out act)) return true;
+        //if (!InTrickAttack && Kazematoi < 5 && ArmorCrushPvE.CanUse(out act)) return true;
         if (AeolianEdgePvE.CanUse(out act)) return true;
         if (GustSlashPvE.CanUse(out act)) return true;
         if (SpinningEdgePvE.CanUse(out act)) return true;
