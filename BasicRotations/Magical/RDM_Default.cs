@@ -40,12 +40,13 @@ public sealed class RDM_Default : RedMageRotation
         
         act = null;
         if (CombatElapsedLess(4)) return false;
-        if (AnyonesMeleeRule)
+        if (!AnyonesMeleeRule)
         {
-            if (IsBurst && AnyoneInRange && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (IsBurst && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         }
-        if (IsBurst && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        
+        if (IsBurst && AnyoneInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         //Use Manafication after embolden.
         if ((Player.HasStatus(true, StatusID.Embolden) || IsLastAbility(ActionID.EmboldenPvE))
