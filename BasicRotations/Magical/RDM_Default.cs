@@ -71,6 +71,8 @@ public sealed class RDM_Default : RedMageRotation
         if (IsBurst && UseBurstMedicine(out act)) return true;
 
         //Attack abilities.
+        if (ViceOfThornsPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (PrefulgencePvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ContreSixtePvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (FlechePvE.CanUse(out act)) return true;
 
@@ -82,6 +84,7 @@ public sealed class RDM_Default : RedMageRotation
     #endregion
 
     #region GCD Logic
+
     protected override bool EmergencyGCD(out IAction? act)
     {
         if (ManaStacks == 3)
@@ -90,12 +93,20 @@ public sealed class RDM_Default : RedMageRotation
             {
                 if (VerholyPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
+
             if (VerflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        if (ResolutionPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (ScorchPvE.CanUse(out act, skipAoeCheck: true)) return true;
-
+        // Hardcode Resolution & Scorch to avoid double melee without finishers
+        if (IsLastGCD(ActionID.ScorchPvE))
+        {
+            if (ResolutionPvE.CanUse(out act, skipStatusProvideCheck: true, skipAoeCheck: true)) return true;
+        }
+        
+        if (IsLastGCD(ActionID.VerholyPvE, ActionID.VerflarePvE))
+        {
+            if (ScorchPvE.CanUse(out act, skipStatusProvideCheck: true, skipAoeCheck: true)) return true;
+        }
 
         if (IsLastGCD(true, MoulinetPvE) && MoulinetPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ZwerchhauPvE.CanUse(out act)) return true;
@@ -105,7 +116,7 @@ public sealed class RDM_Default : RedMageRotation
 
         if (MoulinetPvE.CanUse(out act))
         {
-            if (BlackMana >= 60 && WhiteMana >= 60 || Player.HasStatus(true, StatusID.MagickedSwordplay)) return true;
+            if (BlackMana >= 50 && WhiteMana >= 50 || Player.HasStatus(true, StatusID.MagickedSwordplay)) return true;
         }
         else
         {
@@ -120,7 +131,9 @@ public sealed class RDM_Default : RedMageRotation
     {
         act = null;
         if (ManaStacks == 3) return false;
-
+        
+        if (GrandImpactPvE.CanUse(out act)) return true;
+        
         if (!VerthunderIiPvE.CanUse(out _))
         {
             if (VerfirePvE.CanUse(out act)) return true;
@@ -128,6 +141,7 @@ public sealed class RDM_Default : RedMageRotation
         }
 
         if (ScatterPvE.CanUse(out act)) return true;
+        
         if (WhiteMana < BlackMana)
         {
             if (VeraeroIiPvE.CanUse(out act) && BlackMana - WhiteMana != 5) return true;
