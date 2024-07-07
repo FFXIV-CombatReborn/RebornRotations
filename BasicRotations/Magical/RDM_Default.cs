@@ -87,6 +87,8 @@ public sealed class RDM_Default : RedMageRotation
 
     protected override bool EmergencyGCD(out IAction? act)
     {
+        if (IsMoving && RangedSwordplay && ReprisePvE.CanUse(out act)) return true;
+        
         if (ManaStacks == 3)
         {
             if (BlackMana > WhiteMana)
@@ -151,8 +153,6 @@ public sealed class RDM_Default : RedMageRotation
         if (VerthunderPvE.CanUse(out act)) return true;
 
         if (JoltPvE.CanUse(out act)) return true;
-
-        if (IsMoving && RangedSwordplay && ReprisePvE.CanUse(out act)) return true;
 
         if (UseVercure && NotInCombatDelay && VercurePvE.CanUse(out act)) return true;
 
