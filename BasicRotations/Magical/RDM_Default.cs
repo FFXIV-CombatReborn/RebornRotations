@@ -10,6 +10,9 @@ public sealed class RDM_Default : RedMageRotation
 
     [RotationConfig(CombatType.PvE, Name = "Use Vercure for Dualcast when out of combat.")]
     public bool UseVercure { get; set; }
+    
+    [RotationConfig(CombatType.PvE, Name = "Cast Reprise when moving with no instacast.")]
+    public bool RangedSwordplay { get; set; } = false;
     #endregion
 
     #region Countdown Logic
@@ -92,11 +95,11 @@ public sealed class RDM_Default : RedMageRotation
 
         if (MoulinetPvE.CanUse(out act))
         {
-            if (BlackMana >= 60 && WhiteMana >= 60) return true;
+            if (BlackMana >= 60 && WhiteMana >= 60 || Player.HasStatus(true, StatusID.MagickedSwordplay)) return true;
         }
         else
         {
-            if (BlackMana >= 50 && WhiteMana >= 50 && RipostePvE.CanUse(out act)) return true;
+            if ((BlackMana >= 50 && WhiteMana >= 50 || Player.HasStatus(true, StatusID.MagickedSwordplay)) && RipostePvE.CanUse(out act)) return true;
         }
         if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
 
@@ -125,6 +128,8 @@ public sealed class RDM_Default : RedMageRotation
 
         if (JoltPvE.CanUse(out act)) return true;
 
+        if (IsMoving && RangedSwordplay && ReprisePvE.CanUse(out act)) return true;
+
         if (UseVercure && NotInCombatDelay && VercurePvE.CanUse(out act)) return true;
 
         return base.GeneralGCD(out act);
@@ -136,7 +141,7 @@ public sealed class RDM_Default : RedMageRotation
     {
         get
         {
-            if (Player.HasStatus(true, StatusID.Manafication, StatusID.Embolden) ||
+            if (Player.HasStatus(true, StatusID.Manafication, StatusID.Embolden, StatusID.MagickedSwordplay) ||
                              BlackMana == 100 || WhiteMana == 100) return true;
 
             if (BlackMana == WhiteMana) return false;
