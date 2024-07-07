@@ -122,9 +122,9 @@ public class PLD_Default : PaladinRotation
 
         if (Player.HasStatus(true, StatusID.Requiescat))
         {
-            if (BladeOfValorPvE.CanUse(out act, skipAoeCheck: true)) return true;
-            if (BladeOfTruthPvE.CanUse(out act, skipAoeCheck: true)) return true;
-            if (BladeOfFaithPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (BladeOfFaithPvE.EnoughLevel && BladeOfValorPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (BladeOfFaithPvE.EnoughLevel && BladeOfTruthPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (BladeOfFaithPvE.EnoughLevel && BladeOfFaithPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (ConfiPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (HolyCirclePvE.CanUse(out act)) return true;
             if (HolySpiritPvE.CanUse(out act)) return true;
