@@ -13,6 +13,9 @@ public sealed class RDM_Default : RedMageRotation
     
     [RotationConfig(CombatType.PvE, Name = "Cast Reprise when moving with no instacast.")]
     public bool RangedSwordplay { get; set; } = false;
+    
+    [RotationConfig(CombatType.PvE, Name = "DO NOT CAST EMBOLDEN/MANAFICATION OUTSIDE OF MELEE RANGE, I'M SERIOUS YOU HAVE TO MOVE UP FOR IT TO WORK IF THIS IS ON.")]
+    public bool AnyonesMeleeRule { get; set; } = false;
     #endregion
 
     #region Countdown Logic
@@ -33,9 +36,15 @@ public sealed class RDM_Default : RedMageRotation
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        bool AnyoneInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() <= 4);
+        
         act = null;
         if (CombatElapsedLess(4)) return false;
+        if (AnyonesMeleeRule)
+        {
+            if (IsBurst && AnyoneInRange && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
+        }
         if (IsBurst && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         //Use Manafication after embolden.
