@@ -49,7 +49,7 @@ public sealed class RDM_Default : RedMageRotation
         if (IsBurst && AnyoneInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         //Use Manafication after embolden.
-        if ((Player.HasStatus(true, StatusID.Embolden) || IsLastAbility(ActionID.EmboldenPvE))
+        if ((Player.HasStatus(true, StatusID.Embolden, StatusID.Embolden_1297, StatusID.Embolden_2282) || IsLastAbility(ActionID.EmboldenPvE))
             && ManaficationPvE.CanUse(out act)) return true;
 
         return base.EmergencyAbility(nextGCD, out act);
