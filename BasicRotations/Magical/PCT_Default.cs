@@ -136,7 +136,7 @@ public sealed class PCT_Default : PictomancerRotation
 
             //123
             if (ThunderInMagentaPvE.CanUse(out act)) return true;
-            if (StoneInYellowPvE.CanUse((out act)) return true;
+            if (StoneInYellowPvE.CanUse(out act)) return true;
             if (BlizzardInCyanPvE.CanUse(out act)) return true;
 
         }
