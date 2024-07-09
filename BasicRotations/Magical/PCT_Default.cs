@@ -130,28 +130,28 @@ public sealed class PCT_Default : PictomancerRotation
         if (Player.HasStatus(true, StatusID.SubtractivePalette))
         {
             //AOE
-            if (ThunderIiInMagentaPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (StoneIiInYellowPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (BlizzardIiInCyanPvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (ThunderIiInMagentaPvE.CanUse(out act)) return true;
+            if (StoneIiInYellowPvE.CanUse(out act)) return true;
+            if (BlizzardIiInCyanPvE.CanUse(out act)) return true;
 
             //123
-            if (ThunderInMagentaPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (StoneInYellowPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (BlizzardInCyanPvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (ThunderInMagentaPvE.CanUse(out act)) return true;
+            if (StoneInYellowPvE.CanUse((out act)) return true;
+            if (BlizzardInCyanPvE.CanUse(out act)) return true;
 
         }
         else
         {
             if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
             //AOE
-            if (WaterIiInBluePvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (AeroIiInGreenPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (FireIiInRedPvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (WaterIiInBluePvE.CanUse(out act)) return true;
+            if (AeroIiInGreenPvE.CanUse(out act)) return true;
+            if (FireIiInRedPvE.CanUse(out act)) return true;
 
             //123
-            if (WaterInBluePvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (AeroInGreenPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (FireInRedPvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (WaterInBluePvE.CanUse(out act)) return true;
+            if (AeroInGreenPvE.CanUse(out act)) return true;
+            if (FireInRedPvE.CanUse(out act)) return true;
         }
 
 
