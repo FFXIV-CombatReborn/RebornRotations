@@ -142,6 +142,7 @@ public sealed class PCT_Default : PictomancerRotation
         }
         else
         {
+            if (Player.HasStatus(true, StatusID.MonochromeTones) && CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
             if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
             //AOE
             if (WaterIiInBluePvE.CanUse(out act)) return true;
