@@ -103,14 +103,14 @@ public sealed class SMN_Default : SummonerRotation
 		bool TargetIsBossAndDying = IsTargetBoss && IsTargetDying;
 		bool elapsedChargesAfterGCDSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD();
 		bool elapsedChargesAfterGCDNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD();
-		bool elapsed2ChargesAfterGCDSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2);
-		bool elapsed2ChargesAfterGCDNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2);
+		bool elapsed1ChargesAfterGCDSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
+		bool elapsed1ChargesAfterGCDNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
 		//bool elapsed3ChargesAfterGcdSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
 		//bool elapsed3ChargesAfterGcdNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
+		bool elapsed3ChargesAfterGcdNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
+		bool elapsed3ChargesAfterGcdSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
 		bool elapsed4ChargesAfterGcdNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4);
 		bool elapsed4ChargesAfterGcdSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4);
-		bool elapsed5ChargesAfterGcdNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(5);
-		bool elapsed5ChargesAfterGcdSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(5);
 
 		// Adding tincture timing to rotations
 		if (InBahamut || InSolarBahamut && UseMedicine && !Player.HasStatus(false, StatusID.SearingLight) && elapsedChargesAfterGCDNormalBaha || elapsedChargesAfterGCDSolar)
@@ -118,29 +118,29 @@ public sealed class SMN_Default : SummonerRotation
 			if (UseBurstMedicine(out act)) return true;
 		}
 
-		if (!Player.HasStatus(false, StatusID.SearingLight) && InBahamut || InSolarBahamut && elapsed2ChargesAfterGCDSolar || elapsed2ChargesAfterGCDNormalBaha)
+		if (!Player.HasStatus(false, StatusID.SearingLight) && InBahamut || InSolarBahamut && elapsed1ChargesAfterGCDSolar || elapsed1ChargesAfterGCDNormalBaha)
 		{
 			if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
 		}
 
 
-		if ((InBahamut || InSolarBahamut || InPhoenix) && (elapsed2ChargesAfterGCDSolar || elapsed2ChargesAfterGCDNormalBaha || TargetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
-		if ((InBahamut || InSolarBahamut || InPhoenix) && (elapsed2ChargesAfterGCDSolar || elapsed2ChargesAfterGCDNormalBaha || TargetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
-		if (InBahamut && (elapsed4ChargesAfterGcdNormalBaha || InPhoenix || TargetIsBossAndDying) && EnkindleBahamutPvE.CanUse(out act)) return true;
-		if (InSolarBahamut && (elapsed4ChargesAfterGcdSolar || TargetIsBossAndDying) && EnkindleSolarBahamutPvE.CanUse(out act)) return true;
+		if ((InBahamut || InSolarBahamut || InPhoenix) && (elapsed1ChargesAfterGCDSolar || elapsed1ChargesAfterGCDNormalBaha || TargetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
+		if ((InBahamut || InSolarBahamut || InPhoenix) && (elapsed1ChargesAfterGCDSolar || elapsed1ChargesAfterGCDNormalBaha || TargetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
+		if (InBahamut && (elapsed3ChargesAfterGcdNormalBaha || InPhoenix || TargetIsBossAndDying) && EnkindleBahamutPvE.CanUse(out act)) return true;
+		if (InSolarBahamut && (elapsed3ChargesAfterGcdSolar || TargetIsBossAndDying) && EnkindleSolarBahamutPvE.CanUse(out act)) return true;
 		if (InPhoenix && (SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || TargetIsBossAndDying) && EnkindlePhoenixPvE.CanUse(out act)) return true;
-		if (InBahamut && (elapsed4ChargesAfterGcdNormalBaha || TargetIsBossAndDying) && DeathflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
-		if (InSolarBahamut && (elapsed4ChargesAfterGcdSolar || TargetIsBossAndDying) && SunflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+		if (InBahamut && (elapsed3ChargesAfterGcdNormalBaha || TargetIsBossAndDying) && DeathflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+		if (InSolarBahamut && (elapsed3ChargesAfterGcdSolar || TargetIsBossAndDying) && SunflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
 		if (RekindlePvE.CanUse(out act, skipAoeCheck: true)) return true;
 		if (MountainBusterPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-		if ((Player.HasStatus(false, StatusID.SearingLight) && InBahamut || InSolarBahamut && ((elapsed5ChargesAfterGcdSolar || elapsed5ChargesAfterGcdNormalBaha) || !EnergyDrainPvE.Cooldown.IsCoolingDown) || EnergyDrainPvE.Cooldown.RecastTimeRemainOneCharge < 5 || !SearingLightPvE.EnoughLevel || IsTargetBoss && IsTargetDying) && PainflarePvE.CanUse(out act)) return true;
+		if ((Player.HasStatus(false, StatusID.SearingLight) && InBahamut || InSolarBahamut && ((elapsed4ChargesAfterGcdSolar || elapsed4ChargesAfterGcdNormalBaha) || !EnergyDrainPvE.Cooldown.IsCoolingDown) || EnergyDrainPvE.Cooldown.RecastTimeRemainOneCharge < 5 || !SearingLightPvE.EnoughLevel || IsTargetBoss && IsTargetDying) && PainflarePvE.CanUse(out act)) return true;
 
-		if ((InBahamut || InSolarBahamut && Player.HasStatus(false, StatusID.SearingLight) && ((elapsed5ChargesAfterGcdSolar || elapsed5ChargesAfterGcdNormalBaha) || !EnergyDrainPvE.Cooldown.IsCoolingDown) || !SearingLightPvE.EnoughLevel || IsTargetBoss && IsTargetDying) && FesterPvE.CanUse(out act) || NecrotizePvE.CanUse(out act)) return true;
+		if ((InBahamut || InSolarBahamut && Player.HasStatus(false, StatusID.SearingLight) && ((elapsed4ChargesAfterGcdSolar || elapsed4ChargesAfterGcdNormalBaha) || !EnergyDrainPvE.Cooldown.IsCoolingDown) || !SearingLightPvE.EnoughLevel || IsTargetBoss && IsTargetDying) && FesterPvE.CanUse(out act) || NecrotizePvE.CanUse(out act)) return true;
 
 
-		if ((elapsed5ChargesAfterGcdSolar || TargetIsBossAndDying) && SearingFlashPvE.CanUse(out act, skipAoeCheck: true)) return true;
+		if ((elapsed4ChargesAfterGcdSolar || TargetIsBossAndDying) && SearingFlashPvE.CanUse(out act, skipAoeCheck: true)) return true;
 		if (DoesAnyPlayerNeedHeal() && (!InBahamut || !InSolarBahamut) && LuxSolarisPvE.CanUse(out act)) return true;
 
 		return base.AttackAbility(nextGCD, out act);
