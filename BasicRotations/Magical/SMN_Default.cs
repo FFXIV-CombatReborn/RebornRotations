@@ -9,13 +9,6 @@ public sealed class SMN_Default : SummonerRotation
 {
 
 	#region Config Options
-	public enum SwiftType : byte
-	{
-		No,
-		Emerald,
-		Ruby,
-		All
-	}
 
 	public enum SummonOrderType : byte
 	{
@@ -32,17 +25,15 @@ public sealed class SMN_Default : SummonerRotation
 	[RotationConfig(CombatType.PvE, Name = "Use Crimson Cyclone. Even When MOVING")]
 	public bool AddCrimsonCycloneMoving { get; set; } = false;
 
-	// [RotationConfig(CombatType.PvE, Name = "Use Swiftcast")]
-	// public SwiftType AddSwiftcast { get; set; } = SwiftType.No;
+	[RotationConfig(CombatType.PvE, Name = "Use Swiftcast on Garuda")]
+	public bool AddSwiftcastOnGaruda { get; set; } = false;
 
 	[RotationConfig(CombatType.PvE, Name = "Order")]
 	public SummonOrderType SummonOrder { get; set; } = SummonOrderType.TopazEmeraldRuby;
 
 	[RotationConfig(CombatType.PvE, Name = "Use radiant on cooldown. But still keeping one charge")]
 	public bool RadiantOnCooldown { get; set; } = true;
-
-	[RotationConfig(CombatType.PvE, Name = "Use medicine when available on burst -- need some test --")]
-	public bool UseMedicine { get; set; } = false;
+	
 	#endregion
 
 
@@ -70,90 +61,68 @@ public sealed class SMN_Default : SummonerRotation
 	#region oGCD Logic
 	protected override bool AttackAbility(IAction nextGCD, out IAction? act)
 	{
-		// switch (AddSwiftcast)
-		// {
-		// case SwiftType.Emerald:
-		//     if (InGaruda && Player.Level > 86)
-		//     {
-		//         if (SwiftcastPvE.CanUse(out act)) return true;
-		//     }
-		//     break;
-		// case SwiftType.Ruby:
-		//     if (InIfrit)
-		//     {
-		//         if (SwiftcastPvE.CanUse(out act)) return true;
-		//     }
-		//     break;
-		// case SwiftType.All:
-		//     if (InGaruda && Player.Level > 86 || InIfrit)
-		//     {
-		//         if (SwiftcastPvE.CanUse(out act)) return true;
-		//     }
-		//     break;
-		// case SwiftType.No:
-		//     break;
-		// }
-
-		if (RadiantOnCooldown && RadiantAegisPvE.Cooldown.CurrentCharges == 2 && (SummonBahamutPvE.Cooldown.IsCoolingDown && Player.Level < 100 || SummonSolarBahamutPvE.Cooldown.IsCoolingDown && Player.Level <= 100) && RadiantAegisPvE.CanUse(out act)) return true;
-		if (RadiantOnCooldown && Player.Level < 88 && SummonBahamutPvE.Cooldown.IsCoolingDown && RadiantAegisPvE.CanUse(out act, false, false, false, true)) return true;
-
-
-		bool IsTargetBoss = HostileTarget?.IsBossFromTTK() ?? false;
-		bool IsTargetDying = HostileTarget?.IsDying() ?? false;
-		bool TargetIsBossAndDying = IsTargetBoss && IsTargetDying;
-		bool elapsedChargesAfterGCDSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD();
-		bool elapsedChargesAfterGCDNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD();
-		bool elapsed1ChargesAfterGCDSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
-		bool elapsed1ChargesAfterGCDNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
-		//bool elapsed3ChargesAfterGcdSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
-		//bool elapsed3ChargesAfterGcdNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
-		bool elapsed3ChargesAfterGcdNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
-		bool elapsed3ChargesAfterGcdSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
-		bool elapsed4ChargesAfterGcdNormalBaha = SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4);
-		bool elapsed4ChargesAfterGcdSolar = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4);
-
-		// Adding tincture timing to rotations
-		if (InBahamut || InSolarBahamut && UseMedicine && !Player.HasStatus(false, StatusID.SearingLight) && elapsedChargesAfterGCDNormalBaha || elapsedChargesAfterGCDSolar)
-		{
-			if (UseBurstMedicine(out act)) return true;
-		}
-
-		if (!Player.HasStatus(false, StatusID.SearingLight) && InBahamut || InSolarBahamut && elapsed1ChargesAfterGCDSolar || elapsed1ChargesAfterGCDNormalBaha)
-		{
-			if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
-		}
-
-
-		if ((InBahamut || InSolarBahamut || InPhoenix) && (elapsed1ChargesAfterGCDSolar || elapsed1ChargesAfterGCDNormalBaha || TargetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
-		if ((InBahamut || InSolarBahamut || InPhoenix) && (elapsed1ChargesAfterGCDSolar || elapsed1ChargesAfterGCDNormalBaha || TargetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
-		if (InBahamut && (elapsed3ChargesAfterGcdNormalBaha || InPhoenix || TargetIsBossAndDying) && EnkindleBahamutPvE.CanUse(out act)) return true;
-		if (InSolarBahamut && (elapsed3ChargesAfterGcdSolar || TargetIsBossAndDying) && EnkindleSolarBahamutPvE.CanUse(out act)) return true;
-		if (InPhoenix && (SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || TargetIsBossAndDying) && EnkindlePhoenixPvE.CanUse(out act)) return true;
-		if (InBahamut && (elapsed3ChargesAfterGcdNormalBaha || TargetIsBossAndDying) && DeathflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
-		if (InSolarBahamut && (elapsed3ChargesAfterGcdSolar || TargetIsBossAndDying) && SunflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+		bool isTargetBoss = HostileTarget?.IsBossFromTTK() ?? false;
+		bool isTargetDying = HostileTarget?.IsDying() ?? false;
+		bool targetIsBossAndDying = isTargetBoss && isTargetDying;
+		bool inBigInvocation = InBahamut || InPhoenix || InSolarBahamut;
+		bool elapsedChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
+		bool elapsed1ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
+		bool elapsed2ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(2);
+		bool elapsed3ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
+		bool elapsed4ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(4);
+		
+		if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
+		if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
+		if (inBigInvocation && (elapsed3ChargeAfterInvocation || targetIsBossAndDying) && EnkindleBahamutPvE.CanUse(out act)) return true;
+		if (inBigInvocation && (elapsed3ChargeAfterInvocation || targetIsBossAndDying) && EnkindleSolarBahamutPvE.CanUse(out act)) return true;
+		if (inBigInvocation && (elapsed2ChargeAfterInvocation || targetIsBossAndDying) && EnkindlePhoenixPvE.CanUse(out act)) return true;
+		if (inBigInvocation && (elapsed3ChargeAfterInvocation || targetIsBossAndDying) && DeathflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+		if (inBigInvocation && (elapsed3ChargeAfterInvocation || targetIsBossAndDying) && SunflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
 		if (RekindlePvE.CanUse(out act, skipAoeCheck: true)) return true;
 		if (MountainBusterPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-		if ((Player.HasStatus(false, StatusID.SearingLight) && InBahamut || InSolarBahamut && ((elapsed4ChargesAfterGcdSolar || elapsed4ChargesAfterGcdNormalBaha) || !EnergyDrainPvE.Cooldown.IsCoolingDown) || EnergyDrainPvE.Cooldown.RecastTimeRemainOneCharge < 5 || !SearingLightPvE.EnoughLevel || IsTargetBoss && IsTargetDying) && PainflarePvE.CanUse(out act)) return true;
-
-		if ((InBahamut || InSolarBahamut && Player.HasStatus(false, StatusID.SearingLight) && ((elapsed4ChargesAfterGcdSolar || elapsed4ChargesAfterGcdNormalBaha) || !EnergyDrainPvE.Cooldown.IsCoolingDown) || !SearingLightPvE.EnoughLevel || IsTargetBoss && IsTargetDying) && FesterPvE.CanUse(out act) || NecrotizePvE.CanUse(out act)) return true;
-
-
-		if ((elapsed4ChargesAfterGcdSolar || TargetIsBossAndDying) && SearingFlashPvE.CanUse(out act, skipAoeCheck: true)) return true;
-		if (DoesAnyPlayerNeedHeal() && (!InBahamut || !InSolarBahamut) && LuxSolarisPvE.CanUse(out act)) return true;
+		if ((inBigInvocation && elapsed4ChargeAfterInvocation || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && PainflarePvE.CanUse(out act)) return true;
+		if ((inBigInvocation && elapsed4ChargeAfterInvocation || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && FesterPvE.CanUse(out act) || NecrotizePvE.CanUse(out act)) return true;
+		
+		if ((elapsed4ChargeAfterInvocation || targetIsBossAndDying) && SearingFlashPvE.CanUse(out act, skipAoeCheck: true)) return true;
+		if (DoesAnyPlayerNeedHeal() && !inBigInvocation && LuxSolarisPvE.CanUse(out act)) return true;
 
 		return base.AttackAbility(nextGCD, out act);
 	}
 	#endregion
 
+	protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
+	{
+		bool anyBigInvocationIsCoolingDown = SummonBahamutPvE.Cooldown.IsCoolingDown || SummonSolarBahamutPvE.Cooldown.IsCoolingDown || SummonPhoenixPvE.Cooldown.IsCoolingDown;
+		bool elapsed1ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
+
+		if (!Player.HasStatus(false, StatusID.SearingLight) && InBahamut || InSolarBahamut && elapsed1ChargeAfterInvocation)
+		{
+			if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
+		}
+		
+		if (AddSwiftcastOnGaruda && nextGCD == SlipstreamPvE && Player.Level > 86 && !InBahamut && !InPhoenix && !InSolarBahamut)
+		{ 
+			if (SwiftcastPvE.CanUse(out act)) return true;
+		}
+		
+		if (RadiantOnCooldown && RadiantAegisPvE.Cooldown.CurrentCharges == 2 && (anyBigInvocationIsCoolingDown && Player.Level <= 100) && RadiantAegisPvE.CanUse(out act)) return true;
+		if (RadiantOnCooldown && Player.Level < 88 && anyBigInvocationIsCoolingDown && RadiantAegisPvE.CanUse(out act)) return true;
+		
+		return base.EmergencyAbility(nextGCD, out act);
+	}
+
 	#region GCD Logic
 	protected override bool GeneralGCD(out IAction? act)
 	{
+		bool inBigInvocation = InBahamut || InPhoenix || InSolarBahamut;
+		bool inLittleInvocation = InIfrit || InGaruda || InTitan;	
+		
 		//if (SummonCarbunclePvE.CanUse(out act)) return true;
-
-
-		if ((!IsIfritReady || !IsGarudaReady || !IsTitanReady) && SummonBahamutPvE.CanUse(out act) || SummonBahamutPvE.CanUse(out act)) return true;
+		
+		if (!inLittleInvocation && SummonBahamutPvE.CanUse(out act)) return true;
+		if ((Player.HasStatus(false, StatusID.SearingLight) || SearingLightPvE.Cooldown.IsCoolingDown) && SummonBahamutPvE.CanUse(out act)) return true;
 		if (IsBurst && (!SearingLightPvE.Cooldown.IsCoolingDown && SummonSolarBahamutPvE.CanUse(out act))) return true;
 
 		if (SlipstreamPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -165,15 +134,9 @@ public sealed class SMN_Default : SummonerRotation
 		if (GemshinePvE.CanUse(out act)) return true;
 
 		if ((!IsMoving || AddCrimsonCycloneMoving) && AddCrimsonCyclone && CrimsonCyclonePvE.CanUse(out act, skipAoeCheck: true)) return true;
-
-		if ((Player.HasStatus(false, StatusID.SearingLight) || SearingLightPvE.Cooldown.IsCoolingDown) && SummonBahamutPvE.CanUse(out act)) return true;
-
+		
 		if (!SummonBahamutPvE.EnoughLevel && HasHostilesInRange && AetherchargePvE.CanUse(out act)) return true;
-
-		if (IsMoving && (Player.HasStatus(true, StatusID.GarudasFavor) || InIfrit)
-			&& !Player.HasStatus(true, StatusID.Swiftcast) && !InBahamut && !InPhoenix
-			&& RuinIvPvE.CanUse(out act, skipAoeCheck: true)) return true;
-
+		
 		if (!InBahamut && !InPhoenix && !InSolarBahamut)
 		{
 			switch (SummonOrder)
@@ -198,15 +161,12 @@ public sealed class SMN_Default : SummonerRotation
 				break;
 			}
 		}
-
-		if (SummonTimeEndAfterGCD() && AttunmentTimeEndAfterGCD() &&
-			!Player.HasStatus(true, StatusID.Swiftcast) && !InBahamut && !InPhoenix &&
-			RuinIvPvE.CanUse(out act, skipAoeCheck: true)) return true;
-
+		
+		if (!Player.HasStatus(true, StatusID.Swiftcast) && !inBigInvocation && !inLittleInvocation && RuinIvPvE.CanUse(out act, skipAoeCheck: true)) return true;
+		
 		if (OutburstPvE.CanUse(out act)) return true;
-
+		
 		if (RuinPvE.CanUse(out act)) return true;
-
 		return base.GeneralGCD(out act);
 	}
 	#endregion
@@ -216,7 +176,7 @@ public sealed class SMN_Default : SummonerRotation
 
 	public bool DoesAnyPlayerNeedHeal()
 	{
-		return PartyMembersAverHP > 80.0f;
+		return PartyMembersAverHP < 0.8f;
 	}
 	#endregion
 
