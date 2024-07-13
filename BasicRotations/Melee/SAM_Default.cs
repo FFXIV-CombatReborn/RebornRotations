@@ -47,10 +47,11 @@ public sealed class SAM_Default : SamuraiRotation
             if (HissatsuSeneiPvE.CanUse(out act)) return true;
         }
 
-        if (ShohaPvE.CanUse(out act)) return true;
+        if (ShohaPvE.CanUse(out act, skipAoeCheck: true)) return true; // Ignores how many targets under actions
 
         if (Kenki >= 50 && IkishotenPvE.Cooldown.WillHaveOneCharge(10) || Kenki >= AddKenki || IsTargetBoss && IsTargetDying)
         {
+            if (ZanshinPvE.CanUse(out act, skipAoeCheck: true)) return true; // Ignores how many targets under actions
             if (HissatsuKyutenPvE.CanUse(out act)) return true;
             if (HissatsuShintenPvE.CanUse(out act)) return true;
         }
@@ -83,6 +84,8 @@ public sealed class SAM_Default : SamuraiRotation
 
         if (KaeshiGokenPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
         if (KaeshiSetsugekkaPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
+        if (TendoKaeshiGokenPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
+        if (TendoKaeshiSetsugekkaPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
 
         if ((!IsTargetBoss || (HostileTarget?.HasStatus(true, StatusID.Higanbana) ?? false)) && HasMoon && HasFlower
             && OgiNamikiriPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -93,10 +96,12 @@ public sealed class SAM_Default : SamuraiRotation
         }
         if (SenCount == 2)
         {
+            if (TendoGokenPvE.CanUse(out act)) return true;
             if (TenkaGokenPvE.CanUse(out act, skipAoeCheck: !MidareSetsugekkaPvE.EnoughLevel)) return true;
         }
         if (SenCount == 3)
         {
+            if (TendoSetsugekkaPvE.CanUse(out act)) return true;
             if (MidareSetsugekkaPvE.CanUse(out act)) return true;
         }
 
@@ -116,8 +121,8 @@ public sealed class SAM_Default : SamuraiRotation
 
         if (!HaveMeikyoShisui)
         {
+            if (GyofuPvE.CanUse(out act)) return true;
             if (HakazePvE.CanUse(out act)) return true;
-
             if (EnpiPvE.CanUse(out act)) return true;
         }
 
