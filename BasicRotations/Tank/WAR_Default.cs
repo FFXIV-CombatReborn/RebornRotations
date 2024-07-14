@@ -125,7 +125,7 @@ public sealed class WAR_Default : WarriorRotation
 
         if (((VengeancePvE.Cooldown.IsCoolingDown && VengeancePvE.Cooldown.ElapsedAfter(60)) || !VengeancePvE.EnoughLevel) && RampartPvE.CanUse(out act)) return true;
 
-        return base.DefenseAreaAbility(nextGCD, out act);
+        return base.DefenseSingleAbility(nextGCD, out act);
     }
 
     [RotationDesc(ActionID.ShakeItOffPvE, ActionID.ReprisalPvE)]
