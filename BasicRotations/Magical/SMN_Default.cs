@@ -162,10 +162,10 @@ public sealed class SMN_Default : SummonerRotation
 			}
 		}
 		
-		if (!Player.HasStatus(true, StatusID.Swiftcast) && !inBigInvocation && !inLittleInvocation && RuinIvPvE.CanUse(out act, skipAoeCheck: true)) return true;
+		if (SummonTimeEndAfterGCD() && AttunmentTimeEndAfterGCD() && !InBahamut && !InPhoenix && !InSolarBahamut && SummonEmeraldPvE.IsInCooldown && SummonTopazPvE.IsInCooldown && SummonRubyPvE.IsInCooldown &&
+			RuinIvPvE.CanUse(out act, skipAoeCheck: true)) return true;
 		
 		if (OutburstPvE.CanUse(out act)) return true;
-		
 		if (RuinPvE.CanUse(out act)) return true;
 		return base.GeneralGCD(out act);
 	}
