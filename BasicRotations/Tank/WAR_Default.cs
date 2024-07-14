@@ -77,7 +77,11 @@ public sealed class WAR_Default : WarriorRotation
 
         if (OnslaughtPvE.CanUse(out act, usedUp: IsBurstStatus) &&
            !IsMoving &&
-           !IsLastAction(true, OnslaughtPvE) &&
+           !IsLastAction(true, OnslaughtPvE) && // avoid clipping with auto heal defensives
+           !IsLastAction(true, EquilibriumPvE) && // avoid clipping with auto heal defensives
+           !IsLastAction(true, NascentFlashPvE) && // avoid clipping with auto heal defensives
+           !IsLastAction(true, ThrillOfBattlePvE) && // avoid clipping with auto heal defensives
+
             Player.HasStatus(false, StatusID.SurgingTempest))
         {
             return true;
@@ -151,13 +155,13 @@ public sealed class WAR_Default : WarriorRotation
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
         {
             // New check for Primal Ruination
-            if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease))
+            if (Player.HasStatus(false, StatusID.PrimalRuinationReady)) // Squeezed ruination into opener for raid buffs = big dps increase
             {
                 if (PrimalRuinationPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
             if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
             {
-                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
+                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 1) return true; // back to default
             }
 
 
