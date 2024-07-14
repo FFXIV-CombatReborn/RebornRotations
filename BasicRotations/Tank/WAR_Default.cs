@@ -2,7 +2,7 @@ using RotationSolver.Basic.Data;
 
 namespace DefaultRotations.Tank;
 
-[Rotation("Sascha", CombatType.PvE, GameVersion = "7.00", Description = "Additional Contributions from Sascha")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "Additional Contributions from Sascha")]
 [SourceCode(Path = "main/DefaultRotations/Tank/WAR_Default.cs")]
 [Api(2)]
 public sealed class WAR_Default : WarriorRotation
@@ -56,11 +56,10 @@ public sealed class WAR_Default : WarriorRotation
         if (UseBurstMedicine(out act)) return true;
 
         if (Player.HasStatus(false, StatusID.SurgingTempest)
-            && !Player.WillStatusEndGCD(2, 0, true, StatusID.SurgingTempest)
+            && !Player.WillStatusEndGCD(6, 0, true, StatusID.SurgingTempest)
             || !MythrilTempestPvE.EnoughLevel)
         {
             if (BerserkPvE.CanUse(out act)) return true;
-
         }
 
         if (IsBurstStatus)
@@ -79,7 +78,6 @@ public sealed class WAR_Default : WarriorRotation
         if (OnslaughtPvE.CanUse(out act, usedUp: IsBurstStatus) &&
            !IsMoving &&
            !IsLastAction(true, OnslaughtPvE) &&
-           !IsLastAction(true, UpheavalPvE) &&
             Player.HasStatus(false, StatusID.SurgingTempest))
         {
             return true;
@@ -150,26 +148,24 @@ public sealed class WAR_Default : WarriorRotation
             if (FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         }
 
-        if (Player.HasStatus(false, StatusID.SurgingTempest) &&
-       (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80))
-        {
-            if (SteelCyclonePvE.CanUse(out act)) return true;
-            if (InnerBeastPvE.CanUse(out act)) return true;
-        }
-
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
         {
-            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
-            {
-                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
-            }
-
             // New check for Primal Ruination
             if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease))
             {
                 if (PrimalRuinationPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
+            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
+            {
+                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
+            }
 
+
+            if (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80)
+            {
+                if (SteelCyclonePvE.CanUse(out act)) return true;
+                if (InnerBeastPvE.CanUse(out act)) return true;
+            }
         }
 
         if (MythrilTempestPvE.CanUse(out act)) return true;
