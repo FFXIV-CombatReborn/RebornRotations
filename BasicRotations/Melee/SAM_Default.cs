@@ -1,8 +1,4 @@
-﻿using System.Diagnostics;
-using static FFXIVClientStructs.FFXIV.Client.UI.Info.InfoProxyCommonList;
-using static FFXIVClientStructs.FFXIV.Client.UI.Misc.CharaViewPortrait.Delegates;
-
-namespace DefaultRotations.Melee;
+﻿namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Melee/SAM_Default.cs")]
