@@ -56,7 +56,7 @@ public sealed class WAR_Default : WarriorRotation
         if (UseBurstMedicine(out act)) return true;
 
         if (Player.HasStatus(false, StatusID.SurgingTempest)
-            && !Player.WillStatusEndGCD(6, 0, true, StatusID.SurgingTempest)
+            && !Player.WillStatusEndGCD(2, 0, true, StatusID.SurgingTempest) // Less delaying of Inner Release which resulted in unsynced burst windows outside of raid buffs (IR grants +10 secs to ST) The opener is 6 GCDS= 15s on 2.5gcd
             || !MythrilTempestPvE.EnoughLevel)
         {
             if (BerserkPvE.CanUse(out act)) return true;
@@ -154,8 +154,8 @@ public sealed class WAR_Default : WarriorRotation
 
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
         {
-            // New check for Primal Ruination
-            if (Player.HasStatus(false, StatusID.PrimalRuinationReady)) // Squeezed ruination into opener for raid buffs = big dps increase
+            
+            if (Player.HasStatus(false, StatusID.PrimalRuinationReady)) // Removed my initial Status check which delayed Ruination by roughly 15 seconds bc the opener on release was still semi-optimal. Ruination in opener is a big dps increase due to raid buffs
             {
                 if (PrimalRuinationPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
