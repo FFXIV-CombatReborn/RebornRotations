@@ -116,12 +116,10 @@ public sealed class SMN_Default : SummonerRotation
 	#region GCD Logic
 	protected override bool GeneralGCD(out IAction? act)
 	{
-		bool inBigInvocation = InBahamut || InPhoenix || InSolarBahamut;
-		bool inLittleInvocation = InIfrit || InGaruda || InTitan;	
-		
 		//if (SummonCarbunclePvE.CanUse(out act)) return true;
 		
-		if (!inLittleInvocation && SummonBahamutPvE.CanUse(out act)) return true;
+		if (SummonBahamutPvE.CanUse(out act)) return true;
+		if (SummonPhoenixPvE.CanUse(out act)) return true;
 		if ((Player.HasStatus(false, StatusID.SearingLight) || SearingLightPvE.Cooldown.IsCoolingDown) && SummonBahamutPvE.CanUse(out act)) return true;
 		if (IsBurst && (!SearingLightPvE.Cooldown.IsCoolingDown && SummonSolarBahamutPvE.CanUse(out act))) return true;
 
