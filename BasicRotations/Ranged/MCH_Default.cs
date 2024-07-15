@@ -1,3 +1,5 @@
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+
 namespace DefaultRotations.Ranged;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
@@ -35,16 +37,10 @@ public sealed class MCH_Default : MachinistRotation
         bool isReassembleUsable =
             //Reassemble current # of charges and double proc protection
             ReassemblePvE.Cooldown.CurrentCharges > 0 && !Player.HasStatus(true, StatusID.Reassembled) &&
-            //Chainsaw Level Check and NextGCD Check
-            ((ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, ChainSawPvE)) ||
-            //AirAnchor Logic
-            (AirAnchorPvE.EnoughLevel && nextGCD.IsTheSameTo(true, AirAnchorPvE)) ||
-            //Drill Logic
-            (DrillPvE.EnoughLevel && !ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, DrillPvE)) ||
-            //Cleanshot Logic
-            (!DrillPvE.EnoughLevel && CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(true, CleanShotPvE)) ||
-            //HotShot Logic
-            (!CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(true, HotShotPvE)));
+            (nextGCD.IsTheSameTo(true, [ChainSawPvE, ExcavatorPvE, AirAnchorPvE]) || 
+             (!ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, DrillPvE)) ||
+             (!DrillPvE.EnoughLevel && nextGCD.IsTheSameTo(true, CleanShotPvE)) || 
+             (!CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(true, HotShotPvE)));
 
         // Keeps Ricochet and Gauss cannon Even
         bool isRicochetMore = RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.CurrentCharges <= RicochetPvE.Cooldown.CurrentCharges;
@@ -97,8 +93,8 @@ public sealed class MCH_Default : MachinistRotation
             if (UseBurstMedicine(out act)) return true;
 
             {
-                if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && !CombatElapsedLess(10) && ToolChargeSoon(out _)
-                && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
+                if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && !CombatElapsedLessGCD(5) &&
+                    (CombatElapsedLess(20) || ToolChargeSoon(out _)) && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
             }
         }
         // Use Hypercharge if at least 12 seconds of combat and (if wildfire will not be up in 30 seconds or if you hit 100 heat)
@@ -111,7 +107,6 @@ public sealed class MCH_Default : MachinistRotation
         {
             if (RookAutoturretPvE.CanUse(out act)) return true;
         }
-        // Use Barrel Stabilizer on CD if won't cap
         if (BarrelStabilizerPvE.CanUse(out act)) return true;
 
         return base.AttackAbility(nextGCD, out act);
@@ -142,9 +137,9 @@ public sealed class MCH_Default : MachinistRotation
         }
 
         // Special condition for using ChainSaw outside of AoE checks if no action is chosen within 4 GCDs.
-        if (!CombatElapsedLessGCD(2) && ChainSawPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (!CombatElapsedLessGCD(1) && ChainSawPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ExcavatorPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (!ChainSawPvE.Cooldown.WillHaveOneCharge(6f))
+        if (!ChainSawPvE.Cooldown.WillHaveOneCharge(6f) && !CombatElapsedLessGCD(6))
         {
             if (DrillPvE.CanUse(out act, usedUp: true)) return true;
         }
