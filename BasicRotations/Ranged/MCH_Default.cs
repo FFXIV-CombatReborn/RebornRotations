@@ -7,7 +7,7 @@ public sealed class MCH_Default : MachinistRotation
 {
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Skip Queen Logic and uses Rook Autoturret/Automaton Queen immediately whenever you get 50 battery")]
-    public bool SkipQueenLogic { get; set; } = false;
+    private bool SkipQueenLogic { get; set; } = false;
     #endregion
 
     #region Countdown logic
@@ -97,14 +97,14 @@ public sealed class MCH_Default : MachinistRotation
             if (UseBurstMedicine(out act)) return true;
 
             {
-                if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && !CombatElapsedLess(10) && CanUseHyperchargePvE(out _)
+                if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && !CombatElapsedLess(10) && ToolChargeSoon(out _)
                 && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
             }
         }
         // Use Hypercharge if at least 12 seconds of combat and (if wildfire will not be up in 30 seconds or if you hit 100 heat)
         if (!LowLevelHyperCheck && !CombatElapsedLess(12) && !Player.HasStatus(true, StatusID.Reassembled) && (!WildfirePvE.Cooldown.WillHaveOneCharge(30) || (Heat == 100)))
         {
-            if (CanUseHyperchargePvE(out act)) return true;
+            if (ToolChargeSoon(out act)) return true;
         }
         // Rook Autoturret/Queen Logic
         if (NoQueenLogic || OpenerQueen || CombatTimeQueen || WildfireCooldownQueen || BatteryCheckQueen || LastGCDCheckQueen)
@@ -138,12 +138,16 @@ public sealed class MCH_Default : MachinistRotation
             if (!AirAnchorPvE.EnoughLevel && HotShotPvE.CanUse(out act)) return true;
 
             // Check if Drill can be used
-            if (DrillPvE.CanUse(out act, usedUp: true)) return true;
+            if (DrillPvE.CanUse(out act, usedUp: false)) return true;
         }
 
         // Special condition for using ChainSaw outside of AoE checks if no action is chosen within 4 GCDs.
-        if (!CombatElapsedLessGCD(4) && ChainSawPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (!CombatElapsedLessGCD(4) && ExcavatorPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (!CombatElapsedLessGCD(2) && ChainSawPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (ExcavatorPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (!ChainSawPvE.Cooldown.WillHaveOneCharge(6f))
+        {
+            if (DrillPvE.CanUse(out act, usedUp: true)) return true;
+        }
 
         // AoE actions: ChainSaw and SpreadShot based on their usability.
         if (SpreadShotPvE.CanUse(out _))
@@ -151,8 +155,8 @@ public sealed class MCH_Default : MachinistRotation
             if (ChainSawPvE.CanUse(out act)) return true;
             if (ExcavatorPvE.CanUse(out act)) return true;
         }
-        if (SpreadShotPvE.CanUse(out act)) return true;
         if (FullMetalFieldPvE.CanUse(out act)) return true;
+        if (SpreadShotPvE.CanUse(out act)) return true;
         // Single target actions: CleanShot, SlugShot, and SplitShot based on their usability.
         if (CleanShotPvE.CanUse(out act)) return true;
         if (SlugShotPvE.CanUse(out act)) return true;
@@ -166,12 +170,12 @@ public sealed class MCH_Default : MachinistRotation
     // Extra private helper methods for determining the usability of specific abilities under certain conditions.
     // These methods simplify the main logic by encapsulating specific checks related to abilities' cooldowns and prerequisites.
     // Logic for Hypercharge
-    private bool CanUseHyperchargePvE(out IAction? act)
+    private bool ToolChargeSoon(out IAction? act)
     {
         float REST_TIME = 6f;
         if
                      //Cannot AOE
-                     ((!SpreadShotPvE.CanUse(out _))
+                     (!SpreadShotPvE.CanUse(out _)
                      &&
                      // AirAnchor Enough Level % AirAnchor 
                      ((AirAnchorPvE.EnoughLevel && AirAnchorPvE.Cooldown.WillHaveOneCharge(REST_TIME))
@@ -190,7 +194,6 @@ public sealed class MCH_Default : MachinistRotation
         }
         else
         {
-            // Use Hypercharge
             return HyperchargePvE.CanUse(out act);
         }
     }
