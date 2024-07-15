@@ -9,7 +9,7 @@ public sealed class RPR_Default : ReaperRotation
     [RotationConfig(CombatType.PvE, Name = "[Beta Option] Pool Shroud for Arcane Circle.")]
     public bool EnshroudPooling { get; set; } = false;
 
-    public static bool HasExecutioner => Player.HasStatus(true, StatusID.Executioner);
+    public static bool ExecutionerReady => Player.HasStatus(true, StatusID.Executioner);
     #endregion
 
     #region Countdown Logic
@@ -88,7 +88,7 @@ public sealed class RPR_Default : ReaperRotation
 
         if (SoulsowPvE.CanUse(out act)) return true;
 
-        if (!HasExecutioner && !HasSoulReaver )
+        if (!ExecutionerReady && !HasSoulReaver )
         {
             if (PerfectioPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
@@ -181,7 +181,7 @@ public sealed class RPR_Default : ReaperRotation
 
     private bool ItsGluttonyTime(out IAction? act)
     {
-        if (HasExecutioner)
+        if (ExecutionerReady)
         {
             if (ExecutionersGuillotinePvE.CanUse(out act)) return true;
             if (Player.HasStatus(true, StatusID.EnhancedGallows))
