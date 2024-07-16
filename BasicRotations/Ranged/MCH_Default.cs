@@ -96,6 +96,10 @@ public sealed class MCH_Default : MachinistRotation
         }
         // Rook Autoturret/Queen Logic
         if (CanUseQueenMeow(out act)) return true;
+        if (nextGCD.IsTheSameTo(true, CleanShotPvE, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && Battery == 100)
+        {
+            if (RookAutoturretPvE.CanUse(out act)) return true;
+        }
         
         if (BarrelStabilizerPvE.CanUse(out act)) return true;
 
@@ -202,7 +206,7 @@ public sealed class MCH_Default : MachinistRotation
     bool QueenThirteen = Battery >= 50 && !CombatElapsedLess(505f) && CombatElapsedLess(525f); 
     bool QueenFourteen = Battery >= 60 && !CombatElapsedLess(538f) && CombatElapsedLess(558f); 
     bool QueenFifteen = Battery >= 100 && !CombatElapsedLess(590f) && CombatElapsedLess(610f);
-        
+    
     if (NoQueenLogic||QueenOne||QueenTwo||QueenThree||QueenFour||QueenFive||QueenSix||QueenSeven||QueenEight||QueenNine||QueenTen||QueenEleven||QueenTwelve||QueenThirteen||QueenFourteen||QueenFifteen)
     {
         if (RookAutoturretPvE.CanUse(out act)) return true;
