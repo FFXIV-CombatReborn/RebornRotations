@@ -95,7 +95,7 @@ public sealed class MCH_Default : MachinistRotation
             if (ToolChargeSoon(out act)) return true;
         }
         // Rook Autoturret/Queen Logic
-        if (CanUseQueenMeow(out act)) return true;
+        if (!IsLastGCD(true, HeatBlastPvE, BlazingShotPvE) && CanUseQueenMeow(out act)) return true;
         if (nextGCD.IsTheSameTo(true, CleanShotPvE, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && Battery == 100)
         {
             if (RookAutoturretPvE.CanUse(out act)) return true;
