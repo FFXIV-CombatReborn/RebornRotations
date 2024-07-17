@@ -1,10 +1,12 @@
 namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "Uses Lunar Solar Opener from The Balance")]
+[Rotation("WIP DT MNK", CombatType.PvE, GameVersion = "7.00", Description = "Uses Lunar Solar Opener from The Balance")]
 [SourceCode(Path = "main/DefaultRotations/Melee/MNK_Default.cs")]
 [Api(2)]
+
 public sealed class MNK_Default : MonkRotation
 {
+
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use Form Shift")]
     public bool AutoFormShift { get; set; } = true;
@@ -43,6 +45,8 @@ public sealed class MNK_Default : MonkRotation
 
         if (CombatElapsedLessGCD(3)) return false; // Prevents the use of abilities if 3 GCDs have not been used
 
+        if (EarthsReplyPvE.CanUse(out act, skipAoeCheck: true) && (Player.CurrentHp < Player.MaxHp)) return true; // Earths Reply
+
         if (BeastChakras.Contains(BeastChakra.NONE) && Player.HasStatus(true, StatusID.RaptorForm)
             && (!RiddleOfFirePvE.EnoughLevel || Player.HasStatus(false, StatusID.RiddleOfFire) && !Player.WillStatusEndGCD(3, 0, false, StatusID.RiddleOfFire)
             || RiddleOfFirePvE.Cooldown.WillHaveOneChargeGCD(1) && (PerfectBalancePvE.Cooldown.ElapsedAfter(60) || !PerfectBalancePvE.Cooldown.IsCoolingDown)))
@@ -51,10 +55,11 @@ public sealed class MNK_Default : MonkRotation
         }
 
         if (BrotherhoodPvE.CanUse(out act, skipAoeCheck: true)) return true; // Brotherhood
-
+        if (EnlightenmentPvE.CanUse(out act)) return true; // Enlightment
         if (HowlingFistPvE.CanUse(out act)) return true; // Howling Fist
         if (SteelPeakPvE.CanUse(out act)) return true; // Steel Peak
-        if (HowlingFistPvE.CanUse(out act, skipAoeCheck: true)) return true; // Howling Fist AOE
+        
+        //if (HowlingFistPvE.CanUse(out act, skipAoeCheck: true)) return true; // Howling Fist AOE
 
         if (RiddleOfWindPvE.CanUse(out act)) return true; // Riddle Of Wind
 
@@ -68,6 +73,7 @@ public sealed class MNK_Default : MonkRotation
     private bool OpoOpoForm(out IAction? act)
     {
         if (ArmOfTheDestroyerPvE.CanUse(out act)) return true; // Arm Of The Destoryer
+        if (LeapingOpoPvE.CanUse(out act)) return true; // Leaping Opo
         if (DragonKickPvE.CanUse(out act)) return true; // Dragon Kick
         if (BootshinePvE.CanUse(out act)) return true; //Bootshine
         return false;
@@ -79,9 +85,11 @@ public sealed class MNK_Default : MonkRotation
     private bool RaptorForm(out IAction? act)
     {
         if (FourpointFuryPvE.CanUse(out act)) return true; //Fourpoint Fury
-        if ((Player.WillStatusEndGCD(3, 0, true, StatusID.DisciplinedFist)
+        /*if ((Player.WillStatusEndGCD(3, 0, true, StatusID.DisciplinedFist)
             || Player.WillStatusEndGCD(7, 0, true, StatusID.DisciplinedFist)
-            && UseLunarPerfectBalance) && TwinSnakesPvE.CanUse(out act)) return true; //Twin Snakes
+            && UseLunarPerfectBalance) && TwinSnakesPvE.CanUse(out act)) return true; //Twin Snakes*/
+        if (RisingRaptorPvE.CanUse(out act)) return true; //Rising Raptor
+        if (TwinSnakesPvE.CanUse(out act)) return true; //Twin Snakes
         if (TrueStrikePvE.CanUse(out act)) return true; //True Strike
         return false;
     }
@@ -89,8 +97,9 @@ public sealed class MNK_Default : MonkRotation
     private bool CoerlForm(out IAction? act)
     {
         if (RockbreakerPvE.CanUse(out act)) return true; // Rockbreaker
-        if (UseLunarPerfectBalance && DemolishPvE.CanUse(out act, skipStatusProvideCheck: true)
-            && (DemolishPvE.Target.Target?.WillStatusEndGCD(7, 0, true, StatusID.Demolish) ?? false)) return true;
+        //if (UseLunarPerfectBalance && DemolishPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        //&& (DemolishPvE.Target.Target?.WillStatusEndGCD(7, 0, true, StatusID.Demolish) ?? false)) return true;
+        if (PouncingCoeurlPvE.CanUse(out act)) return true; // Pouncing Coeurl
         if (DemolishPvE.CanUse(out act)) return true; // Demolish
         if (SnapPunchPvE.CanUse(out act)) return true; // Snap Punch
         return false;
@@ -98,6 +107,9 @@ public sealed class MNK_Default : MonkRotation
 
     protected override bool GeneralGCD(out IAction? act)
     {
+        if (WindsReplyPvE.CanUse(out act, skipAoeCheck: true)) return true; // Winds Reply
+        if (FiresReplyPvE.CanUse(out act, skipAoeCheck: true)) return true; // Fires Reply
+
         if (PerfectBalanceActions(out act)) return true;
 
         if (Player.HasStatus(true, StatusID.CoeurlForm))
@@ -120,6 +132,8 @@ public sealed class MNK_Default : MonkRotation
 
         if (Chakra < 5 && ForbiddenMeditationPvE.CanUse(out act)) return true;
 
+        if (Player.HasStatus(true, StatusID.MeditativeBrotherhood) && Chakra >= 5 && ForbiddenMeditationPvE.CanUse(out act)) return true;
+
         if (AutoFormShift && FormShiftPvE.CanUse(out act)) return true; // Form Shift GCD use
 
         return base.GeneralGCD(out act);
@@ -141,10 +155,11 @@ public sealed class MNK_Default : MonkRotation
             }
             else
             {
+                if (ElixirBurstPvE.CanUse(out act, skipAoeCheck: true)) return true;
                 if (ElixirFieldPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
         }
-        else if (Player.HasStatus(true, StatusID.PerfectBalance) && ElixirFieldPvE.EnoughLevel)
+        else if (Player.HasStatus(true, StatusID.PerfectBalance) && (ElixirBurstPvE.EnoughLevel || ElixirFieldPvE.EnoughLevel))
         {
             //Sometimes, no choice
             if (HasSolar || BeastChakras.Count(c => c == BeastChakra.OPOOPO) > 1)
@@ -156,9 +171,8 @@ public sealed class MNK_Default : MonkRotation
                 if (SolarNadi(out act)) return true;
             }
 
-            //Add status when solar.
-            if (Player.WillStatusEndGCD(3, 0, true, StatusID.DisciplinedFist)
-                || (HostileTarget?.WillStatusEndGCD(3, 0, true, StatusID.Demolish) ?? false))
+            //Add Solar Nadi if Lunar Nadi is present.
+            if (HasLunar)
             {
                 if (SolarNadi(out act)) return true;
             }
@@ -178,7 +192,7 @@ public sealed class MNK_Default : MonkRotation
     bool SolarNadi(out IAction? act)
     {
         //Emergency usage of status.
-        if (!BeastChakras.Contains(BeastChakra.RAPTOR)
+        /*if (!BeastChakras.Contains(BeastChakra.RAPTOR)
             && HasLunar
             && Player.WillStatusEndGCD(1, 0, true, StatusID.DisciplinedFist))
         {
@@ -188,7 +202,7 @@ public sealed class MNK_Default : MonkRotation
             && (HostileTarget?.WillStatusEndGCD(1, 0, true, StatusID.Demolish) ?? false))
         {
             if (CoerlForm(out act)) return true;
-        }
+        }*/
 
         if (!BeastChakras.Contains(BeastChakra.OPOOPO))
         {
@@ -209,5 +223,11 @@ public sealed class MNK_Default : MonkRotation
 
         return CoerlForm(out act);
     }
+    #endregion
+
+    #region Extra Methods
+
+    private static bool NoForm => ((!Player.HasStatus(false, StatusID.OpoopoForm) && !Player.HasStatus(false, StatusID.RaptorForm) && !Player.HasStatus(false, StatusID.CoeurlForm)) || Player.HasStatus(true, StatusID.FormlessFist) || Player.HasStatus(true, StatusID.PerfectBalance));
+
     #endregion
 }
