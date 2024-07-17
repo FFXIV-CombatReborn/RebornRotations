@@ -131,7 +131,7 @@ public sealed class MNK_Default : MonkRotation
 
         if (OpoOpoForm(out act)) return true; // Fallback to Use OpoOpo Form GCDs 
 
-        if (Chakra < 5 && ForbiddenMeditationPvE.CanUse(out act)) return true;
+        if (Chakra < 5 && (ForbiddenMeditationPvE.CanUse(out act) || SteeledMeditationPvE.CanUse(out act))) return true;
 
         if (AutoFormShift && FormShiftPvE.CanUse(out act)) return true; // Form Shift GCD use
 
