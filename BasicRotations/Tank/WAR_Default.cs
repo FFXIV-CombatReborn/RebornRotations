@@ -49,7 +49,8 @@ public sealed class WAR_Default : WarriorRotation
     #region oGCD Logic
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        if (InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
+        act = null;
+        if (!Player.HasStatus(true, StatusID.BurgeoningFury) && InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
 
         if (CombatElapsedLessGCD(1)) return false;
 
@@ -64,7 +65,7 @@ public sealed class WAR_Default : WarriorRotation
 
         if (IsBurstStatus)
         {
-            if (InfuriatePvE.CanUse(out act, usedUp: true)) return true;
+            if (!Player.HasStatus(true, StatusID.BurgeoningFury) && InfuriatePvE.CanUse(out act, usedUp: true)) return true;
         }
 
         if (CombatElapsedLessGCD(4)) return false;
