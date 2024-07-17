@@ -109,6 +109,7 @@ public sealed class MNK_Default : MonkRotation
     {
         if (WindsReplyPvE.CanUse(out act, skipAoeCheck: true)) return true; // Winds Reply
         if (FiresReplyPvE.CanUse(out act, skipAoeCheck: true)) return true; // Fires Reply
+        if (Player.HasStatus(true, StatusID.MeditativeBrotherhood) && Chakra >= 5 && TheForbiddenChakraPvE.CanUse(out act)) return true;
 
         if (PerfectBalanceActions(out act)) return true;
 
@@ -131,8 +132,6 @@ public sealed class MNK_Default : MonkRotation
         if (OpoOpoForm(out act)) return true; // Fallback to Use OpoOpo Form GCDs 
 
         if (Chakra < 5 && ForbiddenMeditationPvE.CanUse(out act)) return true;
-
-        if (Player.HasStatus(true, StatusID.MeditativeBrotherhood) && Chakra >= 5 && ForbiddenMeditationPvE.CanUse(out act)) return true;
 
         if (AutoFormShift && FormShiftPvE.CanUse(out act)) return true; // Form Shift GCD use
 
