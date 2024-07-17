@@ -151,7 +151,7 @@ public sealed class DNC_Default : DancerRotation
         }
 
         if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (LastDancePvE.CanUse(out act)) return true;
+        if (LastDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (HoldStepForTargets)
         {
