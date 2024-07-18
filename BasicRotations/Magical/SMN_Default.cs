@@ -94,9 +94,10 @@ public sealed class SMN_Default : SummonerRotation
 	protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
 	{
 		bool anyBigInvocationIsCoolingDown = SummonBahamutPvE.Cooldown.IsCoolingDown || SummonSolarBahamutPvE.Cooldown.IsCoolingDown || SummonPhoenixPvE.Cooldown.IsCoolingDown;
-		bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(0) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(0) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(0);
-
-		if (!Player.HasStatus(false, StatusID.SearingLight) && InSolarBahamut && elapsed0ChargeAfterInvocation)
+		bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
+		bool burstInSolar = Player.Level == 100 ? InSolarBahamut : InBahamut;
+		
+		if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed0ChargeAfterInvocation)
 		{
 			if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
 		}
