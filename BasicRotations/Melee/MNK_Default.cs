@@ -74,7 +74,7 @@ public sealed class MNK_Default : MonkRotation
     {
         if (ArmOfTheDestroyerPvE.CanUse(out act)) return true; // Arm Of The Destoryer
         if (LeapingOpoPvE.CanUse(out act)) return true; // Leaping Opo
-        if (DragonKickPvE.CanUse(out act) && OpoOpoFury < 1) return true; // Dragon Kick
+        if (DragonKickPvE.CanUse(out act)) return true; // Dragon Kick
         if (BootshinePvE.CanUse(out act)) return true; //Bootshine
         return false;
     }
@@ -89,7 +89,7 @@ public sealed class MNK_Default : MonkRotation
             || Player.WillStatusEndGCD(7, 0, true, StatusID.DisciplinedFist)
             && UseLunarPerfectBalance) && TwinSnakesPvE.CanUse(out act)) return true; //Twin Snakes*/
         if (RisingRaptorPvE.CanUse(out act)) return true; //Rising Raptor
-        if (TwinSnakesPvE.CanUse(out act) && RaptorFury < 1) return true; //Twin Snakes
+        if (TwinSnakesPvE.CanUse(out act)) return true; //Twin Snakes
         if (TrueStrikePvE.CanUse(out act)) return true; //True Strike
         return false;
     }
@@ -100,7 +100,7 @@ public sealed class MNK_Default : MonkRotation
         //if (UseLunarPerfectBalance && DemolishPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         //&& (DemolishPvE.Target.Target?.WillStatusEndGCD(7, 0, true, StatusID.Demolish) ?? false)) return true;
         if (PouncingCoeurlPvE.CanUse(out act)) return true; // Pouncing Coeurl
-        if (DemolishPvE.CanUse(out act) && CoeurlFury < 1) return true; // Demolish
+        if (DemolishPvE.CanUse(out act)) return true; // Demolish
         if (SnapPunchPvE.CanUse(out act)) return true; // Snap Punch
         return false;
     }
