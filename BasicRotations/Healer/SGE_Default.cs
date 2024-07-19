@@ -68,12 +68,20 @@ public sealed class SGE_Default : SageRotation
     #endregion
 
     #region oGCD Logic
+    [RotationDesc(ActionID.PsychePvE)]
+    protected override bool AttackAbility(IAction nextGCD, out IAction? act)
+    {
+        if (PsychePvE.CanUse(out act)) return true;
+
+        return base.AttackAbility(nextGCD, out act);
+    }
+
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
         if (base.EmergencyAbility(nextGCD, out act)) return true;
 
         if (nextGCD.IsTheSameTo(false, PneumaPvE, EukrasianDiagnosisPvE,
-            EukrasianPrognosisPvE, DiagnosisPvE, PrognosisPvE))
+            EukrasianPrognosisPvE, EukrasianPrognosisIiPvE, DiagnosisPvE, PrognosisPvE))
         {
             if (ZoePvE.CanUse(out act)) return true;
         }
@@ -180,7 +188,7 @@ public sealed class SGE_Default : SageRotation
         return base.HealSingleAbility(nextGCD, out act);
     }
 
-    [RotationDesc(ActionID.EukrasianPrognosisPvE)]
+    [RotationDesc(ActionID.EukrasianPrognosisPvE, ActionID.EukrasianPrognosisIiPvE)]
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
@@ -199,7 +207,21 @@ public sealed class SGE_Default : SageRotation
     #region GCD Logic 
     protected override bool DefenseAreaGCD(out IAction? act)
     {
-        if (EukrasianPrognosisPvE.CanUse(out act))
+        if (EukrasianPrognosisIiPvE.CanUse(out act))
+        {
+            if (EukrasianPrognosisIiPvE.Target.Target?.HasStatus(false,
+                StatusID.EukrasianDiagnosis,
+                StatusID.EukrasianPrognosis,
+                StatusID.Galvanize
+            ) ?? false) return false;
+
+            if (EukrasiaPvE.CanUse(out act)) return true;
+
+            act = EukrasianPrognosisIiPvE;
+            return true;
+        }
+
+        if (!EukrasianPrognosisIiPvE.EnoughLevel && EukrasianPrognosisPvE.CanUse(out act))
         {
             if (EukrasianPrognosisPvE.Target.Target?.HasStatus(false,
                 StatusID.EukrasianDiagnosis,
@@ -256,7 +278,7 @@ public sealed class SGE_Default : SageRotation
         if (!PhlegmaIiiPvE.EnoughLevel && PhlegmaIiPvE.CanUse(out act, usedUp: IsMoving, skipAoeCheck: true)) return true;
         if (!PhlegmaIiPvE.EnoughLevel && PhlegmaPvE.CanUse(out act, usedUp: IsMoving, skipAoeCheck: true)) return true;
 
-        if (PartyMembers.Any(b => b.GetHealthRatio() < PneumaSTPartyHeal) || PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaSTTankHeal))
+        if (PartyMembers.Any(b => b.GetHealthRatio() < PneumaSTPartyHeal && !b.IsDead) || PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaSTTankHeal && !t.IsDead))
         {
             if (PneumaPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
@@ -287,7 +309,7 @@ public sealed class SGE_Default : SageRotation
         return base.GeneralGCD(out act);
     }
 
-    [RotationDesc(ActionID.PneumaPvE, ActionID.PrognosisPvE, ActionID.EukrasianPrognosisPvE)]
+    [RotationDesc(ActionID.PneumaPvE, ActionID.PrognosisPvE, ActionID.EukrasianPrognosisPvE, ActionID.EukrasianPrognosisIiPvE)]
     protected override bool HealAreaGCD(out IAction? act)
     {
         if (PartyMembersAverHP < PneumaAOEPartyHeal || DyskrasiaPvE.CanUse(out _) && PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaAOETankHeal))
@@ -300,7 +322,13 @@ public sealed class SGE_Default : SageRotation
             if (PrognosisPvE.CanUse(out act)) return true;
         }
 
-        if (EukrasianPrognosisPvE.CanUse(out _))
+        if (EukrasianPrognosisIiPvE.CanUse(out _)) {
+            if (EukrasiaPvE.CanUse(out act)) return true;
+            act = EukrasianPrognosisIiPvE;
+            return true;
+        }
+
+        if (!EukrasianPrognosisIiPvE.EnoughLevel && EukrasianPrognosisPvE.CanUse(out _))
         {
             if (EukrasiaPvE.CanUse(out act)) return true;
             act = EukrasianPrognosisPvE;
