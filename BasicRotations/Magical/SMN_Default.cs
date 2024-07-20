@@ -65,10 +65,16 @@ public sealed class SMN_Default : SummonerRotation
 		bool isTargetDying = HostileTarget?.IsDying() ?? false;
 		bool targetIsBossAndDying = isTargetBoss && isTargetDying;
 		bool inBigInvocation = InBahamut || InPhoenix || InSolarBahamut;
-		bool inSolarUnique = !InBahamut && !InPhoenix && InSolarBahamut;
+		bool inSolarUnique = Player.Level == 100 ? !InBahamut && !InPhoenix && InSolarBahamut : InBahamut && !InPhoenix;
 		bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
 		bool elapsed1ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
 		bool elapsed2ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(2);
+		bool burstInSolar = Player.Level == 100 ? InSolarBahamut : InBahamut;
+		
+		if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed0ChargeAfterInvocation)
+		{
+			if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
+		}
 		
 		if (inBigInvocation && (elapsed0ChargeAfterInvocation || targetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
 		if (inBigInvocation && (elapsed0ChargeAfterInvocation || targetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
@@ -94,14 +100,6 @@ public sealed class SMN_Default : SummonerRotation
 	protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
 	{
 		bool anyBigInvocationIsCoolingDown = SummonBahamutPvE.Cooldown.IsCoolingDown || SummonSolarBahamutPvE.Cooldown.IsCoolingDown || SummonPhoenixPvE.Cooldown.IsCoolingDown;
-		bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
-		bool burstInSolar = Player.Level == 100 ? InSolarBahamut : InBahamut;
-		
-		if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed0ChargeAfterInvocation)
-		{
-			if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
-		}
-		
 		if (AddSwiftcastOnGaruda && nextGCD == SlipstreamPvE && Player.Level > 86 && !InBahamut && !InPhoenix && !InSolarBahamut)
 		{ 
 			if (SwiftcastPvE.CanUse(out act)) return true;
