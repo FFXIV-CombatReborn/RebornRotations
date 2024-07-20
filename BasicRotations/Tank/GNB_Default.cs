@@ -99,9 +99,9 @@ public sealed class GNB_Default : GunbreakerRotation
         bool IsReadyToReign = (Player.HasStatus(true, StatusID.ReadyToReign));
         bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
 
-        if (LionHeartPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (IsLastGCD(true, NobleBloodPvE) && LionHeartPvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true)) return true;
 
-        if (NobleBloodPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (IsLastGCD(true, ReignOfBeastsPvE) && NobleBloodPvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true)) return true;
 
         if (IsReadyToReign)
         {
