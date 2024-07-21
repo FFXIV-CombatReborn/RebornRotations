@@ -116,7 +116,7 @@ public sealed class MCH_Default : MachinistRotation
         if (HeatBlastPvE.CanUse(out act)) return true;
 
         // Executes Bioblaster, and then checks for AirAnchor or HotShot, and Drill based on availability and conditions.
-        if (BioblasterPvE.CanUse(out act)) return true;
+        if (BioblasterPvE.CanUse(out act, usedUp: true)) return true;
         // Check if SpreadShot cannot be used
         if (!SpreadShotPvE.CanUse(out _))
         {
