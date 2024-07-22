@@ -74,7 +74,7 @@ public sealed class RDM_Default : RedMageRotation
         if (ViceOfThornsPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (PrefulgencePvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ContreSixtePvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (GrandImpactPvE.CanUse(out act, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
         if (FlechePvE.CanUse(out act)) return true;
 
         if (EngagementPvE.CanUse(out act, usedUp: true)) return true;
