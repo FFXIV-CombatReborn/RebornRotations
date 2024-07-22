@@ -40,7 +40,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./build/RebornRotations.dll
-            ./build/RebornRotations.pdb
+            ./build/LoidShitRotations.dll
+            ./build/LoidShitRotations.pdb
           token: ${{ secrets.GITHUB_TOKEN }}
 
