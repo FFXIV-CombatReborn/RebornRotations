@@ -31,16 +31,15 @@ jobs:
           Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
 
       - name: Restore Nuget Packages
-        run: dotnet restore BasicRotations/RebornRotations.csproj
+        run: dotnet restore Advanced_Rotations/RabbsRotationsNET8.csproj
 
       - name: Build Rotations
-        run: dotnet build --no-restore -c Release BasicRotations/RebornRotations.csproj -p:AssemblyVersion=${{ env.tag }} -p:FileVersion=${{ env.tag }} -p:InformationalVersion=${{ env.tag }} --output .\build
+        run: dotnet build --no-restore -c Release LoidGetRotatedIdiot/LoidShitRotation.csproj -p:AssemblyVersion=${{ env.tag }} -p:FileVersion=${{ env.tag }} -p:InformationalVersion=${{ env.tag }} --output .\build
 
       - name: Publish Rotations
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./build/LoidShitRotations.dll
-            ./build/LoidShitRotations.pdb
+            ./build/LoidShitRotation.dll
+            ./build/LoidShitRotation.pdb
           token: ${{ secrets.GITHUB_TOKEN }}
-
