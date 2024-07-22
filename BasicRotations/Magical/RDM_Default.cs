@@ -129,7 +129,7 @@ public sealed class RDM_Default : RedMageRotation
         if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
 
         // Hardcode grand impact usage (?)
-        if (IsLastAction(ActionID.AccelerationPvE))
+        if (IsLastGCD(ActionID.AccelerationPvE))
         {
             if (GrandImpactPvE.CanUse(out act, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration), skipAoeCheck: true)) return true;
         }
