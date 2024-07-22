@@ -245,6 +245,7 @@ public sealed class VPR_Default : ViperRotation
             if (UnCoilCoil.CanUse(out act, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, skipStatusProvideCheck: true)) return true;
         }
 
+        if (WrithingSnapPvE.CanUse(out act)) return true;
 
         return base.GeneralGCD(out act);
     }
