@@ -74,7 +74,7 @@ public sealed class RDM_Default : RedMageRotation
         if (ViceOfThornsPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (PrefulgencePvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ContreSixtePvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
+        // if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
         if (FlechePvE.CanUse(out act)) return true;
 
         if (EngagementPvE.CanUse(out act, usedUp: true)) return true;
@@ -99,8 +99,14 @@ public sealed class RDM_Default : RedMageRotation
             if (VerflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        // Hardcode Resolution & Scorch to avoid double melee without finishers
-        if (IsLastGCD(ActionID.ScorchPvE))
+            // Hardcode grand impact usage (?)
+        if (IsLastGCD(ActionID.AccelerationPvE))
+        {
+            if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
+        }
+
+            // Hardcode Resolution & Scorch to avoid double melee without finishers
+            if (IsLastGCD(ActionID.ScorchPvE))
         {
             if (ResolutionPvE.CanUse(out act, skipStatusProvideCheck: true, skipAoeCheck: true)) return true;
         }
