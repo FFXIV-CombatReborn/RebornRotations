@@ -2,7 +2,7 @@
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/PLD_Default.PvP.cs")]
-[Api(1)]
+[Api(2)]
 public sealed class PLD_DefaultPvP : PaladinRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]

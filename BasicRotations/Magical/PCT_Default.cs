@@ -14,8 +14,6 @@ public sealed class PCT_Default : PictomancerRotation
         IAction act;
         if (!InCombat)
         {
-
-
             if (!CreatureMotifDrawn)
             {
                 if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return act;
@@ -58,15 +56,12 @@ public sealed class PCT_Default : PictomancerRotation
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
 
-
-
         if (Player.HasStatus(true, StatusID.StarryMuse))
         {
             if (Player.HasStatus(true, StatusID.SubtractiveSpectrum) && !Player.HasStatus(true, StatusID.SubtractivePalette))
             {
                 if (SubtractivePalettePvE.CanUse(out act)) return true;
             }
-
 
             if (CreatureMotifDrawn)
             {
@@ -147,8 +142,6 @@ public sealed class PCT_Default : PictomancerRotation
             if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
         }
 
-        
-
         if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Player.HasStatus(true, StatusID.HammerTime) && InCombat) return true;
 
         if (!InCombat)
@@ -210,23 +203,12 @@ public sealed class PCT_Default : PictomancerRotation
             if (HammerMotifPvE.CanUse(out act)) return true;
         }
 
-        
-
-
-
-
-        
-
         //white paint over cap protection
         if (Paint == 5)
         {
             if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0 && Player.HasStatus(true, StatusID.MonochromeTones)) return true;
             if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
         }
-
-
-
-
 
         ///123 combo stuff with moving checks
         if (!IsMoving)
@@ -246,7 +228,6 @@ public sealed class PCT_Default : PictomancerRotation
 
             ///single target
             ///
-
 
             if (ThunderInMagentaPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette) && Player.HasStatus(true, StatusID.AetherhuesIi)) return true;
             if (StoneInYellowPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette) && Player.HasStatus(true, StatusID.Aetherhues)) return true;
