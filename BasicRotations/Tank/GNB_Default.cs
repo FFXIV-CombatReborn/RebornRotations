@@ -96,17 +96,11 @@ public sealed class GNB_Default : GunbreakerRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
-        bool IsReadyToReign = (Player.HasStatus(true, StatusID.ReadyToReign));
         bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
 
-        if (IsLastGCD(true, NobleBloodPvE) && LionHeartPvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true)) return true;
-
-        if (IsLastGCD(true, ReignOfBeastsPvE) && NobleBloodPvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true)) return true;
-
-        if (IsReadyToReign)
-        {
-            if (ReignOfBeastsPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        }
+        if (LionHeartPvE.CanUse(out act)) return true;
+        if (NobleBloodPvE.CanUse(out act)) return true;
+        if (ReignOfBeastsPvE.CanUse(out act)) return true;
 
         if (FatedCirclePvE.CanUse(out act)) return true;
 
