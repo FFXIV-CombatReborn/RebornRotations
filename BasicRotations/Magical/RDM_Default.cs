@@ -131,7 +131,7 @@ public sealed class RDM_Default : RedMageRotation
         // Hardcode grand impact usage (?)
         if (IsLastAction(ActionID.AccelerationPvE))
         {
-            if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
+            if (GrandImpactPvE.CanUse(out act, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration), skipAoeCheck: true)) return true;
         }
 
         return base.EmergencyGCD(out act);
