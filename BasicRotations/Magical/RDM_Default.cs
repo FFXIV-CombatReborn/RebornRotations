@@ -102,7 +102,7 @@ public sealed class RDM_Default : RedMageRotation
             // Hardcode grand impact usage (?)
         if (IsLastGCD(ActionID.AccelerationPvE))
         {
-            if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
+            if (GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: true, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
         }
 
             // Hardcode Resolution & Scorch to avoid double melee without finishers
