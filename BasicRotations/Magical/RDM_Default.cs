@@ -99,13 +99,7 @@ public sealed class RDM_Default : RedMageRotation
             if (VerflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-            // Hardcode grand impact usage (?)
-        if (IsLastGCD(ActionID.AccelerationPvE))
-        {
-            if (GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: true, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
-        }
-
-            // Hardcode Resolution & Scorch to avoid double melee without finishers
+           // Hardcode Resolution & Scorch to avoid double melee without finishers
             if (IsLastGCD(ActionID.ScorchPvE))
         {
             if (ResolutionPvE.CanUse(out act, skipStatusProvideCheck: true, skipAoeCheck: true)) return true;
@@ -133,6 +127,12 @@ public sealed class RDM_Default : RedMageRotation
         if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
         
         if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
+
+        // Hardcode grand impact usage (?)
+        if (IsLastAction(ActionID.AccelerationPvE))
+        {
+            if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
+        }
 
         return base.EmergencyGCD(out act);
     }
