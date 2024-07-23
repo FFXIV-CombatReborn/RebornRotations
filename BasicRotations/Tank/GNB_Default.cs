@@ -98,8 +98,8 @@ public sealed class GNB_Default : GunbreakerRotation
     {
         bool areDDTargetsInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() < 4.5f);
 
-        if (LionHeartPvE.CanUse(out act)) return true;
-        if (NobleBloodPvE.CanUse(out act)) return true;
+        if (IsLastGCD(false, NobleBloodPvE) && LionHeartPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (IsLastGCD(false, ReignOfBeastsPvE) && NobleBloodPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (ReignOfBeastsPvE.CanUse(out act)) return true;
 
         if (FatedCirclePvE.CanUse(out act)) return true;
