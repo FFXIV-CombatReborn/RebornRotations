@@ -125,7 +125,7 @@ public sealed class RDM_Default : RedMageRotation
         }
         if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
         
-        if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
+        //if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
 
         return base.EmergencyGCD(out act);
     }
@@ -134,7 +134,7 @@ public sealed class RDM_Default : RedMageRotation
     {
         act = null;
 
-        //Swiftcast and acceleration usage (experimental, old method on line 61)
+    //Swiftcast and acceleration usage (experimental, old method on line 61)
         //Check if player moving and dont have acceleration buff already to not override it
         if (IsMoving && !Player.HasStatus(true, StatusID.Acceleration) &&
         //Additional checks to NOT INTERRUPT DOUBLE/TRIPLE melee combos, ANY COMBO
@@ -142,8 +142,18 @@ public sealed class RDM_Default : RedMageRotation
             !IsLastGCD(ActionID.ResolutionPvE) &&
             //Check if player dont have GrandImpact buff
             !Player.HasStatus(true, StatusID.GrandImpactReady) &&
-            //Fires acceleration. If player dont have acceleration at all, fires swiftcast instead
-            (AccelerationPvE.CanUse(out act, usedUp: true) || (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))) return true;
+                //Fires acceleration. If player dont have acceleration at all, fires swiftcast instead
+                (AccelerationPvE.CanUse(out act, usedUp: true) || (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))) return true;
+
+        //Reprise usage logic
+            //Really dirty done basic checks if RSR can do SOMETHING ELSE except Reprise from instacast spells when moving
+            if (IsMoving && !Player.HasStatus(true, StatusID.GrandImpactReady) && 
+            !AccelerationPvE.CanUse(out act) && !SwiftcastPvE.CanUse(out act) && 
+            !Player.HasStatus(true, StatusID.Swiftcast) && !Player.HasStatus(true, StatusID.Acceleration) &&
+            //Protecc against spamming Reprise when player has melee combo ready
+            (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
+                //Spam reprise when nothing else to use
+                RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act)))) return true;
 
 
         //Grand impact usage
