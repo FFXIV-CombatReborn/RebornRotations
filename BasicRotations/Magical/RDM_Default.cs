@@ -126,19 +126,13 @@ public sealed class RDM_Default : RedMageRotation
         if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
         
         if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
-<<<<<<< Updated upstream
-
-=======
         
->>>>>>> Stashed changes
         return base.EmergencyGCD(out act);
     }
 
     protected override bool GeneralGCD(out IAction? act)
     {
         act = null;
-<<<<<<< Updated upstream
-=======
 
         //Swiftcast and acceleration usage (experimental, old method on line 61)
         //Check if player moving and dont have acceleration buff already to not override it
@@ -155,8 +149,6 @@ public sealed class RDM_Default : RedMageRotation
         if (!IsLastGCD(ActionID.ResolutionPvE) && /*<- additional melee protection, just to be sure*/
         GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck: true, skipAoeCheck: true)) return true;
 
-
->>>>>>> Stashed changes
         if (ManaStacks == 3) return false;
         
         if (GrandImpactPvE.CanUse(out act)) return true;
