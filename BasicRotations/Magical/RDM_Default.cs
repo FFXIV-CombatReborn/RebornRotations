@@ -135,8 +135,7 @@ public sealed class RDM_Default : RedMageRotation
         bool didWeJustCombo = IsLastGCD([
             ActionID.ScorchPvE, ActionID.VerflarePvE, ActionID.VerholyPvE, ActionID.ZwerchhauPvE,
             ActionID.RedoublementPvE]);
-
-
+        //Grand impact usage if not interrupting melee combo
         if (!didWeJustCombo && GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck:true, skipAoeCheck: true)) return true;
 
         //Acceleration/Swiftcast usage on move
@@ -152,7 +151,7 @@ public sealed class RDM_Default : RedMageRotation
         {
             return true;
         }
-        
+
          //Reprise logic
         if (IsMoving && RangedSwordplay && !didWeJustCombo &&
             //Check to not use Reprise when player can do melee combo
