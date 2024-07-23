@@ -126,13 +126,37 @@ public sealed class RDM_Default : RedMageRotation
         if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
         
         if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
+<<<<<<< Updated upstream
 
+=======
+        
+>>>>>>> Stashed changes
         return base.EmergencyGCD(out act);
     }
 
     protected override bool GeneralGCD(out IAction? act)
     {
         act = null;
+<<<<<<< Updated upstream
+=======
+
+        //Swiftcast and acceleration usage (experimental, old method on line 61)
+        //Check if player moving and dont have acceleration buff already to not override it
+        if (IsMoving && !Player.HasStatus(true, StatusID.Acceleration) &&
+        //Additional checks to NOT INTERRUPT DOUBLE/TRIPLE melee combos, ANY COMBO
+            (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
+            !IsLastGCD(ActionID.ResolutionPvE) &&
+            //Check if player dont have GrandImpact buff
+            !Player.HasStatus(true, StatusID.GrandImpactReady) &&
+            //Fires acceleration. If player dont have acceleration at all, fires swiftcast instead
+            (AccelerationPvE.CanUse(out act, usedUp: true) || (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))) return true;
+
+        //Grand impact usage
+        if (!IsLastGCD(ActionID.ResolutionPvE) && /*<- additional melee protection, just to be sure*/
+        GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck: true, skipAoeCheck: true)) return true;
+
+
+>>>>>>> Stashed changes
         if (ManaStacks == 3) return false;
         
         if (GrandImpactPvE.CanUse(out act)) return true;
