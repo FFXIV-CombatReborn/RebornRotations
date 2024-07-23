@@ -33,7 +33,6 @@ public sealed class RDM_Default : RedMageRotation
     }
     #endregion
 
-
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
