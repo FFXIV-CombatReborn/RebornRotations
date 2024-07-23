@@ -138,7 +138,6 @@ public sealed class RDM_Default : RedMageRotation
         //Check if player moving and dont have acceleration buff already to not override it
         if (IsMoving && !Player.HasStatus(true, StatusID.Acceleration) &&
             (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
-            !CanStartMeleeCombo &&
             //Additional check to NOT INTERRUPT DOUBLE/TRIPLE melee combos
             !IsLastGCD(ActionID.ResolutionPvE) &&
             //Check if player dont have GrandImpact buff
