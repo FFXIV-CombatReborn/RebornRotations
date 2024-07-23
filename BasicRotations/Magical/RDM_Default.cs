@@ -57,8 +57,8 @@ public sealed class RDM_Default : RedMageRotation
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        //Swift
-        if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
+        //Swiftcast/Acceleration usage OLD VERSION
+       /* if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
             && (CombatElapsedLess(4) || !ManaficationPvE.EnoughLevel || !ManaficationPvE.Cooldown.WillHaveOneChargeGCD(0, 1)))
         {
             if (InCombat && !Player.HasStatus(true, StatusID.VerfireReady, StatusID.VerstoneReady))
@@ -66,7 +66,7 @@ public sealed class RDM_Default : RedMageRotation
                 if (SwiftcastPvE.CanUse(out act)) return true;
                 if (AccelerationPvE.CanUse(out act, usedUp: true)) return true;
             }
-        }
+        }*/
 
         if (IsBurst && UseBurstMedicine(out act)) return true;
 
@@ -138,8 +138,8 @@ public sealed class RDM_Default : RedMageRotation
         //Grand impact usage if not interrupting melee combo
         if (!didWeJustCombo && GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck:true, skipAoeCheck: true)) return true;
 
-        //Acceleration/Swiftcast usage on move
-        if (IsMoving && 
+        //Acceleration/Swiftcast usage on move, old method on line 61.
+        if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) &&
             //Checks for not override previous acceleration and lose grand impact
             !Player.HasStatus(true, StatusID.Acceleration) && 
             !Player.HasStatus(true, StatusID.GrandImpactReady) &&
@@ -154,7 +154,7 @@ public sealed class RDM_Default : RedMageRotation
 
          //Reprise logic
         if (IsMoving && RangedSwordplay && !didWeJustCombo &&
-            //Check to not use Reprise when player can do melee combo
+            //Check to not use Reprise when player can do melee combo, to not break it
             (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
             //Check if dualcast active
             !Player.HasStatus(true, StatusID.Dualcast) &&
