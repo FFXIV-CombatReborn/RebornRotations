@@ -137,8 +137,8 @@ public sealed class RDM_Default : RedMageRotation
         //Swiftcast and acceleration usage (experimental, old method on line 61)
         //Check if player moving and dont have acceleration buff already to not override it
         if (IsMoving && !Player.HasStatus(true, StatusID.Acceleration) &&
+        //Additional checks to NOT INTERRUPT DOUBLE/TRIPLE melee combos, ANY COMBO
             (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
-            //Additional check to NOT INTERRUPT DOUBLE/TRIPLE melee combos
             !IsLastGCD(ActionID.ResolutionPvE) &&
             //Check if player dont have GrandImpact buff
             !Player.HasStatus(true, StatusID.GrandImpactReady) &&
