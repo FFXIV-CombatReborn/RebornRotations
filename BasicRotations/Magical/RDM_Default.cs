@@ -125,8 +125,6 @@ public sealed class RDM_Default : RedMageRotation
         }
         if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
         
-        if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
-        
         return base.EmergencyGCD(out act);
     }
 
@@ -134,20 +132,42 @@ public sealed class RDM_Default : RedMageRotation
     {
         act = null;
 
-        //Swiftcast and acceleration usage (experimental, old method on line 61)
-        //Check if player moving and dont have acceleration buff already to not override it
-        if (IsMoving && !Player.HasStatus(true, StatusID.Acceleration) &&
-        //Additional checks to NOT INTERRUPT DOUBLE/TRIPLE melee combos, ANY COMBO
-            (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
-            !IsLastGCD(ActionID.ResolutionPvE) &&
-            //Check if player dont have GrandImpact buff
-            !Player.HasStatus(true, StatusID.GrandImpactReady) &&
-            //Fires acceleration. If player dont have acceleration at all, fires swiftcast instead
-            (AccelerationPvE.CanUse(out act, usedUp: true) || (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))) return true;
+        bool didWeJustCombo = IsLastGCD([
+            ActionID.ScorchPvE, ActionID.VerflarePvE, ActionID.VerholyPvE, ActionID.ZwerchhauPvE,
+            ActionID.RedoublementPvE]);
 
-        //Grand impact usage
-        if (!IsLastGCD(ActionID.ResolutionPvE) && /*<- additional melee protection, just to be sure*/
-        GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck: true, skipAoeCheck: true)) return true;
+
+        if (!didWeJustCombo && GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck:true, skipAoeCheck: true)) return true;
+
+        //Acceleration/Swiftcast usage on move
+        if (IsMoving && 
+            //Checks for not override previous acceleration and lose grand impact
+            !Player.HasStatus(true, StatusID.Acceleration) && 
+            !Player.HasStatus(true, StatusID.GrandImpactReady) &&
+            //Check for melee combo 
+            !didWeJustCombo &&
+            //Use acceleration. If acceleration not awaliable, use switftast instead 
+            (AccelerationPvE.CanUse(out act, usedUp: true) || 
+                (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act)))) 
+        {
+            return true;
+        }
+        
+         //Reprise logic
+        if (IsMoving && RangedSwordplay && !didWeJustCombo &&
+            //Check to not use Reprise when player can do melee combo
+            (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
+            //Check if dualcast active
+            !Player.HasStatus(true, StatusID.Dualcast) &&
+            //Bunch of checks if anything else can be used instead of Reprise
+            !AccelerationPvE.CanUse(out _) &&
+            !Player.HasStatus(true, StatusID.Acceleration) &&
+            !SwiftcastPvE.CanUse(out _) &&
+            !Player.HasStatus(true, StatusID.Swiftcast) &&
+            !GrandImpactPvE.CanUse(out _) &&
+            !Player.HasStatus(true, StatusID.GrandImpactReady) &&
+            //If nothing else to use and player moving - fire reprise.
+        (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act)))) return true;
 
         if (ManaStacks == 3) return false;
         
