@@ -138,7 +138,7 @@ public sealed class RDM_Default : RedMageRotation
         //Check if player moving and dont have acceleration buff already to not override it
         if (IsMoving && !Player.HasStatus(true, StatusID.Acceleration) &&
             //Additional check to NOT INTERRUPT DOUBLE/TRIPLE melee combos
-            !IsLastGCD(ActionID.ResolutionPvE)&&
+            !IsLastGCD(ActionID.ResolutionPvE) &&
             //Check if player dont have GrandImpact buff
             !Player.HasStatus(true, StatusID.GrandImpactReady) &&
             //Fires acceleration. If player dont have acceleration at all, fires swiftcast instead
@@ -146,7 +146,7 @@ public sealed class RDM_Default : RedMageRotation
 
         //Grand impact usage
         if (!IsLastGCD(ActionID.ResolutionPvE) && /*<- additional melee protection, just to be sure*/
-            GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck: true, skipAoeCheck: true)) return true;
+        GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck: true, skipAoeCheck: true)) return true;
 
 
         if (ManaStacks == 3) return false;
