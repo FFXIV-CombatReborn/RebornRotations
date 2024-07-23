@@ -133,8 +133,8 @@ public sealed class RDM_Default : RedMageRotation
         act = null;
 
         bool didWeJustCombo = IsLastGCD([
-            ActionID.ScorchPvE, ActionID.VerflarePvE, ActionID.VerholyPvE, ActionID.ZwerchhauPvE,
-            ActionID.RedoublementPvE]);
+            ActionID.ScorchPvE, ActionID.VerflarePvE, ActionID.VerholyPvE, ActionID.EnchantedZwerchhauPvE,
+            ActionID.EnchantedRedoublementPvP, ActionID.EnchantedRipostePvE]);
         //Grand impact usage if not interrupting melee combo
         if (!didWeJustCombo && GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck:true, skipAoeCheck: true)) return true;
 
