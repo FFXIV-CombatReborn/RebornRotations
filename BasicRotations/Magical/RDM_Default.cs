@@ -45,7 +45,8 @@ public sealed class RDM_Default : RedMageRotation
             if (IsBurst && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         }
-        
+
+
         if (IsBurst && AnyoneInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         //Use Manafication after embolden.
@@ -58,15 +59,15 @@ public sealed class RDM_Default : RedMageRotation
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         //Swift
-        if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
-            && (CombatElapsedLess(4) || !ManaficationPvE.EnoughLevel || !ManaficationPvE.Cooldown.WillHaveOneChargeGCD(0, 1)))
-        {
-            if (InCombat && !Player.HasStatus(true, StatusID.VerfireReady, StatusID.VerstoneReady))
-            {
-                if (SwiftcastPvE.CanUse(out act)) return true;
-                if (AccelerationPvE.CanUse(out act, usedUp: true)) return true;
-            }
-        }
+       // if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
+       //     && (CombatElapsedLess(4) || !ManaficationPvE.EnoughLevel || !ManaficationPvE.Cooldown.WillHaveOneChargeGCD(0, 1)))
+       // {
+       //     if (IsMoving && InCombat && !Player.HasStatus(true, StatusID.VerfireReady, StatusID.VerstoneReady))
+       //     {
+       //         if (SwiftcastPvE.CanUse(out act)) return true;
+       //         if (AccelerationPvE.CanUse(out act, usedUp: true)) return true;
+       //     }
+       //
 
         if (IsBurst && UseBurstMedicine(out act)) return true;
 
@@ -74,7 +75,6 @@ public sealed class RDM_Default : RedMageRotation
         if (ViceOfThornsPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (PrefulgencePvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ContreSixtePvE.CanUse(out act, skipAoeCheck: true)) return true;
-        // if (GrandImpactPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration))) return true;
         if (FlechePvE.CanUse(out act)) return true;
 
         if (EngagementPvE.CanUse(out act, usedUp: true)) return true;
@@ -87,8 +87,7 @@ public sealed class RDM_Default : RedMageRotation
     #region GCD Logic
 
     protected override bool EmergencyGCD(out IAction? act)
-    {
-        
+    { 
         if (ManaStacks == 3)
         {
             if (BlackMana > WhiteMana)
@@ -128,18 +127,28 @@ public sealed class RDM_Default : RedMageRotation
         
         if (IsMoving && RangedSwordplay && (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act))) return true;
 
-        // Hardcode grand impact usage (?)
-        if (IsLastGCD(ActionID.AccelerationPvE))
-        {
-            if (GrandImpactPvE.CanUse(out act, skipCastingCheck: Player.HasStatus(true, StatusID.Acceleration), skipAoeCheck: true)) return true;
-        }
-
         return base.EmergencyGCD(out act);
     }
-
+ 
     protected override bool GeneralGCD(out IAction? act)
     {
         act = null;
+
+      //Swiftcast and acceleration usage (experimental, old method on line 61)
+        //Check if player moving and dont have acceleration buff already to not override it
+        if (IsMoving && !Player.HasStatus(true, StatusID.Acceleration) &&
+            //Additional check to NOT INTERRUPT DOUBLE/TRIPLE melee combos
+            !IsLastGCD(ActionID.ResolutionPvE)&&
+            //Check if player dont have GrandImpact buff
+            !Player.HasStatus(true, StatusID.GrandImpactReady) &&
+            //Fires acceleration. If player dont have acceleration at all, fires swiftcast instead
+            (AccelerationPvE.CanUse(out act, usedUp: true) || (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act)))) return true;
+
+        //Grand impact usage
+        if (!IsLastGCD(ActionID.ResolutionPvE) && /*<- additional melee protection, just to be sure*/
+            GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck: true, skipAoeCheck: true)) return true;
+
+
         if (ManaStacks == 3) return false;
         
         if (!VerthunderIiPvE.CanUse(out _))
