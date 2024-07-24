@@ -211,7 +211,7 @@ public sealed class GNB_Default : GunbreakerRotation
     {
         if (BurstStrikePvE.CanUse(out act))
         {
-            if (DemonSlicePvE.CanUse(out act)) return false;
+            if (DemonSlicePvE.CanUse(out _)) return false;
 
             if (SonicBreakPvE.Cooldown.IsCoolingDown && SonicBreakPvE.Cooldown.WillHaveOneCharge(0.5f) && GnashingFangPvE.EnoughLevel) return false;
 
