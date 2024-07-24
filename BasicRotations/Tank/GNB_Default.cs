@@ -68,8 +68,9 @@ public sealed class GNB_Default : GunbreakerRotation
 
         if (JugularRipPvE.CanUse(out act)) return true;
 
-        if (DangerZonePvE.CanUse(out act))
+        if (DangerZonePvE.CanUse(out act) && !DoubleDownPvE.EnoughLevel)
         {
+            
             if (!IsFullParty && !(DangerZonePvE.Target.Target?.IsBossFromTTK() ?? false)) return true;
 
             if (!GnashingFangPvE.EnoughLevel && (Player.HasStatus(true, StatusID.NoMercy) || !NoMercyPvE.Cooldown.WillHaveOneCharge(15))) return true;
@@ -79,7 +80,7 @@ public sealed class GNB_Default : GunbreakerRotation
             if (!Player.HasStatus(true, StatusID.NoMercy) && !GnashingFangPvE.Cooldown.WillHaveOneCharge(20)) return true;
         }
 
-        if (Player.HasStatus(true, StatusID.NoMercy) && IsLastGCD(ActionID.SonicBreakPvE) && CanUseBowShock(out act)) return true;
+        if (Player.HasStatus(true, StatusID.NoMercy) && CanUseBowShock(out act)) return true;
 
         //if (TrajectoryPvE.CanUse(out act) && !IsMoving) return true;
         if (GnashingFangPvE.Cooldown.IsCoolingDown && DoubleDownPvE.Cooldown.IsCoolingDown && Ammo == 0 && BloodfestPvE.CanUse(out act)) return true;
@@ -109,8 +110,10 @@ public sealed class GNB_Default : GunbreakerRotation
         if (areDDTargetsInRange)
         {
             if (Player.HasStatus(true, StatusID.NoMercy) && CanUseDoubleDown(out act)) return true;
-            if (Player.HasStatus(true, StatusID.NoMercy) && BlastingZonePvE.CanUse(out act)) return true;
+            if (Player.HasStatus(true, StatusID.NoMercy) && IsLastGCD(ActionID.DoubleDownPvE) && BlastingZonePvE.CanUse(out act)) return true;
         }
+
+        
         
         if (CanUseGnashingFang(out act)) return true;
 
@@ -163,6 +166,8 @@ public sealed class GNB_Default : GunbreakerRotation
     {
         if (GnashingFangPvE.CanUse(out act))
         {
+            //AOE Check: Mobs = NO, Boss = YES
+            if (DemonSlicePvE.CanUse(out _)) return false;
 
             if (Player.HasStatus(true, StatusID.NoMercy) || !NoMercyPvE.Cooldown.WillHaveOneCharge(55)) return true;
 
@@ -177,7 +182,7 @@ public sealed class GNB_Default : GunbreakerRotation
         return false;
     }
 
-    private bool CanUseSonicBreak(out IAction act)
+    /*private bool CanUseSonicBreak(out IAction act)
     {
         if (SonicBreakPvE.CanUse(out act))
         {
@@ -189,7 +194,7 @@ public sealed class GNB_Default : GunbreakerRotation
 
         }
         return false;
-    }
+    }*/
 
     private bool CanUseDoubleDown(out IAction? act)
     {
@@ -228,6 +233,7 @@ public sealed class GNB_Default : GunbreakerRotation
     {
         if (BowShockPvE.CanUse(out act, skipAoeCheck: true))
         {
+            //AOE CHECK
             if (DemonSlicePvE.CanUse(out _) && !IsFullParty) return true;
 
             if (!SonicBreakPvE.EnoughLevel && Player.HasStatus(true, StatusID.NoMercy)) return true;
