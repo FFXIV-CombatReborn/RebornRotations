@@ -16,6 +16,10 @@ public sealed class RDM_Default : RedMageRotation
     
     [RotationConfig(CombatType.PvE, Name = "DO NOT CAST EMBOLDEN/MANAFICATION OUTSIDE OF MELEE RANGE, I'M SERIOUS YOU HAVE TO MOVE UP FOR IT TO WORK IF THIS IS ON.")]
     public bool AnyonesMeleeRule { get; set; } = false;
+
+    //Fine, ill do it myself
+    [RotationConfig(CombatType.PvE, Name = "Cast manafication outside of embolden window.")]
+    public bool AnyoneManafication { get; set; } = false;
     #endregion
 
     #region Countdown Logic
@@ -48,9 +52,16 @@ public sealed class RDM_Default : RedMageRotation
         
         if (IsBurst && AnyoneInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-        //Use Manafication after embolden.
-        if ((Player.HasStatus(true, StatusID.Embolden, StatusID.Embolden_1297, StatusID.Embolden_2282) || IsLastAbility(ActionID.EmboldenPvE))
+        //If manafication usage OUTSIDE of embolden enabled.
+        if (AnyoneManafication)
+        {
+            if (AnyoneInRange && ManaficationPvE.CanUse(out act)) return true;     
+        }
+        
+        //Use Manafication after embolden.  
+        if (!AnyoneManafication && (Player.HasStatus(true, StatusID.Embolden, StatusID.Embolden_1297, StatusID.Embolden_2282) || IsLastAbility(ActionID.EmboldenPvE))
             && ManaficationPvE.CanUse(out act)) return true;
+        
 
         return base.EmergencyAbility(nextGCD, out act);
     }
@@ -87,7 +98,7 @@ public sealed class RDM_Default : RedMageRotation
 
     protected override bool EmergencyGCD(out IAction? act)
     {
-        
+
         if (ManaStacks == 3)
         {
             if (BlackMana > WhiteMana)
@@ -109,21 +120,23 @@ public sealed class RDM_Default : RedMageRotation
             if (ScorchPvE.CanUse(out act, skipStatusProvideCheck: true, skipAoeCheck: true)) return true;
         }
 
-        if (IsLastGCD(true, MoulinetPvE) && MoulinetPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (ZwerchhauPvE.CanUse(out act)) return true;
-        if (RedoublementPvE.CanUse(out act)) return true;
+        //Melee AOE combo
+        if (IsLastGCD(true, EnchantedMoulinetPvE) && EnchantedMoulinetDeuxPvE.CanUse(out act)) return true;
+        if (IsLastGCD(true, EnchantedMoulinetDeuxPvE) && EnchantedMoulinetTroisPvE.CanUse(out act)) return true;
+        if (EnchantedZwerchhauPvE.CanUse(out act)) return true;
+        if (EnchantedRedoublementPvE.CanUse(out act)) return true;
 
         if (!CanStartMeleeCombo) return false;
 
-        if (MoulinetPvE.CanUse(out act))
+        //Check if can start melee combo
+        if (EnchantedMoulinetPvE.CanUse(out act))
         {
             if (BlackMana >= 50 && WhiteMana >= 50 || Player.HasStatus(true, StatusID.MagickedSwordplay)) return true;
         }
         else
         {
-            if ((BlackMana >= 50 && WhiteMana >= 50 || Player.HasStatus(true, StatusID.MagickedSwordplay)) && RipostePvE.CanUse(out act)) return true;
+            if ((BlackMana >= 50 && WhiteMana >= 50 || Player.HasStatus(true, StatusID.MagickedSwordplay)) && EnchantedRipostePvE.CanUse(out act)) return true;
         }
-        if (ManaStacks > 0 && RipostePvE.CanUse(out act)) return true;
         
         return base.EmergencyGCD(out act);
     }
@@ -134,14 +147,15 @@ public sealed class RDM_Default : RedMageRotation
 
         bool didWeJustCombo = IsLastGCD([
             ActionID.ScorchPvE, ActionID.VerflarePvE, ActionID.VerholyPvE, ActionID.EnchantedZwerchhauPvE,
-            ActionID.EnchantedRedoublementPvP, ActionID.EnchantedRipostePvE]);
+            ActionID.EnchantedRedoublementPvP, ActionID.EnchantedRipostePvE, ActionID.EnchantedMoulinetPvE, ActionID.EnchantedMoulinetDeuxPvE, ActionID.EnchantedMoulinetTroisPvE
+        ]);
         //Grand impact usage if not interrupting melee combo
         if (!didWeJustCombo && GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck:true, skipAoeCheck: true)) return true;
 
         //Acceleration/Swiftcast usage on move, old method on line 61.
-        if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) &&
+        if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && HasHostilesInRange &&
             //Checks for not override previous acceleration and lose grand impact
-            !Player.HasStatus(true, StatusID.Acceleration) && 
+            !Player.HasStatus(true, StatusID.Acceleration) &&
             !Player.HasStatus(true, StatusID.GrandImpactReady) &&
             //Check for melee combo 
             !didWeJustCombo &&
@@ -166,7 +180,7 @@ public sealed class RDM_Default : RedMageRotation
             !GrandImpactPvE.CanUse(out _) &&
             !Player.HasStatus(true, StatusID.GrandImpactReady) &&
             //If nothing else to use and player moving - fire reprise.
-        (ReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act)))) return true;
+        (EnchantedReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act)))) return true;
 
         if (ManaStacks == 3) return false;
         
@@ -202,7 +216,7 @@ public sealed class RDM_Default : RedMageRotation
         get
         {
             if (Player.HasStatus(true, StatusID.Manafication, StatusID.Embolden, StatusID.MagickedSwordplay) ||
-                             BlackMana == 100 || WhiteMana == 100) return true;
+                             BlackMana >= 50 || WhiteMana >= 50) return true;
 
             if (BlackMana == WhiteMana) return false;
 
