@@ -39,7 +39,9 @@ public sealed class RDM_Default : RedMageRotation
 
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
-    {
+    {   
+        
+        //COMMENT FOR MYSELF FROM FUTURE - WHY THE FUCK EMBOLDEN DONT WORK WITHOUT skipAoeCheck: true???
         bool AnyoneInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() <= 4);
         
         act = null;
@@ -69,15 +71,15 @@ public sealed class RDM_Default : RedMageRotation
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         //Swiftcast/Acceleration usage OLD VERSION
-       /* if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
-            && (CombatElapsedLess(4) || !ManaficationPvE.EnoughLevel || !ManaficationPvE.Cooldown.WillHaveOneChargeGCD(0, 1)))
-        {
-            if (InCombat && !Player.HasStatus(true, StatusID.VerfireReady, StatusID.VerstoneReady))
-            {
-                if (SwiftcastPvE.CanUse(out act)) return true;
-                if (AccelerationPvE.CanUse(out act, usedUp: true)) return true;
-            }
-        }*/
+       // if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
+       //      && (CombatElapsedLess(4) || !ManaficationPvE.EnoughLevel || !ManaficationPvE.Cooldown.WillHaveOneChargeGCD(0, 1)))
+       //  {
+       //      if (InCombat && !Player.HasStatus(true, StatusID.VerfireReady, StatusID.VerstoneReady))
+       //      {
+       //          if (SwiftcastPvE.CanUse(out act)) return true;
+       //          if (AccelerationPvE.CanUse(out act, usedUp: true)) return true;
+       //      }
+       //  }
 
         if (IsBurst && UseBurstMedicine(out act)) return true;
 
@@ -121,10 +123,10 @@ public sealed class RDM_Default : RedMageRotation
         }
 
         //Melee AOE combo
-        if (IsLastGCD(true, EnchantedMoulinetPvE) && EnchantedMoulinetDeuxPvE.CanUse(out act)) return true;
         if (IsLastGCD(true, EnchantedMoulinetDeuxPvE) && EnchantedMoulinetTroisPvE.CanUse(out act)) return true;
-        if (EnchantedZwerchhauPvE.CanUse(out act)) return true;
+        if (IsLastGCD(true, EnchantedMoulinetPvE) && EnchantedMoulinetDeuxPvE.CanUse(out act)) return true;
         if (EnchantedRedoublementPvE.CanUse(out act)) return true;
+        if (EnchantedZwerchhauPvE.CanUse(out act)) return true;
 
         if (!CanStartMeleeCombo) return false;
 
