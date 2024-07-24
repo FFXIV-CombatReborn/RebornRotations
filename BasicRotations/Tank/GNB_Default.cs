@@ -112,8 +112,8 @@ public sealed class GNB_Default : GunbreakerRotation
             if (Player.HasStatus(true, StatusID.NoMercy) && CanUseDoubleDown(out act)) return true;
             if (Player.HasStatus(true, StatusID.NoMercy) && IsLastGCD(ActionID.DoubleDownPvE) && BlastingZonePvE.CanUse(out act)) return true;
         }
-
-        
+    
+        if (NoMercyPvE.Cooldown.IsCoolingDown && BloodfestPvE.Cooldown.IsCoolingDown && BlastingZonePvE.CanUse(out act)) return true;
         
         if (CanUseGnashingFang(out act)) return true;
 
@@ -126,7 +126,7 @@ public sealed class GNB_Default : GunbreakerRotation
         if (DemonSlaughterPvE.CanUse(out act)) return true;
         if (DemonSlicePvE.CanUse(out act)) return true;
 
-        if (Ammo == 3 && IsLastGCD(ActionID.BrutalShellPvE) && BurstStrikePvE.CanUse(out act)) return true;
+        if (Ammo == 2 && IsLastGCD(ActionID.BrutalShellPvE) && BurstStrikePvE.CanUse(out act)) return true;
         
         if (SolidBarrelPvE.CanUse(out act)) return true;
         if (BrutalShellPvE.CanUse(out act)) return true;
