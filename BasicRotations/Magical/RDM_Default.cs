@@ -109,8 +109,10 @@ public sealed class RDM_Default : RedMageRotation
               ActionID.EnchantedMoulinetPvE
           });
 
-        //Acceleration usage on combo with saving 1 charge for movement
-        if (!checkmelee && !Player.HasStatus(true, StatusID.Dualcast) && AccelerationPvE.CanUse(out act)) return true;
+        //Acceleration usage on rotation with saving 1 charge for movement
+        if (!checkmelee && (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) && //i hate this.
+                            !Player.HasStatus(true, StatusID.Manafication, StatusID.Embolden, StatusID.MagickedSwordplay) &&
+                            !Player.HasStatus(true, StatusID.Dualcast) && AccelerationPvE.CanUse(out act))) return true;
     
         //Acceleration/Swiftcast usage on move
         if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && !checkmelee &&
