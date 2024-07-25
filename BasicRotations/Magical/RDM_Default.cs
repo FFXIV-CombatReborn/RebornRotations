@@ -73,77 +73,80 @@ public sealed class RDM_Default : RedMageRotation
     if (!AnyoneManafication && (Player.HasStatus(true, StatusID.Embolden) || IsLastAbility(ActionID.EmboldenPvE)) && 
              ManaficationPvE.CanUse(out act)) return true;
 
-        //Swiftcast/Acceleration usage OLD VERSION
-          // if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
-          //     && (CombatElapsedLess(4) || !ManaficationPvE.EnoughLevel || !ManaficationPvE.Cooldown.WillHaveOneChargeGCD(0, 1)))
-          // {
-          //     if (InCombat && !Player.HasStatus(true, StatusID.VerfireReady, StatusID.VerstoneReady))
-          //     {
-          //         if (SwiftcastPvE.CanUse(out act)) return true;
-          //         if (AccelerationPvE.CanUse(out act, usedUp: true)) return true;
-          //     }
-          // }
+    //Swiftcast/Acceleration usage OLD VERSION
+    // if (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50)
+    //     && (CombatElapsedLess(4) || !ManaficationPvE.EnoughLevel || !ManaficationPvE.Cooldown.WillHaveOneChargeGCD(0, 1)))
+    // {
+    //     if (InCombat && !Player.HasStatus(true, StatusID.VerfireReady, StatusID.VerstoneReady))
+    //     {
+    //         if (SwiftcastPvE.CanUse(out act)) return true;
+    //         if (AccelerationPvE.CanUse(out act, usedUp: true)) return true;
+    //     }
+    // }
           
-          //Melee combo interrupt protection
-          bool checkmelee = IsLastGCD(new[]
-          {
-              ActionID.ResolutionPvE,
-              ActionID.ScorchPvE,
-              ActionID.VerflarePvE,
-              ActionID.VerholyPvE,
-              ActionID.RedoublementPvE,
-              ActionID.EnchantedRedoublementPvE,
-              ActionID.ZwerchhauPvE,
-              ActionID.EnchantedZwerchhauPvE,
-              ActionID.RipostePvE,
-              ActionID.EnchantedRipostePvE,
-              ActionID.EnchantedMoulinetTroisPvE,
-              ActionID.EnchantedMoulinetDeuxPvE,
-              ActionID.EnchantedMoulinetPvE,
-              ActionID.MoulinetPvE
-          }) && !nextGCD.IsTheSameTo(new[]
-          {
-              ActionID.RipostePvE,
-              ActionID.EnchantedRipostePvE,
-              ActionID.MoulinetPvE,
-              ActionID.EnchantedMoulinetPvE
-          });
+    //Melee combo interrupt protection (i hate this too)
+    bool checkmelee = IsLastGCD(new[]
+    {
+        ActionID.ResolutionPvE,
+        ActionID.ScorchPvE,
+        ActionID.VerflarePvE,
+        ActionID.VerholyPvE,
+        ActionID.RedoublementPvE,
+        ActionID.EnchantedRedoublementPvE,
+        ActionID.ZwerchhauPvE,
+        ActionID.EnchantedZwerchhauPvE,
+        ActionID.RipostePvE,
+        ActionID.EnchantedRipostePvE,
+        ActionID.EnchantedMoulinetTroisPvE,
+        ActionID.EnchantedMoulinetDeuxPvE,
+        ActionID.EnchantedMoulinetPvE,
+        ActionID.MoulinetPvE
+        //I dont know at this point if nextGCD.IsTheSameTo even fucking working, but stil gonna left it in here.
+    }) && !nextGCD.IsTheSameTo(new[]
+    {
+        ActionID.RipostePvE,
+        ActionID.EnchantedRipostePvE,
+        ActionID.MoulinetPvE,
+        ActionID.EnchantedMoulinetPvE
+    });
+          
+    //i really hate this.
+    bool ambatumelee = Player.HasStatus(true, StatusID.Manafication, StatusID.MagickedSwordplay);
 
-        //Acceleration usage on rotation with saving 1 charge for movement
-        if (!checkmelee && (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) && //i hate this.
-                            !Player.HasStatus(true, StatusID.Manafication, StatusID.Embolden, StatusID.MagickedSwordplay) &&
-                            !Player.HasStatus(true, StatusID.Dualcast) && AccelerationPvE.CanUse(out act))) return true;
+    //Acceleration usage on rotation with saving 1 charge for movement
+    if (!checkmelee && !ambatumelee && //i hate this.
+        !Player.HasStatus(true, StatusID.Manafication, StatusID.MagickedSwordplay) &&
+        !Player.HasStatus(true, StatusID.Dualcast) && AccelerationPvE.CanUse(out act)) return true;
     
         //Acceleration/Swiftcast usage on move
-        if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && !checkmelee &&
-            //Checks for not override previous acceleration and lose grand impact
-            !Player.HasStatus(true, StatusID.Acceleration) &&
-            !Player.HasStatus(true, StatusID.GrandImpactReady) && HasHostilesInRange &&
-            //Use acceleration. If acceleration not available, use switfcast instead 
-            (AccelerationPvE.CanUse(out act, usedUp: IsMoving) ||
-             (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))
-        {
-            return true;
-        }
+    if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && !checkmelee && !ambatumelee && 
+        //Checks for not override previous acceleration and lose grand impact
+        !Player.HasStatus(true, StatusID.Acceleration) &&
+        !Player.HasStatus(true, StatusID.GrandImpactReady) && HasHostilesInRange &&
+        //Use acceleration. If acceleration not available, use switfcast instead 
+        (AccelerationPvE.CanUse(out act, usedUp: IsMoving) || (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))
+    {
+        return true;
+    }
         
         
         //Reprise logic
-        if (IsMoving && RangedSwordplay && !checkmelee &&
-            //Check to not use Reprise when player can do melee combo, to not break it
-            (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
-             //Check if dualcast active
-             !Player.HasStatus(true, StatusID.Dualcast) &&
-             //Bunch of checks if anything else can be used instead of Reprise
-             !AccelerationPvE.CanUse(out _) &&
-             !Player.HasStatus(true, StatusID.Acceleration) &&
-             !SwiftcastPvE.CanUse(out _) &&
-             !Player.HasStatus(true, StatusID.Swiftcast) &&
-             !GrandImpactPvE.CanUse(out _) &&
-             !Player.HasStatus(true, StatusID.GrandImpactReady) &&
-             //If nothing else to use and player moving - fire reprise.
-             EnchantedReprisePvE.CanUse(out act))) return true;
+    if (IsMoving && RangedSwordplay && !checkmelee && !ambatumelee && 
+        //Check to not use Reprise when player can do melee combo, to not break it
+        (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) && 
+         //Check if dualcast active
+         !Player.HasStatus(true, StatusID.Dualcast) &&
+         //Bunch of checks if anything else can be used instead of Reprise
+         !AccelerationPvE.CanUse(out _) &&
+         !Player.HasStatus(true, StatusID.Acceleration) &&
+         !SwiftcastPvE.CanUse(out _) &&
+         !Player.HasStatus(true, StatusID.Swiftcast) &&
+         !GrandImpactPvE.CanUse(out _) &&
+         !Player.HasStatus(true, StatusID.GrandImpactReady) &&
+         //If nothing else to use and player moving - fire reprise.
+         EnchantedReprisePvE.CanUse(out act))) return true;
         
-        if (IsBurst && UseBurstMedicine(out act)) return true;
+    if (IsBurst && UseBurstMedicine(out act)) return true;
 
         //Attack abilities.
         if (PrefulgencePvE.CanUse(out act, skipAoeCheck: true)) return true;
