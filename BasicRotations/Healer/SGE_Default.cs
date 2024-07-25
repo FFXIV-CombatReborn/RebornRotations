@@ -1,6 +1,6 @@
 namespace DefaultRotations.Healer;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
 [SourceCode(Path = "main/DefaultRotations/Healer/SGE_Default.cs")]
 [Api(2)]
 public sealed class SGE_Default : SageRotation
@@ -86,9 +86,16 @@ public sealed class SGE_Default : SageRotation
             if (ZoePvE.CanUse(out act)) return true;
         }
 
-        if (nextGCD.IsTheSameTo(false, PneumaPvE))
+        if (nextGCD.IsTheSameTo(false, PneumaPvE, EukrasianDiagnosisPvE,
+             EukrasianPrognosisPvE, EukrasianPrognosisIiPvE, DiagnosisPvE, PrognosisPvE))
         {
             if (KrasisPvE.CanUse(out act)) return true;
+        }
+
+        if (nextGCD.IsTheSameTo(false, PneumaPvE, EukrasianDiagnosisPvE,
+             EukrasianPrognosisPvE, EukrasianPrognosisIiPvE, DiagnosisPvE, PrognosisPvE))
+        {
+            if (PhilosophiaPvE.CanUse(out act)) return true;
         }
 
         return base.EmergencyAbility(nextGCD, out act);
@@ -263,6 +270,19 @@ public sealed class SGE_Default : SageRotation
     {
         if (HostileTarget?.IsBossFromTTK() ?? false)
         {
+            if (EukrasianDyskrasiaPvE.CanUse(out _, skipCastingCheck: true))
+            {
+                if (EukrasiaPvE.CanUse(out act, skipCastingCheck: true)) return true;
+                if (EukrasianDyskrasiaPvE.CanUse(out act))
+                {
+                    DosisPvE.Target = EukrasianDyskrasiaPvE.Target;
+                    return true;
+                }
+            }
+        }
+
+        if (HostileTarget?.IsBossFromTTK() ?? false)
+        {
             if (EukrasianDosisPvE.CanUse(out _, skipCastingCheck: true))
             {
                 if (EukrasiaPvE.CanUse(out act, skipCastingCheck: true)) return true;
@@ -284,6 +304,16 @@ public sealed class SGE_Default : SageRotation
         }
 
         if (IsMoving && ToxikonPvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (EukrasianDyskrasiaPvE.CanUse(out _, skipCastingCheck: true))
+        {
+            if (EukrasiaPvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (DyskrasiaPvE.CanUse(out act))
+            {
+                DyskrasiaPvE.Target = EukrasianDyskrasiaPvE.Target;
+                return true;
+            }
+        }
 
         if (DyskrasiaPvE.CanUse(out act)) return true;
 
@@ -322,7 +352,8 @@ public sealed class SGE_Default : SageRotation
             if (PrognosisPvE.CanUse(out act)) return true;
         }
 
-        if (EukrasianPrognosisIiPvE.CanUse(out _)) {
+        if (EukrasianPrognosisIiPvE.CanUse(out _))
+        {
             if (EukrasiaPvE.CanUse(out act)) return true;
             act = EukrasianPrognosisIiPvE;
             return true;
