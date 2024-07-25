@@ -20,8 +20,8 @@ public sealed class RDM_Default : RedMageRotation
     public bool AnyonesMeleeRule { get; set; } = false;
 
     //Fine, ill do it myself
-      [RotationConfig(CombatType.PvE, Name = "Cast manafication outside of embolden window (use at own risk).")]
-      public bool AnyoneManafication { get; set; } = false;
+    [RotationConfig(CombatType.PvE, Name = "Cast manafication outside of embolden window (use at own risk).")]
+    public bool AnyoneManafication { get; set; } = false;
     #endregion
 
     #region Countdown Logic
