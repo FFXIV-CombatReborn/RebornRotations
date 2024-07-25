@@ -71,17 +71,19 @@ public sealed class DRK_Default : DarkKnightRotation
         //10
         if (OblationPvE.CanUse(out act, usedUp: true)) return true;
 
-        if (ReprisalPvE.CanUse(out act, skipAoeCheck: true)) return true;
-
         if (TheBlackestNightPvE.CanUse(out act)) return true;
+        //20
+        if (DarkMindPvE.CanUse(out act)) return true;
+
         //30
         if ((!RampartPvE.Cooldown.IsCoolingDown || RampartPvE.Cooldown.ElapsedAfter(60)) && ShadowWallPvE.CanUse(out act)) return true;
 
         //20
         if (ShadowWallPvE.Cooldown.IsCoolingDown && ShadowWallPvE.Cooldown.ElapsedAfter(60) && RampartPvE.CanUse(out act)) return true;
-        if (DarkMindPvE.CanUse(out act)) return true;
 
-        return base.DefenseAreaAbility(nextGCD, out act);
+        if (ReprisalPvE.CanUse(out act)) return true;
+
+        return base.DefenseSingleAbility(nextGCD, out act);
     }
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
