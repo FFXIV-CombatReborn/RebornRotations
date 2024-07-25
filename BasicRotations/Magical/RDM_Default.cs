@@ -44,7 +44,7 @@ public sealed class RDM_Default : RedMageRotation
     
     //When we removed emergencyGCD vercure/verraise start overwriting all logic below. Need to do something about it.
     
-    //No bugs in this section, i polished it. Extra Methods is fucked up tho, need to good look of experienced rotation dev.
+    //No bugs in this section (mostly™). Extra Methods is fucked up tho, need to good look of experienced rotation dev.
     
 {
     bool AnyoneInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() <= 4);
