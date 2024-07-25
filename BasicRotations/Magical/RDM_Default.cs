@@ -41,12 +41,19 @@ public sealed class RDM_Default : RedMageRotation
 
     #region oGCD Logic
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
+    
+    //When we removed emergencyGCD vercure/verraise start overwriting all logic below. Need to do something about it.
+    
+    //No bugs in this section, i polished it. Extra Methods is fucked up tho, need to good look of experienced rotation dev.
+    
 {
     bool AnyoneInRange = AllHostileTargets.Any(hostile => hostile.DistanceToPlayer() <= 4);
     
     act = null;
-    //if (CombatElapsedLess(4)) return false;
     
+    if (CombatElapsedLess(4)) return false;
+    
+    //COMMENT FOR MYSELF FROM FUTURE - WHY THE FUCK EMBOLDEN DONT WORK WITHOUT skipAoeCheck:true???
     if (!AnyonesMeleeRule)
     {
         if (IsBurst && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -78,7 +85,9 @@ public sealed class RDM_Default : RedMageRotation
           // }
           
           //Melee combo interrupt protection
-          bool didWeJustCombo = IsLastGCD([
+          bool checkmelee = IsLastGCD(new[]
+          {
+              ActionID.ResolutionPvE,
               ActionID.ScorchPvE,
               ActionID.VerflarePvE,
               ActionID.VerholyPvE,
@@ -87,17 +96,25 @@ public sealed class RDM_Default : RedMageRotation
               ActionID.ZwerchhauPvE,
               ActionID.EnchantedZwerchhauPvE,
               ActionID.RipostePvE,
-              ActionID.EnchantedRipostePvE
-          ]);
+              ActionID.EnchantedRipostePvE,
+              ActionID.EnchantedMoulinetTroisPvE,
+              ActionID.EnchantedMoulinetDeuxPvE,
+              ActionID.EnchantedMoulinetPvE,
+              ActionID.MoulinetPvE
+          }) && !nextGCD.IsTheSameTo(new[]
+          {
+              ActionID.RipostePvE,
+              ActionID.EnchantedRipostePvE,
+              ActionID.MoulinetPvE,
+              ActionID.EnchantedMoulinetPvE
+          });
     
     
         //Acceleration/Swiftcast usage on move
-        if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && HasHostilesInRange &&
+        if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && !checkmelee &&
             //Checks for not override previous acceleration and lose grand impact
             !Player.HasStatus(true, StatusID.Acceleration) &&
-            !Player.HasStatus(true, StatusID.GrandImpactReady) &&
-            //Check for melee combo
-            !didWeJustCombo &&
+            !Player.HasStatus(true, StatusID.GrandImpactReady) && HasHostilesInRange &&
             //Use acceleration. If acceleration not available, use switfcast instead 
             (AccelerationPvE.CanUse(out act, usedUp: IsMoving) ||
              (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))
@@ -107,7 +124,7 @@ public sealed class RDM_Default : RedMageRotation
         
         
         //Reprise logic
-        if (IsMoving && RangedSwordplay && !didWeJustCombo &&
+        if (IsMoving && RangedSwordplay && !checkmelee &&
             //Check to not use Reprise when player can do melee combo, to not break it
             (ManaStacks == 0 && (BlackMana < 50 || WhiteMana < 50) &&
              //Check if dualcast active
@@ -120,7 +137,8 @@ public sealed class RDM_Default : RedMageRotation
              !GrandImpactPvE.CanUse(out _) &&
              !Player.HasStatus(true, StatusID.GrandImpactReady) &&
              //If nothing else to use and player moving - fire reprise.
-             (EnchantedReprisePvE.CanUse(out act) || EnchantedReprisePvE.CanUse(out act)))) return true;
+             EnchantedReprisePvE.CanUse(out act))) return true;
+        
         if (IsBurst && UseBurstMedicine(out act)) return true;
 
         //Attack abilities.
@@ -128,7 +146,6 @@ public sealed class RDM_Default : RedMageRotation
         if (ViceOfThornsPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ContreSixtePvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (FlechePvE.CanUse(out act)) return true;
-
         if (EngagementPvE.CanUse(out act, usedUp: true)) return true;
         if (CorpsacorpsPvE.CanUse(out act) && !IsMoving) return true;
 
@@ -168,8 +185,7 @@ public sealed class RDM_Default : RedMageRotation
         if (IsLastGCD(false, EnchantedMoulinetPvE) && EnchantedMoulinetDeuxPvE.CanUse(out act)) return true;
         if (EnchantedRedoublementPvE.CanUse(out act)) return true;
         if (EnchantedZwerchhauPvE.CanUse(out act)) return true;
-
-        //if (!CanStartMeleeCombo) return false;
+        
 
         //Check if you can start melee combo
         if (CanStartMeleeCombo)
@@ -186,21 +202,6 @@ public sealed class RDM_Default : RedMageRotation
         }
         //Grand impact usage if not interrupting melee combo
         if (GrandImpactPvE.CanUse(out act, skipStatusProvideCheck: Player.HasStatus(true, StatusID.GrandImpactReady), skipCastingCheck:true, skipAoeCheck: true)) return true;
-
-         //Acceleration/Swiftcast usage on move if moving
-         //if (!_didWeJustCombo)
-         // {
-         //     if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && HasHostilesInRange &&
-         //         //Checks for not override previous acceleration and lose grand impact
-         //         !Player.HasStatus(true, StatusID.Acceleration) &&
-         //         !Player.HasStatus(true, StatusID.GrandImpactReady) &&
-         //         //Use acceleration. If acceleration not available, use switfcast instead 
-         //         (AccelerationPvE.CanUse(out act, usedUp: true) ||
-         //          (!AccelerationPvE.CanUse(out _) && SwiftcastPvE.CanUse(out act))))
-         //     {
-         //         return true;
-         //     }
-         // }
 
         if (ManaStacks == 3) return false;
         
