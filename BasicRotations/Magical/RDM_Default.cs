@@ -110,7 +110,7 @@ public sealed class RDM_Default : RedMageRotation
           });
 
         //Acceleration usage on combo with saving 1 charge for movement
-        if (!checkmelee && AccelerationPvE.CanUse(out act)) return true;
+        if (!checkmelee && !Player.HasStatus(true, StatusID.Dualcast) && AccelerationPvE.CanUse(out act)) return true;
     
         //Acceleration/Swiftcast usage on move
         if (IsMoving && !Player.HasStatus(true, StatusID.Dualcast) && !checkmelee &&
