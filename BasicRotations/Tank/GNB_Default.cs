@@ -126,7 +126,7 @@ public sealed class GNB_Default : GunbreakerRotation
         if (DemonSlaughterPvE.CanUse(out act)) return true;
         if (DemonSlicePvE.CanUse(out act)) return true;
 
-        if (Ammo == 2 && IsLastGCD(ActionID.BrutalShellPvE) && BurstStrikePvE.CanUse(out act)) return true;
+        if (Ammo == MaxAmmo && IsLastGCD(ActionID.BrutalShellPvE) && BurstStrikePvE.CanUse(out act)) return true;
         
         if (SolidBarrelPvE.CanUse(out act)) return true;
         if (BrutalShellPvE.CanUse(out act)) return true;
