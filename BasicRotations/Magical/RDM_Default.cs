@@ -53,7 +53,7 @@ public sealed class RDM_Default : RedMageRotation
     
     if (CombatElapsedLess(4)) return false;
     
-    //COMMENT FOR MYSELF FROM FUTURE - WHY THE FUCK EMBOLDEN DONT WORK WITHOUT skipAoeCheck:true???
+    //COMMENT FOR MYSELF FROM FUTURE - WHY THE HELL EMBOLDEN DONT WORK WITHOUT skipAoeCheck:true???
     if (!AnyonesMeleeRule)
     {
         if (IsBurst && HasHostilesInRange && EmboldenPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -101,7 +101,7 @@ public sealed class RDM_Default : RedMageRotation
         ActionID.EnchantedMoulinetDeuxPvE,
         ActionID.EnchantedMoulinetPvE,
         ActionID.MoulinetPvE
-        //I dont know at this point if nextGCD.IsTheSameTo even fucking working, but stil gonna left it in here.
+        //I dont know at this point if nextGCD.IsTheSameTo even working, but stil gonna left it in here.
     }) && !nextGCD.IsTheSameTo(new[]
     {
         ActionID.RipostePvE,
