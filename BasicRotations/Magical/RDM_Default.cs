@@ -114,7 +114,7 @@ public sealed class RDM_Default : RedMageRotation
     bool ambatumelee = Player.HasStatus(true, StatusID.Manafication, StatusID.MagickedSwordplay);
 
     //Acceleration usage on rotation with saving 1 charge for movement
-    if (!checkmelee && !ambatumelee && //i hate this.
+    if (GrandImpactPvE.EnoughLevel && !checkmelee && !ambatumelee && //Check for enough level to use Grand Impact, or its pointless.
         !Player.HasStatus(true, StatusID.Manafication, StatusID.MagickedSwordplay) &&
         !Player.HasStatus(true, StatusID.Dualcast) && AccelerationPvE.CanUse(out act)) return true;
     
