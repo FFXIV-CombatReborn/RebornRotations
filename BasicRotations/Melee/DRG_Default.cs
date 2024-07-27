@@ -67,12 +67,13 @@ public sealed class DRG_Default : DragoonRotation
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        if (Player.HasStatus(true, StatusID.LanceCharge) && LanceChargePvE.Cooldown.ElapsedOneChargeAfterGCD(3))
+        if (Player.HasStatus(true, StatusID.LanceCharge))
         {
             if (GeirskogulPvE.CanUse(out act)) return true;
         }
 
-        if (Player.HasStatus(true, StatusID.LanceCharge) && LanceChargePvE.Cooldown.ElapsedOneChargeAfterGCD(3))
+        if (BattleLitanyPvE.EnoughLevel && Player.HasStatus(true, StatusID.BattleLitany) && Player.HasStatus(true, StatusID.LanceCharge) 
+            || !BattleLitanyPvE.EnoughLevel && Player.HasStatus(true, StatusID.LanceCharge))
         {
             if (DragonfireDivePvE.CanUse(out act)) return true;
         }
@@ -83,15 +84,14 @@ public sealed class DRG_Default : DragoonRotation
             if (WyrmwindThrustPvE.CanUse(out act, usedUp: true)) return true;
         }
 
+        if (JumpPvE.CanUse(out act)) return true;
         if (HighJumpPvE.CanUse(out act)) return true;
+
         if (StardiverPvE.CanUse(out act)) return true;
-
-
         if (MirageDivePvE.CanUse(out act)) return true;
         if (NastrondPvE.CanUse(out act)) return true;
         if (StarcrossPvE.CanUse(out act)) return true;
         if (RiseOfTheDragonPvE.CanUse(out act)) return true;
-        if (HighJumpPvE.CanUse(out act)) return true;
 
         return base.AttackAbility(nextGCD, out act);
     }
@@ -116,11 +116,11 @@ public sealed class DRG_Default : DragoonRotation
         if (FangAndClawPvE.CanUse(out act)) return true;
         if (WheelingThrustPvE.CanUse(out act)) return true;
 
-        if (HeavensThrustPvE.CanUse(out act)) return true;
-        if (ChaoticSpringPvE.CanUse(out act)) return true;
+        if (FullThrustPvE.CanUse(out act)) return true;
+        if (ChaosThrustPvE.CanUse(out act)) return true;
 
-        if (LanceBarragePvE.CanUse(out act)) return true;
-        if (SpiralBlowPvE.CanUse(out act)) return true;
+        if (VorpalThrustPvE.CanUse(out act)) return true;
+        if (DisembowelPvE.CanUse(out act)) return true;
 
         if (RaidenThrustPvE.CanUse(out act)) return true;
         if (TrueThrustPvE.CanUse(out act)) return true;
