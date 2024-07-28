@@ -23,7 +23,7 @@ public sealed class MNK_Default : MonkRotation
         // gap closer at the end of countdown
         if (remainTime <= 0.5 && ThunderclapPvE.CanUse(out var act)) return act; // need to face target to trigger
         // true north before pull
-        if (remainTime <= 4 && TrueNorthPvE.CanUse(out act)) return act;
+        if (remainTime <= 2 && TrueNorthPvE.CanUse(out act)) return act;
         // turn on 5 chakra at -5 prepull 
         if (remainTime <= 5 && Chakra < 5 && ForbiddenMeditationPvE.CanUse(out act)) return act;
         // formShift to prep opening
@@ -38,7 +38,7 @@ public sealed class MNK_Default : MonkRotation
     {
         // PerfectBalancePvE after first gcd + TheForbiddenChakraPvE after second gcd
         // fail to weave both after first gcd - rsr doesn't have enough time to react to both spells
-        // you pot -2s prepull or after 2nd gcd!!! 
+        // you pot -2s (real world -3s) prepull or after 2nd gcd!!! 
         // there is a small chance PB is not pressed in time if put in AttackAbility
         // start the fight 8 yarms away from boss for double weaving
         // 'The form shift and meditation prepull are implied. Prepull pot should win out, but choosing to press it in the first few weave slots shouldn¡¯t result in more than a single digit loss'
