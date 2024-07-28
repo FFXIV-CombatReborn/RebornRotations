@@ -1,45 +1,25 @@
 ﻿namespace DefaultRotations.Magical;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
 [SourceCode(Path = "main/DefaultRotations/Magical/BLM_Default.cs")]
-[Api(1)]
+[Api(2)]
 public class BLM_Default : BlackMageRotation
-{/*
-    private bool NeedToGoIce
-    {
-        get
-        {
-            //Can use Despair.
-            if (DespairPvE.EnoughLevel && CurrentMp >= DespairPvE.Info.MPNeed) return false;
-
-            //Can use Fire1
-            if (FirePvE.EnoughLevel && CurrentMp >= FirePvE.Info.MPNeed) return false;
-
-            return true;
-        }
-    }
-
-    private bool NeedToTransposeGoIce(bool usedOne)
-    {
-        if (!NeedToGoIce) return false;
-        if (!ParadoxPvE.EnoughLevel) return false;
-        var compare = usedOne ? -1 : 0;
-        var count = PolyglotStacks;
-        if (count == compare++) return false;
-        if (count == compare++ && !EnchinaEndAfterGCD(2)) return false;
-        if (count >= compare && (HasFire || SwiftcastPvE.Cooldown.WillHaveOneChargeGCD(2) || TriplecastPvE.Cooldown.WillHaveOneChargeGCD(2))) return true;
-        if (!HasFire && !SwiftcastPvE.Cooldown.WillHaveOneChargeGCD(2) && !TriplecastPvE.CanUse(out _, gcdCountForAbility: 8)) return false;
-        return true;
-    }
-
+{
+    #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use Transpose to Astral Fire before Paradox")]
     public bool UseTransposeForParadox { get; set; } = true;
 
-    [RotationConfig(CombatType.PvE, Name = "Extend Astral Fire Time Safely")]
+    [RotationConfig(CombatType.PvE, Name = "Use Retrace when out of Leylines and standing still (Dangerous and Experimental)")]
+    public bool UseRetrace { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Extend Astral Fire time more conservatively (3 GCDs) (Default is 2 GCDs)")]
     public bool ExtendTimeSafely { get; set; } = false;
 
     [RotationConfig(CombatType.PvE, Name = @"Use ""Double Paradox"" rotation [N15]")]
     public bool UseN15 { get; set; } = false;
+    #endregion
+
+    #region Additional oGCD Logic
 
     protected override IAction? CountDownAction(float remainTime)
     {
@@ -48,36 +28,14 @@ public class BLM_Default : BlackMageRotation
         {
             if (FireIiiPvE.CanUse(out act)) return act;
         }
-        if (remainTime <= 12 && SharpcastPvE.CanUse(out act, usedUp: true)) return act;
+        //if (remainTime <= 12 && SharpcastPvE.CanUse(out act, usedUp: true)) return act;
         return base.CountDownAction(remainTime);
     }
 
-    protected override bool AttackAbility(IAction nextGCD, out IAction? act)
-    {
-        if (IsBurst && UseBurstMedicine(out act)) return true;
-        if (InUmbralIce)
-        {
-            if (UmbralIceStacks == 2 && !HasFire
-                && !IsLastGCD(ActionID.ParadoxPvE))
-            {
-                if (SwiftcastPvE.CanUse(out act)) return true;
-                if (TriplecastPvE.CanUse(out act, usedUp: true)) return true;
-            }
-
-            if (UmbralIceStacks < 3 && LucidDreamingPvE.CanUse(out act)) return true;
-            if (SharpcastPvE.CanUse(out act, usedUp: true)) return true;
-        }
-        if (InAstralFire)
-        {
-            if (!CombatElapsedLess(6) && CombatElapsedLess(9) && LeyLinesPvE.CanUse(out act)) return true;
-            if (TriplecastPvE.CanUse(out act, gcdCountForAbility: 5)) return true;
-        }
-        if (AmplifierPvE.CanUse(out act)) return true;
-        return base.AttackAbility(nextGCD, out act);
-    }
-
+    [RotationDesc]
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        if (UseRetrace && RetracePvE.CanUse(out act)) return true;
         //To Fire
         if (CurrentMp >= 7200 && UmbralIceStacks == 2 && ParadoxPvE.EnoughLevel)
         {
@@ -99,17 +57,84 @@ public class BLM_Default : BlackMageRotation
         return base.EmergencyAbility(nextGCD, out act);
     }
 
+    [RotationDesc(ActionID.AetherialManipulationPvE)]
+    protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
+    {
+        if (AetherialManipulationPvE.CanUse(out act)) return true;
+
+        return base.MoveForwardAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.BetweenTheLinesPvE)]
+    protected override bool MoveBackAbility(IAction nextGCD, out IAction? act)
+    {
+        if (BetweenTheLinesPvE.CanUse(out act)) return true;
+
+        return base.MoveBackAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.ManawardPvE)]
+    protected override bool DefenseSingleAbility(IAction nextGCD, out IAction? act)
+    {
+        if (ManawardPvE.CanUse(out act)) return true;
+        return base.DefenseSingleAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.ManawardPvE, ActionID.AddlePvE)]
+    protected sealed override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
+    {
+        if (ManawardPvE.CanUse(out act)) return true;
+        if (AddlePvE.CanUse(out act)) return true;
+        return base.DefenseAreaAbility(nextGCD, out act);
+    }
+    #endregion
+
+    #region oGCD Logic
+    [RotationDesc(ActionID.ManafontPvE, ActionID.TransposePvE)]
+    protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
+    {
+        if (IsMoving && HasHostilesInRange && TriplecastPvE.CanUse(out act, usedUp: true)) return true;
+
+        return base.GeneralAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.RetracePvE, ActionID.SwiftcastPvE, ActionID.TriplecastPvE, ActionID.AmplifierPvE)]
+    protected override bool AttackAbility(IAction nextGCD, out IAction? act)
+    {
+        if (IsBurst && UseBurstMedicine(out act)) return true;
+        if (InUmbralIce)
+        {
+            if (UmbralIceStacks == 2 && !HasFire
+                && !IsLastGCD(ActionID.ParadoxPvE))
+            {
+                if (SwiftcastPvE.CanUse(out act)) return true;
+                if (TriplecastPvE.CanUse(out act, usedUp: true)) return true;
+            }
+
+            if (UmbralIceStacks < 3 && LucidDreamingPvE.CanUse(out act)) return true;
+        }
+
+        if (InAstralFire)
+        {
+            if (TriplecastPvE.CanUse(out act, gcdCountForAbility: 5)) return true;
+        }
+
+        if (AmplifierPvE.CanUse(out act)) return true;
+        return base.AttackAbility(nextGCD, out act);
+    }
+    #endregion
+
+    #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        if (FlareStarPvE.CanUse(out act)) return true;
+
         if (InFireOrIce(out act, out var mustGo)) return true;
         if (mustGo) return false;
-        //Triplecast for moving.
-        if (IsMoving && HasHostilesInRange && TriplecastPvE.CanUse(out act, usedUp: true)) return true;
 
         if (AddElementBase(out act)) return true;
         if (ScathePvE.CanUse(out act)) return true;
         if (MaintainStatus(out act)) return true;
-
         return base.GeneralGCD(out act);
     }
 
@@ -308,7 +333,7 @@ public class BLM_Default : BlackMageRotation
 
         //So long for thunder.
         if (ThunderPvE.CanUse(out _) && (!ThunderPvE.Target.Target?.WillStatusEndGCD(gcdCount, 0, true,
-            StatusID.Thunder, StatusID.ThunderIi, StatusID.ThunderIii, StatusID.ThunderIv) ?? false))
+            StatusID.Thunder, StatusID.ThunderIi, StatusID.ThunderIii, StatusID.ThunderIv, StatusID.HighThunder_3872) ?? false))
             return false;
 
         if (ThunderIiPvE.CanUse(out act)) return true;
@@ -339,7 +364,7 @@ public class BLM_Default : BlackMageRotation
     {
         act = null;
 
-        if (gcdCount == 0 || IsPolyglotStacksMaxed && EnchinaEndAfterGCD(gcdCount))
+        if (gcdCount == 0 || IsPolyglotStacksMaxed && EnochianEndAfterGCD(gcdCount))
         {
             if (FoulPvE.CanUse(out act)) return true;
             if (XenoglossyPvE.CanUse(out act)) return true;
@@ -360,12 +385,31 @@ public class BLM_Default : BlackMageRotation
         return false;
     }
 
-    [RotationDesc(ActionID.BetweenTheLinesPvE, ActionID.LeyLinesPvE)]
-    protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
+    private bool NeedToGoIce
     {
-        if (BetweenTheLinesPvE.CanUse(out act)) return true;
-        if (LeyLinesPvE.CanUse(out act)) return true;
+        get
+        {
+            //Can use Despair.
+            if (DespairPvE.EnoughLevel && CurrentMp >= DespairPvE.Info.MPNeed) return false;
 
-        return base.HealSingleAbility(nextGCD, out act);
+            //Can use Fire1
+            if (FirePvE.EnoughLevel && CurrentMp >= FirePvE.Info.MPNeed) return false;
+
+            return true;
+        }
     }
-*/}
+
+    private bool NeedToTransposeGoIce(bool usedOne)
+    {
+        if (!NeedToGoIce) return false;
+        if (!ParadoxPvE.EnoughLevel) return false;
+        var compare = usedOne ? -1 : 0;
+        var count = PolyglotStacks;
+        if (count == compare++) return false;
+        if (count == compare++ && !EnochianEndAfterGCD(2)) return false;
+        if (count >= compare && (HasFire || SwiftcastPvE.Cooldown.WillHaveOneChargeGCD(2) || TriplecastPvE.Cooldown.WillHaveOneChargeGCD(2))) return true;
+        if (!HasFire && !SwiftcastPvE.Cooldown.WillHaveOneChargeGCD(2) && !TriplecastPvE.CanUse(out _, gcdCountForAbility: 8)) return false;
+        return true;
+    }
+    #endregion
+}
