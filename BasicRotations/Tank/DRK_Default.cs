@@ -2,7 +2,7 @@ namespace DefaultRotations.Tank;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Tank/DRK_Balance.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class DRK_Default : DarkKnightRotation
 {
     #region Config Options

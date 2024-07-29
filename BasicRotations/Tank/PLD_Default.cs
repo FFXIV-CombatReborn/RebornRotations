@@ -2,7 +2,7 @@
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Tank/PLD_Default.cs")]
-[Api(2)]
+[Api(3)]
 public class PLD_Default : PaladinRotation
 {
     #region Config Options

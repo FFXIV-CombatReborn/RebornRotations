@@ -2,7 +2,7 @@ namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
 [SourceCode(Path = "main/DefaultRotations/Melee/NIN_Default.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class NIN_Default : NinjaRotation
 {
     #region Config Options

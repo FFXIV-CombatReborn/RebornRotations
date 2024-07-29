@@ -4,7 +4,7 @@ namespace DefaultRotations.Ranged;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/MCH_Default.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class MCH_Default : MachinistRotation
 {
     #region Config Options

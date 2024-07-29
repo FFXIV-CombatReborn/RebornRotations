@@ -2,7 +2,7 @@
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/RPR_Default.PvP.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class RPR_DefaultPvP : ReaperRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]
