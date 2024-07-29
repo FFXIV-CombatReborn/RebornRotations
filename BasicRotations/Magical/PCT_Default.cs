@@ -70,44 +70,47 @@ public sealed class PCT_Default : PictomancerRotation
 	// Determines emergency actions to take based on the next planned GCD action.
 	protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
 	{
-		switch (MotifSwiftCast)
+		if (InCombat)
 		{
-		case MotifSwift.CreatureMotif:
-			if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
+			switch (MotifSwiftCast)
 			{
-				if (SwiftcastPvE.CanUse(out act)) return true;
+			case MotifSwift.CreatureMotif:
+				if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.WeaponMotif:
+				if (nextGCD == HammerMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.LandscapeMotif:
+				if (nextGCD == StarrySkyMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.AllMotif:
+				if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}else
+				if (nextGCD == HammerMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}else
+				if (nextGCD == StarrySkyMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.NoMotif:
+				break;
 			}
-			break;
-		case MotifSwift.WeaponMotif:
-			if (nextGCD == HammerMotifPvE)
-			{
-				if (SwiftcastPvE.CanUse(out act)) return true;
-			}
-			break;
-		case MotifSwift.LandscapeMotif:
-			if (nextGCD == StarrySkyMotifPvE)
-			{
-				if (SwiftcastPvE.CanUse(out act)) return true;
-			}
-			break;
-		case MotifSwift.AllMotif:
-			if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
-			{
-				if (SwiftcastPvE.CanUse(out act)) return true;
-			}else
-			if (nextGCD == HammerMotifPvE)
-			{
-				if (SwiftcastPvE.CanUse(out act)) return true;
-			}else
-			if (nextGCD == StarrySkyMotifPvE)
-			{
-				if (SwiftcastPvE.CanUse(out act)) return true;
-			}
-			break;
-		case MotifSwift.NoMotif:
-			break;
 		}
-
+		
 		return base.EmergencyAbility(nextGCD, out act);
 	}
 	#endregion
@@ -225,74 +228,75 @@ public sealed class PCT_Default : PictomancerRotation
 
 		if (InCombat && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia) && !IsTargetDying && (HasSwift || !HasHostilesInMaxRange) && (!CreatureMotifDrawn || !WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime) || !LandscapeMotifDrawn))
 		{
+			bool swiftmode = HasSwift || !SwiftcastPvE.Cooldown.IsCoolingDown;
 			switch (MotifSwiftCast)
 			{
 			case MotifSwift.CreatureMotif:
 				if (!CreatureMotifDrawn)
 				{
-					if (PomMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
-					if (WingMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
-					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
-					if (MawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode ) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
 				}
 				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
 				{
-					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CombatTime > 23) return true;
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
 				}
 				if (!LandscapeMotifDrawn)
 				{
-					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
 				}
 				break;
 			case MotifSwift.WeaponMotif:
 				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
 				{
-					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CombatTime > 23) return true;
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
 				}
 				if (!LandscapeMotifDrawn)
 				{
-					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
 				}
 				if (!CreatureMotifDrawn)
 				{
-					if (PomMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
-					if (WingMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
-					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
-					if (MawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
 				}
 				break;
 			case MotifSwift.LandscapeMotif:
 				if (!LandscapeMotifDrawn)
 				{
-					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
 				}
 				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
 				{
-					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CombatTime > 23) return true;
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
 				}
 				if (!CreatureMotifDrawn)
 				{
-					if (PomMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
-					if (WingMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
-					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
-					if (MawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
 				}
 				break;
 			case MotifSwift.AllMotif:
 				if (!CreatureMotifDrawn)
 				{
-					if (PomMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
-					if (WingMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
-					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
-					if (MawMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
 				}
 				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
 				{
-					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && CombatTime > 23) return true;
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
 				}
 				if (!LandscapeMotifDrawn)
 				{
-					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:HasSwift) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
 				}
 				break;
 			case MotifSwift.NoMotif:
