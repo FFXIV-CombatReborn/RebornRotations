@@ -68,7 +68,7 @@ public sealed class RPR_Default : ReaperRotation
             if (GluttonyPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        if (!Player.HasStatus(true, StatusID.BloodsownCircle_2972) && !Player.HasStatus(true, StatusID.ImmortalSacrifice) && (GluttonyPvE.EnoughLevel && !GluttonyPvE.Cooldown.WillHaveOneChargeGCD(4) || !GluttonyPvE.EnoughLevel || Soul == 100))
+        if (!Player.HasStatus(true, StatusID.BloodsownCircle_2972) && !Player.HasStatus(true, StatusID.Executioner) && !Player.HasStatus(true, StatusID.ImmortalSacrifice) && (GluttonyPvE.EnoughLevel && !GluttonyPvE.Cooldown.WillHaveOneChargeGCD(4) || !GluttonyPvE.EnoughLevel || Soul == 100))
         {
             if (GrimSwathePvE.CanUse(out act)) return true;
             if (BloodStalkPvE.CanUse(out act)) return true;
