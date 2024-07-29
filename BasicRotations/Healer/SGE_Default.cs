@@ -2,7 +2,7 @@ namespace DefaultRotations.Healer;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
 [SourceCode(Path = "main/DefaultRotations/Healer/SGE_Default.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class SGE_Default : SageRotation
 {
     #region Config Options

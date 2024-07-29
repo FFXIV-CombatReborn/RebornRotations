@@ -2,7 +2,7 @@
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
 [SourceCode(Path = "main/DefaultRotations/Magical/BLM_Default.cs")]
-[Api(2)]
+[Api(3)]
 public class BLM_Default : BlackMageRotation
 {
     #region Config Options

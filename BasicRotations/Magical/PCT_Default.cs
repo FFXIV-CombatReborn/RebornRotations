@@ -4,7 +4,7 @@ namespace DefaultRotations.Magical;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.0", Description = "Kindly created and donated by Rabbs")]
 [SourceCode(Path = "main/DefaultRotations/Magical/PCT_Default.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class PCT_Default : PictomancerRotation
 {
 	public override MedicineType MedicineType => MedicineType.Intelligence;

@@ -2,7 +2,7 @@
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Magical/BLM_Default.PVP.cs")]
-[Api(2)]
+[Api(3)]
 public class BLM_DefaultPVP : BlackMageRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]

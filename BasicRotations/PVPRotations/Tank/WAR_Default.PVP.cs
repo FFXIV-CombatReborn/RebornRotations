@@ -2,7 +2,7 @@
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/WAR_Default.PvP.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class WAR_DefaultPvP : WarriorRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]
