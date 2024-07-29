@@ -106,11 +106,6 @@ public sealed class DRG_Default : DragoonRotation
         if (SonicThrustPvE.CanUse(out act)) return true;
         if (DoomSpikePvE.CanUse(out act, skipComboCheck: doomSpikeRightNow)) return true;
 
-        if (Player.WillStatusEndGCD(5, 0, true, StatusID.PowerSurge_2720))
-        {
-            if (DisembowelPvE.CanUse(out act)) return true;
-        }
-
         if (DrakesbanePvE.CanUse(out act)) return true;
 
         if (FangAndClawPvE.CanUse(out act)) return true;
@@ -119,8 +114,10 @@ public sealed class DRG_Default : DragoonRotation
         if (FullThrustPvE.CanUse(out act)) return true;
         if (ChaosThrustPvE.CanUse(out act)) return true;
 
-        if (VorpalThrustPvE.CanUse(out act)) return true;
+        if (SpiralBlowPvE.CanUse(out act)) return true;
         if (DisembowelPvE.CanUse(out act)) return true;
+        if (LanceBarragePvE.CanUse(out act)) return true;
+        if (VorpalThrustPvE.CanUse(out act)) return true;
 
         if (RaidenThrustPvE.CanUse(out act)) return true;
         if (TrueThrustPvE.CanUse(out act)) return true;
