@@ -438,7 +438,7 @@ public sealed class NIN_Default : NinjaRotation
     private IBaseAction? _ninActionAim = null;
 
     // Determines if Trick Attack is in its effective period.
-    private bool InTrickAttack => TrickAttackPvE.Cooldown.IsCoolingDown && !TrickAttackPvE.Cooldown.ElapsedAfter(17);
+    private bool InTrickAttack => (KunaisBanePvE.Cooldown.IsCoolingDown || TrickAttackPvE.Cooldown.IsCoolingDown) && (!KunaisBanePvE.Cooldown.ElapsedAfter(17) || !TrickAttackPvE.Cooldown.ElapsedAfter(17));
 
     // Determines if Mug is in its effective period.
     private bool InMug => MugPvE.Cooldown.IsCoolingDown && !MugPvE.Cooldown.ElapsedAfter(19);
