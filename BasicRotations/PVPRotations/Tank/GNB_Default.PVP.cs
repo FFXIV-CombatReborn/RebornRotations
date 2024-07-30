@@ -2,7 +2,7 @@
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/GNB_Default.PvP.cs")]
-[Api(1)]
+[Api(3)]
 public sealed class GNB_DefaultPvP : GunbreakerRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]

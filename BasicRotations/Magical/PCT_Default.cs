@@ -1,217 +1,379 @@
-﻿namespace DefaultRotations.Magical;
+﻿using System.ComponentModel;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.0")]
+namespace DefaultRotations.Magical;
+
+[Rotation("Default", CombatType.PvE, GameVersion = "7.0", Description = "Kindly created and donated by Rabbs")]
 [SourceCode(Path = "main/DefaultRotations/Magical/PCT_Default.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class PCT_Default : PictomancerRotation
 {
+	public override MedicineType MedicineType => MedicineType.Intelligence;
+	public static IBaseAction RainbowPrePull { get; } = new BaseAction((ActionID)34688);
 
-    private const ActionID PomMPVEActionID = (ActionID)34670;
-    private IBaseAction PomMPvE = new BaseAction(PomMPVEActionID);
+	[RotationConfig(CombatType.PvE, Name = "Use HolyInWhite or CometInBlack while moving")]
+	public bool HolyCometMoving { get; set; } = true;
 
-    private const ActionID WingMPVEActionID = (ActionID)34671;
-    private IBaseAction WingMPvE = new BaseAction(WingMPVEActionID);
+	[RotationConfig(CombatType.PvE, Name = "Use swifcast on")]
+	public MotifSwift MotifSwiftCast { get; set; } = MotifSwift.NoMotif;
 
-    private bool MogofAgesReady = false;
-    private bool MogofAgesNotInCooldown = false;
-    private bool PomMotifAvailable = false;
-    private bool PomMuseAvailable = false;
+	public enum MotifSwift : byte
+	{
 
-    public override MedicineType MedicineType => MedicineType.Intelligence;
-    #region Countdown logic
-    // Defines logic for actions to take during the countdown before combat starts.
-    protected override IAction? CountDownAction(float remainTime)
-    {
-        return base.CountDownAction(remainTime);
-    }
-    #endregion
+		[Description("CreatureMotif")] CreatureMotif,
 
-    #region Emergency Logic
-    // Determines emergency actions to take based on the next planned GCD action.
-    protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
-    {
-        act = null;
+		[Description("WeaponMotif")] WeaponMotif,
 
-        return base.EmergencyAbility(nextGCD, out act);
-    }
-    #endregion
+		[Description("LandscapeMotif")] LandscapeMotif,
 
-    #region oGCD Logic
-    protected override bool AttackAbility(IAction nextGCD, out IAction? act)
-    {
-        //LivingMusePve.AdjusteId == 34670 rdy to cast Pom Muse 34671 Winged Muse  , 35347 not ready to cast anything
-        //SteelMusePve.AdjusteId == 34674 rdy to cast Striking Muse  , 35348 not ready to cast anything
-        //ScenicMusePve.AdjusteId ==  34675, 35349 not ready to cast anything
-        bool PomMotifReady = (CreatureMotifPvE.AdjustedID == 34664);
-        bool PomMuseReady = (LivingMusePvE.AdjustedID == 34670);
-        bool WingedMusefReady = (LivingMusePvE.AdjustedID == 34671);
+		[Description("AllMotif")] AllMotif,
 
-        if(MogOfTheAgesPvE.Cooldown.IsCoolingDown)
-        {
-            MogofAgesNotInCooldown = false;
-            MogofAgesReady = false;
-            PomMotifAvailable = false;
-            PomMuseAvailable = false;
-        }
+		[Description("NoMotif(ManualSwifcast")]
+		NoMotif
+	}
 
-        if (!MogOfTheAgesPvE.Cooldown.IsCoolingDown)
-        {
-            MogofAgesNotInCooldown = true;
-        }
+	#region Countdown logic
+	// Defines logic for actions to take during the countdown before combat starts.
+	protected override IAction? CountDownAction(float remainTime)
+	{
+		IAction act;
+		if (!InCombat)
+		{
+			if (!CreatureMotifDrawn)
+			{
+				if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return act;
+				if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return act;
+				if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return act;
+				if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return act;
+			}
+			if (!WeaponMotifDrawn)
+			{
+				if (HammerMotifPvE.CanUse(out act)) return act;
+			}
+			if (!LandscapeMotifDrawn)
+			{
+				if (StarrySkyMotifPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return act;
+			}
+		}
+		if (remainTime < RainbowDripPvE.Info.CastTime + CountDownAhead)
+		{
+			if (StrikingMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && WeaponMotifDrawn) return act;
+		}
+		if (remainTime < RainbowDripPvE.Info.CastTime + 0.4f + CountDownAhead)
+		{
+			if (RainbowPrePull.CanUse(out act, skipAoeCheck: true, skipCastingCheck: true, skipStatusProvideCheck: true)) return act;
+		}
+		return base.CountDownAction(remainTime);
+	}
+	#endregion
 
-        if (MogofAgesNotInCooldown && !PomMotifAvailable && PomMotifReady)
-        {
-            PomMotifAvailable = true;
-        }
+	#region Emergency Logic
+	// Determines emergency actions to take based on the next planned GCD action.
+	protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
+	{
+		if (InCombat)
+		{
+			switch (MotifSwiftCast)
+			{
+			case MotifSwift.CreatureMotif:
+				if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.WeaponMotif:
+				if (nextGCD == HammerMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.LandscapeMotif:
+				if (nextGCD == StarrySkyMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.AllMotif:
+				if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}else
+				if (nextGCD == HammerMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}else
+				if (nextGCD == StarrySkyMotifPvE)
+				{
+					if (SwiftcastPvE.CanUse(out act)) return true;
+				}
+				break;
+			case MotifSwift.NoMotif:
+				break;
+			}
+		}
+		
+		return base.EmergencyAbility(nextGCD, out act);
+	}
+	#endregion
 
-        if (MogofAgesNotInCooldown && !PomMuseAvailable && PomMuseReady)
-        {
-            PomMuseAvailable = true;
-        }
+	#region oGCD Logic
+	protected override bool AttackAbility(IAction nextGCD, out IAction? act)
+	{
+		if (Player.HasStatus(true, StatusID.StarryMuse))
+		{
+			if (Player.HasStatus(true, StatusID.SubtractiveSpectrum) && !Player.HasStatus(true, StatusID.SubtractivePalette))
+			{
+				if (SubtractivePalettePvE.CanUse(out act)) return true;
+			}
 
-        if (MogofAgesNotInCooldown && (PomMuseAvailable || PomMotifAvailable))
-        {
-            MogofAgesReady = true;
-        }
+			if (CreatureMotifDrawn)
+			{
+				if (FangedMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CreatureMotifDrawn && LivingMusePvE.AdjustedID == FangedMusePvE.ID) return true;
+			}
 
-        if (!Player.HasStatus(true, StatusID.SubtractivePalette) && (PaletteGauge >= 50 || Player.HasStatus(true, StatusID.SubtractiveSpectrum)) && SubtractivePalettePvE.CanUse(out act)) return true;
+			if (RetributionOfTheMadeenPvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && MadeenPortraitReady) return true;
+		}
 
-        //landscape to be used before mog of ages
-        //if (LandscapeMotifDrawn && (PomMotifReady || PomMuseReady) && !MogOfTheAgesPvE.Cooldown.IsCoolingDown && StarryMusePvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, usedUp: true)) return true;
-        if (LandscapeMotifDrawn && MogofAgesReady && !MogOfTheAgesPvE.Cooldown.IsCoolingDown && StarryMusePvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, usedUp: true)) return true;
-        if (MogOfTheAgesPvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, usedUp: true)) return true;
+		if (!Player.HasStatus(true, StatusID.SubtractivePalette) && (PaletteGauge >= 50 || Player.HasStatus(true, StatusID.SubtractiveSpectrum)) && SubtractivePalettePvE.CanUse(out act)) return true;
 
-        if (CreatureMotifDrawn && PomMuseReady && PomMPvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, usedUp: true)) return true;
-        if (CreatureMotifDrawn && WingedMusefReady && WingMPvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, usedUp: true)) return true;
-        if (WeaponMotifDrawn && StrikingMusePvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, usedUp: true)) return true;
+		if (InCombat)
+		{
+			if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && LandscapeMotifDrawn && CreatureMotifDrawn && CombatTime > 5) return true;
+			if (RetributionOfTheMadeenPvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && MadeenPortraitReady) return true;
+			if (MogOfTheAgesPvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && MooglePortraitReady) return true;
+			if (StrikingMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && WeaponMotifDrawn) return true;
+			if (PomMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CreatureMotifDrawn && LivingMusePvE.AdjustedID == PomMusePvE.ID) return true;
+			if (WingedMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CreatureMotifDrawn && LivingMusePvE.AdjustedID == WingedMusePvE.ID) return true;
+			if (ClawedMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CreatureMotifDrawn && LivingMusePvE.AdjustedID == ClawedMusePvE.ID) return true;
+		}
 
-        //kept just in case
-        //if (LandscapeMotifDrawn && StarryMusePvE.CanUse(out act, skipStatusProvideCheck: true, skipComboCheck: true, skipCastingCheck: true, skipAoeCheck: true, usedUp: true)) return true;
-        
+		return base.AttackAbility(nextGCD, out act);
+	}
 
-
-        return base.AttackAbility(nextGCD, out act);
-    }
-
-    protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
-    {
-        act = null;
-
-
-        return base.MoveForwardAbility(nextGCD, out act);
-    }
-    #endregion
-
-    #region GCD Logic
-    protected override bool MoveForwardGCD(out IAction? act)
-    {
-        act = null;
-
-        return base.MoveForwardGCD(out act);
-    }
-
-    protected override bool GeneralGCD(out IAction? act)
-    {
-
-        bool HammerMotifReady = (WeaponMotifPvE.AdjustedID == 34668);
-        bool WingMotifReady = (CreatureMotifPvE.AdjustedID == 34665);
-        bool PomMotifReady = (CreatureMotifPvE.AdjustedID == 34664);
-        bool StarryMotifReady = (LandscapeMotifPvE.AdjustedID == 34669);
-        //WeaponMotifPvE.AdjustedID == 34668 => rdy to cast HammerMotif, 34690 not ready to cast anything
-        //CreatureMotifPve.AdjustedID == 34665 => rdy to cast WingMotif / 34664 =>rdy to cast PomMotif , 34689 not ready to cast anything
-        //LandscapeMotifPvE .AdjustedID ==  34669 => rdy to cast StarrySkyMotif , 34691 not ready to cast anything
-
-        if (Player.HasStatus(true, StatusID.HammerTime) && HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
-
-        if (!CreatureMotifDrawn && WingMotifReady && WingMotifPvE.CanUse(out act)) return true;
-        if (!CreatureMotifDrawn && PomMotifReady && PomMotifPvE.CanUse(out act)) return true;
-        if (!WeaponMotifDrawn && HammerMotifReady &&  HammerMotifPvE.CanUse(out act)) return true;
-        if (!LandscapeMotifDrawn && StarryMotifReady && StarrySkyMotifPvE.CanUse(out act)) return true;
-        if (Player.HasStatus(true, StatusID.SubtractivePalette))
-        {
-            //AOE
-            if (ThunderIiInMagentaPvE.CanUse(out act)) return true;
-            if (StoneIiInYellowPvE.CanUse(out act)) return true;
-            if (BlizzardIiInCyanPvE.CanUse(out act)) return true;
-
-            //123
-            if (ThunderInMagentaPvE.CanUse(out act)) return true;
-            if (StoneInYellowPvE.CanUse(out act)) return true;
-            if (BlizzardInCyanPvE.CanUse(out act)) return true;
-
-        }
-        else
-        {
-            if (Player.HasStatus(true, StatusID.MonochromeTones) && CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
-            if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
-            //AOE
-            if (WaterIiInBluePvE.CanUse(out act)) return true;
-            if (AeroIiInGreenPvE.CanUse(out act)) return true;
-            if (FireIiInRedPvE.CanUse(out act)) return true;
-
-            //123
-            if (WaterInBluePvE.CanUse(out act)) return true;
-            if (AeroInGreenPvE.CanUse(out act)) return true;
-            if (FireInRedPvE.CanUse(out act)) return true;
-        }
+	protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
+	{
+		act = null;
 
 
-        return base.GeneralGCD(out act);
-    }
+		return base.MoveForwardAbility(nextGCD, out act);
+	}
+	#endregion
 
-    private bool AttackGCD(out IAction? act, bool burst)
-    {
-        act = null;
+	#region GCD Logic
+	protected override bool MoveForwardGCD(out IAction? act)
+	{
+		act = null;
 
-        return false;
-    }
-    #endregion
+		return base.MoveForwardGCD(out act);
+	}
 
-    #region Extra Methods
-    // Extra private helper methods for determining the usability of specific abilities under certain conditions.
-    // These methods simplify the main logic by encapsulating specific checks related to abilities' cooldowns and prerequisites.
-    //private bool CanUseExamplePvE(out IAction? act)
-    //{
+	protected override bool GeneralGCD(out IAction? act)
+	{
+		bool IsTargetDying = HostileTarget?.IsDying() ?? false;
 
-    //}
+		if (CombatTime < 5)
+		{
+			if (StrikingMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && WeaponMotifDrawn) return true;
+			if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
+			if (!CreatureMotifDrawn)
+			{
+				if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+				if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+				if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+				if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+			}
+		}
 
-    public override void DisplayStatus()
-    {
-        //motif
-        ImGui.Text("-----Motif");
-        ImGui.Text("HammerMotif " + HammerMotifPvE.AdjustedID.ToString());
-        ImGui.Text("WeaponMotif adjID " + WeaponMotifPvE.AdjustedID.ToString());
-        ImGui.Text("-----");
-        ImGui.Text("WingMotif " + WingMotifPvE.AdjustedID.ToString());
-        ImGui.Text("CreatureMotif adjID " + CreatureMotifPvE.AdjustedID.ToString());
-        ImGui.Text("-----");
-        ImGui.Text("StarrySkyMotif " + StarrySkyMotifPvE.AdjustedID.ToString());
-        ImGui.Text("LandscapeMotif adjID " + LandscapeMotifPvE.AdjustedID.ToString());
+		if (Player.HasStatus(true, StatusID.StarryMuse))
+		{
+			if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0 && Player.HasStatus(true, StatusID.MonochromeTones)) return true;
+		}
 
-        //muse
-        ImGui.Text("-----Muse");
-        ImGui.Text("PomMuse " + PomMusePvE.AdjustedID.ToString());
-        ImGui.Text("LivingMuse adjID " + LivingMusePvE.AdjustedID.ToString());
-        ImGui.Text("-----");
-        ImGui.Text("StrikingMuse " + StrikingMusePvE.AdjustedID.ToString());
-        ImGui.Text("SteelMuse adjID " + SteelMusePvE.AdjustedID.ToString());
-        ImGui.Text("-----");
-        ImGui.Text("StarryMuse " + StarryMusePvE.AdjustedID.ToString());
-        ImGui.Text("ScenicMuse adjID " + ScenicMusePvE.AdjustedID.ToString());
+		if (StarPrismPvE.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.Starstruck)) return true;
 
-        bool PomMotifReady = (CreatureMotifPvE.AdjustedID == 34664);
-        bool PomMuseReady = (LivingMusePvE.AdjustedID == 34670);
-        //pom starry sky
-        ImGui.Text("-----Pom Starry Sky");
-        ImGui.Text("PomMotifReady " + PomMotifReady.ToString());
-        ImGui.Text("PomMuseReady " + PomMuseReady.ToString());
-        ImGui.Text("StarryMuse " + StarryMusePvE.Cooldown.IsCoolingDown.ToString());
-        ImGui.Text("MogofAges enabled " + MogOfTheAgesPvE.IsEnabled.ToString());
-        ImGui.Text("MogofAges incooldown " + MogOfTheAgesPvE.IsInCooldown.ToString());
-        ImGui.Text("MogofAges iscoolingdown " + MogOfTheAgesPvE.Cooldown.IsCoolingDown.ToString());
-        ImGui.Text("MogofAges cooldown " + MogOfTheAgesPvE.Info.ToString());
+		if (RainbowDripPvE.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.RainbowBright)) return true;
 
-        base.DisplayStatus();
-    }
-    #endregion
+		// white/black paint use while moving
+		if (IsMoving)
+		{
+			if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Player.HasStatus(true, StatusID.HammerTime) && InCombat) return true;
+			if (HolyCometMoving)
+			{
+				if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0 && Player.HasStatus(true, StatusID.MonochromeTones)) return true;
+				if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
+			}
+		}
+
+		if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Player.HasStatus(true, StatusID.HammerTime) && InCombat) return true;
+
+		if (!InCombat)
+		{
+			if (!CreatureMotifDrawn)
+			{
+				if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+				if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+				if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+				if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+			}
+			if (!WeaponMotifDrawn)
+			{
+				if (HammerMotifPvE.CanUse(out act)) return true;
+			}
+			if (!LandscapeMotifDrawn)
+			{
+				if (StarrySkyMotifPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+			}
+
+			if (RainbowDripPvE.CanUse(out act)) return true;
+		}
+
+		if (InCombat && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia) && !IsTargetDying && (HasSwift || !HasHostilesInMaxRange) && (!CreatureMotifDrawn || !WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime) || !LandscapeMotifDrawn))
+		{
+			bool swiftmode = HasSwift || !SwiftcastPvE.Cooldown.IsCoolingDown;
+			switch (MotifSwiftCast)
+			{
+			case MotifSwift.CreatureMotif:
+				if (!CreatureMotifDrawn)
+				{
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode ) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+				}
+				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
+				{
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
+				}
+				if (!LandscapeMotifDrawn)
+				{
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+				}
+				break;
+			case MotifSwift.WeaponMotif:
+				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
+				{
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
+				}
+				if (!LandscapeMotifDrawn)
+				{
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+				}
+				if (!CreatureMotifDrawn)
+				{
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+				}
+				break;
+			case MotifSwift.LandscapeMotif:
+				if (!LandscapeMotifDrawn)
+				{
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+				}
+				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
+				{
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
+				}
+				if (!CreatureMotifDrawn)
+				{
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+				}
+				break;
+			case MotifSwift.AllMotif:
+				if (!CreatureMotifDrawn)
+				{
+					if (PomMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+				}
+				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
+				{
+					if (HammerMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && CombatTime > 23) return true;
+				}
+				if (!LandscapeMotifDrawn)
+				{
+					if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck:swiftmode) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+				}
+				break;
+			case MotifSwift.NoMotif:
+				if (!LandscapeMotifDrawn)
+				{
+					if (StarrySkyMotifPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+				}
+				if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime))
+				{
+					if (HammerMotifPvE.CanUse(out act) && CombatTime > 23) return true;
+				}
+				if (!CreatureMotifDrawn)
+				{
+					if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+					if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+					if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+					if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+				}
+				break;
+			}
+		}
+
+		if (!LandscapeMotifDrawn && ScenicMusePvE.Cooldown.RecastTimeRemainOneCharge <= 15 && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
+		{
+			if (StarrySkyMotifPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
+		}
+		if (!CreatureMotifDrawn && (LivingMusePvE.Cooldown.HasOneCharge || LivingMusePvE.Cooldown.RecastTimeRemainOneCharge <= CreatureMotifPvE.Info.CastTime) && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
+		{
+			if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+			if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+			if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+			if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+			;
+		}
+		if (!WeaponMotifDrawn && !Player.HasStatus(true, StatusID.HammerTime) && (SteelMusePvE.Cooldown.HasOneCharge || SteelMusePvE.Cooldown.RecastTimeRemainOneCharge <= WeaponMotifPvE.Info.CastTime) && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
+		{
+			if (HammerMotifPvE.CanUse(out act)) return true;
+		}
+
+		//white paint over cap protection
+		if (Paint == 5)
+		{
+			if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0 && Player.HasStatus(true, StatusID.MonochromeTones)) return true;
+			if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
+		}
+		//aoe
+		//
+		if (ThunderIiInMagentaPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette) && Player.HasStatus(true, StatusID.AetherhuesIi)) return true;
+		if (StoneIiInYellowPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette) && Player.HasStatus(true, StatusID.Aetherhues)) return true;
+		if (BlizzardIiInCyanPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette)) return true;
+
+
+		if (WaterIiInBluePvE.CanUse(out act) && Player.HasStatus(true, StatusID.AetherhuesIi)) return true;
+		if (AeroIiInGreenPvE.CanUse(out act) && Player.HasStatus(true, StatusID.Aetherhues)) return true;
+		if (FireIiInRedPvE.CanUse(out act)) return true;
+
+		//single target
+		//
+
+		if (ThunderInMagentaPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette) && Player.HasStatus(true, StatusID.AetherhuesIi)) return true;
+		if (StoneInYellowPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette) && Player.HasStatus(true, StatusID.Aetherhues)) return true;
+		if (BlizzardInCyanPvE.CanUse(out act) && Player.HasStatus(true, StatusID.SubtractivePalette)) return true;
+
+
+		if (WaterInBluePvE.CanUse(out act) && Player.HasStatus(true, StatusID.AetherhuesIi)) return true;
+		if (AeroInGreenPvE.CanUse(out act) && Player.HasStatus(true, StatusID.Aetherhues)) return true;
+		if (FireInRedPvE.CanUse(out act)) return true;
+
+		return base.GeneralGCD(out act);
+	}
+
+	private bool AttackGCD(out IAction? act, bool burst)
+	{
+		act = null;
+
+		return false;
+	}
+	#endregion
+
 }

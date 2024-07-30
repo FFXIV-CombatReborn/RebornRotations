@@ -2,7 +2,7 @@
 
 [Rotation("Default", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Melee/MNK_Default.PVP.cs")]
-[Api(1)]
+[Api(3)]
 public sealed class MNK_DefaultPvP : MonkRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]

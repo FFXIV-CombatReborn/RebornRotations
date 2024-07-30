@@ -1,15 +1,15 @@
 ﻿namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.01", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Melee/RPR_Default.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class RPR_Default : ReaperRotation
 {
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "[Beta Option] Pool Shroud for Arcane Circle.")]
     public bool EnshroudPooling { get; set; } = false;
 
-    public static bool HasExecutioner => Player.HasStatus(true, StatusID.Executioner);
+    public static bool ExecutionerReady => Player.HasStatus(true, StatusID.Executioner);
     #endregion
 
     #region Countdown Logic
@@ -63,12 +63,12 @@ public sealed class RPR_Default : ReaperRotation
             if (LemuresSlicePvE.CanUse(out act, usedUp: true)) return true;
         }
 
-        if (PlentifulHarvestPvE.EnoughLevel && !Player.HasStatus(true, StatusID.ImmortalSacrifice) /*&& !Player.HasStatus(true, StatusID.BloodsownCircle_2972) */|| !PlentifulHarvestPvE.EnoughLevel)
+        if (PlentifulHarvestPvE.EnoughLevel && !HasPerfectioParata && !Player.HasStatus(true, StatusID.ImmortalSacrifice) /*&& !Player.HasStatus(true, StatusID.BloodsownCircle_2972) */|| !PlentifulHarvestPvE.EnoughLevel)
         {
             if (GluttonyPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        if (!Player.HasStatus(true, StatusID.BloodsownCircle_2972) && !Player.HasStatus(true, StatusID.ImmortalSacrifice) && (GluttonyPvE.EnoughLevel && !GluttonyPvE.Cooldown.WillHaveOneChargeGCD(4) || !GluttonyPvE.EnoughLevel || Soul == 100))
+        if (!Player.HasStatus(true, StatusID.BloodsownCircle_2972) && !HasPerfectioParata && !Player.HasStatus(true, StatusID.Executioner) && !Player.HasStatus(true, StatusID.ImmortalSacrifice) && (GluttonyPvE.EnoughLevel && !GluttonyPvE.Cooldown.WillHaveOneChargeGCD(4) || !GluttonyPvE.EnoughLevel || Soul == 100))
         {
             if (GrimSwathePvE.CanUse(out act)) return true;
             if (BloodStalkPvE.CanUse(out act)) return true;
@@ -88,7 +88,7 @@ public sealed class RPR_Default : ReaperRotation
 
         if (SoulsowPvE.CanUse(out act)) return true;
 
-        if (!HasExecutioner && !HasSoulReaver )
+        if (!ExecutionerReady && !HasSoulReaver )
         {
             if (PerfectioPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
@@ -181,7 +181,7 @@ public sealed class RPR_Default : ReaperRotation
 
     private bool ItsGluttonyTime(out IAction? act)
     {
-        if (HasExecutioner)
+        if (ExecutionerReady)
         {
             if (ExecutionersGuillotinePvE.CanUse(out act)) return true;
             if (Player.HasStatus(true, StatusID.EnhancedGallows))

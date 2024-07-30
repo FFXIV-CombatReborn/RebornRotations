@@ -2,7 +2,7 @@
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Magical/RDM_Default.PVP.cs")]
-[Api(1)]
+[Api(3)]
 public class RDM_DefaultPvP : RedMageRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]

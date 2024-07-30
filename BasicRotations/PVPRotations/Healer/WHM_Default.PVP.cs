@@ -2,7 +2,7 @@ namespace DefaultRotations.Healer;
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Healer/WHM_Default.PVP.cs")]
-[Api(1)]
+[Api(3)]
 public class WHM_DefaultPVP : WhiteMageRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]

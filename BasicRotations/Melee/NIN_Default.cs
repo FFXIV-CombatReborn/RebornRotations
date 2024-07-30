@@ -1,8 +1,8 @@
 namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
 [SourceCode(Path = "main/DefaultRotations/Melee/NIN_Default.cs")]
-[Api(2)]
+[Api(3)]
 public sealed class NIN_Default : NinjaRotation
 {
     #region Config Options
@@ -411,7 +411,7 @@ public sealed class NIN_Default : NinjaRotation
         if (DeathBlossomPvE.CanUse(out act)) return true;
 
         //Single
-        //if (!InTrickAttack && Kazematoi < 5 && ArmorCrushPvE.CanUse(out act)) return true;
+        if (!InTrickAttack && Kazematoi < 5 && ArmorCrushPvE.CanUse(out act)) return true;
         if (AeolianEdgePvE.CanUse(out act)) return true;
         if (GustSlashPvE.CanUse(out act)) return true;
         if (SpinningEdgePvE.CanUse(out act)) return true;
@@ -438,7 +438,7 @@ public sealed class NIN_Default : NinjaRotation
     private IBaseAction? _ninActionAim = null;
 
     // Determines if Trick Attack is in its effective period.
-    private bool InTrickAttack => TrickAttackPvE.Cooldown.IsCoolingDown && !TrickAttackPvE.Cooldown.ElapsedAfter(17);
+    private bool InTrickAttack => (KunaisBanePvE.Cooldown.IsCoolingDown || TrickAttackPvE.Cooldown.IsCoolingDown) && (!KunaisBanePvE.Cooldown.ElapsedAfter(17) || !TrickAttackPvE.Cooldown.ElapsedAfter(17));
 
     // Determines if Mug is in its effective period.
     private bool InMug => MugPvE.Cooldown.IsCoolingDown && !MugPvE.Cooldown.ElapsedAfter(19);
