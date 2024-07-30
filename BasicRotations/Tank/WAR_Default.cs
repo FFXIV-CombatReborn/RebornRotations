@@ -49,23 +49,23 @@ public sealed class WAR_Default : WarriorRotation
     #region oGCD Logic
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        act = null;
-        if (!Player.HasStatus(true, StatusID.BurgeoningFury) && InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
+        if (InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
 
         if (CombatElapsedLessGCD(1)) return false;
 
         if (UseBurstMedicine(out act)) return true;
 
         if (Player.HasStatus(false, StatusID.SurgingTempest)
-            && !Player.WillStatusEndGCD(2, 0, true, StatusID.SurgingTempest) // Less delaying of Inner Release which resulted in unsynced burst windows outside of raid buffs (IR grants +10 secs to ST) The opener is 6 GCDS= 15s on 2.5gcd
+            && !Player.WillStatusEndGCD(2, 0, true, StatusID.SurgingTempest)
             || !MythrilTempestPvE.EnoughLevel)
         {
             if (BerserkPvE.CanUse(out act)) return true;
+
         }
 
         if (IsBurstStatus)
         {
-            if (!Player.HasStatus(true, StatusID.BurgeoningFury) && InfuriatePvE.CanUse(out act, usedUp: true)) return true;
+            if (InfuriatePvE.CanUse(out act, usedUp: true)) return true;
         }
 
         if (CombatElapsedLessGCD(4)) return false;
@@ -78,11 +78,8 @@ public sealed class WAR_Default : WarriorRotation
 
         if (OnslaughtPvE.CanUse(out act, usedUp: IsBurstStatus) &&
            !IsMoving &&
-           !IsLastAction(true, OnslaughtPvE) && // avoid clipping with auto heal defensives
-           !IsLastAction(true, EquilibriumPvE) && // avoid clipping with auto heal defensives
-           !IsLastAction(true, NascentFlashPvE) && // avoid clipping with auto heal defensives
-           !IsLastAction(true, ThrillOfBattlePvE) && // avoid clipping with auto heal defensives
-
+           !IsLastAction(true, OnslaughtPvE) &&
+           !IsLastAction(true, UpheavalPvE) &&
             Player.HasStatus(false, StatusID.SurgingTempest))
         {
             return true;
@@ -153,24 +150,26 @@ public sealed class WAR_Default : WarriorRotation
             if (FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         }
 
+        if (Player.HasStatus(false, StatusID.SurgingTempest) &&
+       (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80))
+        {
+            if (SteelCyclonePvE.CanUse(out act)) return true;
+            if (InnerBeastPvE.CanUse(out act)) return true;
+        }
+
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
         {
-            
-            if (Player.HasStatus(false, StatusID.PrimalRuinationReady)) // Removed my initial Status check which delayed Ruination by roughly 15 seconds bc the opener on release was still semi-optimal. Ruination in opener is a big dps increase due to raid buffs
+            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
+            {
+                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
+            }
+
+            // New check for Primal Ruination
+            if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease))
             {
                 if (PrimalRuinationPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
-            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
-            {
-                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 1) return true; // back to default
-            }
 
-
-            if (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80)
-            {
-                if (SteelCyclonePvE.CanUse(out act)) return true;
-                if (InnerBeastPvE.CanUse(out act)) return true;
-            }
         }
 
         if (MythrilTempestPvE.CanUse(out act)) return true;
