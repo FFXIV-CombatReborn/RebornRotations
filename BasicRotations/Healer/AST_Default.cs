@@ -39,16 +39,6 @@ public sealed class AST_Default : AstrologianRotation
 
     #region Defensive Logic
 
-    [RotationDesc(ActionID.CelestialIntersectionPvE, ActionID.TheArrowPvE, ActionID.TheEwerPvE)]
-    protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
-    {
-        if (InCombat && TheArrowPvE.CanUse(out act)) return true;
-        if (InCombat && TheEwerPvE.CanUse(out act)) return true;
-
-        if (CelestialIntersectionPvE.CanUse(out act, usedUp: true)) return true;
-        return base.HealSingleAbility(nextGCD, out act);
-    }
-
     [RotationDesc(ActionID.ExaltationPvE, ActionID.TheArrowPvE, ActionID.TheSpirePvE, ActionID.TheBolePvE, ActionID.TheEwerPvE)]
     protected override bool DefenseSingleAbility(IAction nextGCD, out IAction? act)
     {
@@ -175,26 +165,21 @@ public sealed class AST_Default : AstrologianRotation
         return base.AttackAbility(nextGCD, out act);
     }
 
-    [RotationDesc(ActionID.EssentialDignityPvE, ActionID.CelestialIntersectionPvE, ActionID.CelestialOppositionPvE,
-        ActionID.EarthlyStarPvE, ActionID.HoroscopePvE)]
+    [RotationDesc(ActionID.TheArrowPvE, ActionID.TheEwerPvE, ActionID.EssentialDignityPvE,
+        ActionID.CelestialIntersectionPvE)]
     protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
     {
+        if (InCombat && TheArrowPvE.CanUse(out act)) return true;
+        if (InCombat && TheEwerPvE.CanUse(out act)) return true;
+
         if (EssentialDignityPvE.CanUse(out act)) return true;
 
         if (CelestialIntersectionPvE.CanUse(out act, usedUp: true)) return true;
 
-        if (CelestialOppositionPvE.CanUse(out act)) return true;
-
-        if (StellarDetonationPvE.CanUse(out act)) return true;
-
-        if (HoroscopePvE.CanUse(out act)) return true;
-
-        if (HoroscopePvE_16558.CanUse(out act)) return true;
-
         return base.HealSingleAbility(nextGCD, out act);
     }
 
-    [RotationDesc(ActionID.CelestialOppositionPvE, ActionID.EarthlyStarPvE, ActionID.HoroscopePvE)]
+    [RotationDesc(ActionID.CelestialOppositionPvE, ActionID.StellarDetonationPvE, ActionID.HoroscopePvE, ActionID.HoroscopePvE_16558, ActionID.LadyOfCrownsPvE, ActionID.HeliosConjunctionPvE)]
     protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
     {
         if (CelestialOppositionPvE.CanUse(out act)) return true;
