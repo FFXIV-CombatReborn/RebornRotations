@@ -83,8 +83,8 @@ public sealed class VPR_Default : ViperRotation
         }
 
         ////AOE Dread Combo
-        if (SwiftskinsDenPvE.CanUse(out act)) return true;
-        if (HuntersDenPvE.CanUse(out act)) return true;
+        if (SwiftskinsDenPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (HuntersDenPvE.CanUse(out act, skipComboCheck: true)) return true;
 
         if (VicepitPvE.Cooldown.CurrentCharges == 1 && VicepitPvE.Cooldown.RecastTimeRemainOneCharge < 10)
         {
