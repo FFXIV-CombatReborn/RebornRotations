@@ -1,12 +1,11 @@
 ﻿namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Melee/VPR_Default.cs")]
 [Api(3)]
 public sealed class VPR_Default : ViperRotation
 {
     #region Additional oGCD Logic
-
     [RotationDesc]
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
@@ -21,6 +20,7 @@ public sealed class VPR_Default : ViperRotation
         //Single Target Dread Combo
         if (TwinfangBitePvE.CanUse(out act)) return true;
         if (TwinbloodBitePvE.CanUse(out act)) return true;
+
         return base.EmergencyAbility(nextGCD, out act);
     }
 
@@ -42,14 +42,14 @@ public sealed class VPR_Default : ViperRotation
     #region oGCD Logic
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        //Reawaken Combo
+        ////Reawaken Combo
         if (FirstLegacyPvE.CanUse(out act)) return true;
         if (SecondLegacyPvE.CanUse(out act)) return true;
         if (ThirdLegacyPvE.CanUse(out act)) return true;
         if (FourthLegacyPvE.CanUse(out act)) return true;
         if (SerpentsIrePvE.CanUse(out act)) return true;
 
-        //Serpent Combo oGCDs
+        ////Serpent Combo oGCDs
         if (LastLashPvE.CanUse(out act)) return true;
         if (DeathRattlePvE.CanUse(out act)) return true;
 
@@ -60,50 +60,53 @@ public sealed class VPR_Default : ViperRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
-
-        if (DreadwinderPvE.Cooldown.CurrentCharges > 0 || !SerpentsIrePvE.Cooldown.IsCoolingDown)
+        // Uncoiled Fury Overcap protection
+        if (MaxRattling == RattlingCoilStacks)
         {
             if (UncoiledFuryPvE.CanUse(out act)) return true;
         }
 
-        //Reawaken Combo
+        ////Reawaken Combo
         if (OuroborosPvE.CanUse(out act)) return true;
         if (FourthGenerationPvE.CanUse(out act)) return true;
         if (ThirdGenerationPvE.CanUse(out act)) return true;
         if (SecondGenerationPvE.CanUse(out act)) return true;
         if (FirstGenerationPvE.CanUse(out act)) return true;
-        if (DreadwinderPvE.Cooldown.CurrentCharges == 0 || (DreadwinderPvE.Cooldown.CurrentCharges == 1 && DreadwinderPvE.Cooldown.RecastTimeRemainOneCharge > 10))
+
+
+        if (SwiftTime > 10 &&
+            HuntersTime > 10 &&
+            !HasHunterVenom && !HasSwiftVenom &&
+            !HasPoisedBlood && !HasPoisedFang)
         {
-            if (ReawakenPvE.CanUse(out act)) return true;
+            if (ReawakenPvE.CanUse(out act, skipComboCheck: true)) return true;
         }
-        if (HostileTarget?.StatusTime(true, StatusID.NoxiousGnash) <= 20 && HostileTarget?.StatusTime(true, StatusID.NoxiousGnash) > 0 && Player.HasStatus(true, StatusID.Swiftscaled, StatusID.Swiftscaled_4121))
+
+        ////AOE Dread Combo
+        if (SwiftskinsDenPvE.CanUse(out act)) return true;
+        if (HuntersDenPvE.CanUse(out act)) return true;
+
+        if (VicepitPvE.Cooldown.CurrentCharges == 1 && VicepitPvE.Cooldown.RecastTimeRemainOneCharge < 10)
         {
-            //Dreadwinder Usage
-            if (PitOfDreadPvE.CanUse(out act, usedUp: true) && DreadCombo is 0) return true;
-            if (DreadwinderPvE.CanUse(out act, usedUp: true) && DreadCombo is 0) return true;
+            if (VicepitPvE.CanUse(out act, usedUp: true)) return true;
         }
-
-        //AOE Dread Combo
-        if (HuntersDenPvE.CanUse(out act, skipComboCheck: true)) return true;
-        if (SwiftskinsDenPvE.CanUse(out act, skipComboCheck: true)) return true;
-
-        if (PitOfDreadPvE.CanUse(out act, usedUp: true)) return true;
-
-        //Single Target Dread Combo
+        if (VicepitPvE.CanUse(out act, usedUp: true)) return true;
+        ////Single Target Dread Combo
         if (HuntersCoilPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (SwiftskinsCoilPvE.CanUse(out act, skipComboCheck: true)) return true;
-
-        if (DreadwinderPvE.CanUse(out act, usedUp: true)) return true;
-
+        if (VicewinderPvE.Cooldown.CurrentCharges == 1 && VicewinderPvE.Cooldown.RecastTimeRemainOneCharge < 10)
+        {
+            if (VicewinderPvE.CanUse(out act, usedUp: true)) return true;
+        }
+        if (VicewinderPvE.CanUse(out act, usedUp: true)) return true;
         //AOE Serpent Combo
-        if (JaggedMawPvE.CanUse(out act, skipStatusProvideCheck: true) && !Player.HasStatus(true, StatusID.GrimhuntersVenom) && !Player.HasStatus(true, StatusID.GrimskinsVenom)) return true;
         if (JaggedMawPvE.CanUse(out act)) return true;
         if (BloodiedMawPvE.CanUse(out act)) return true;
 
         if (HuntersBitePvE.CanUse(out act)) return true;
         if (SwiftskinsBitePvE.CanUse(out act)) return true;
 
-        if (DreadMawPvE.CanUse(out act)) return true;
+        if (ReavingMawPvE.CanUse(out act)) return true;
         if (SteelMawPvE.CanUse(out act)) return true;
 
         //Single Target Serpent Combo
@@ -115,11 +118,14 @@ public sealed class VPR_Default : ViperRotation
         if (HuntersStingPvE.CanUse(out act)) return true;
         if (SwiftskinsStingPvE.CanUse(out act)) return true;
 
-        if (DreadFangsPvE.CanUse(out act)) return true;
+        if (ReavingFangsPvE.CanUse(out act)) return true;
         if (SteelFangsPvE.CanUse(out act)) return true;
 
-        // Uncoiled Fury Combo
-        if (UncoiledFuryPvE.CanUse(out act)) return true;
+        //Uncoiled fury use
+        //if (!Player.HasStatus(true, StatusID.ReadyToReawaken) && !HasHunterVenom && !HasSwiftVenom && IsHunter && IsSwift)
+        //{
+        //    if (UncoiledFuryPvE.CanUse(out act)) return true;
+        //}
 
         //Ranged
         if (WrithingSnapPvE.CanUse(out act)) return true;
