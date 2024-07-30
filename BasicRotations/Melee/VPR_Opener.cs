@@ -3,7 +3,7 @@
 [Rotation("Viper with Opener", CombatType.PvE, GameVersion = "7.01",
 Description = "Kindly created and donated by Rabbs, compatibility with current RSR not guarenteed.")]
 [SourceCode(Path = "main/DefaultRotations/Melee/VPR_Opener.cs")]
-[Api(3)]
+[Api(1)]
 
 public sealed class VPR_Opener : ViperRotation
 {
