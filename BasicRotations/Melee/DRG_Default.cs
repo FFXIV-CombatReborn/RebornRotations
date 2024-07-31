@@ -103,7 +103,7 @@ public sealed class DRG_Default : DragoonRotation
         bool doomSpikeRightNow = DoomSpikeWhenever;
 
         if (CoerthanTormentPvE.CanUse(out act)) return true;
-        if (SonicThrustPvE.CanUse(out act)) return true;
+        if (SonicThrustPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         if (DoomSpikePvE.CanUse(out act, skipComboCheck: doomSpikeRightNow)) return true;
 
         if (DrakesbanePvE.CanUse(out act)) return true;

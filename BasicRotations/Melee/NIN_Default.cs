@@ -19,6 +19,7 @@ public sealed class NIN_Default : NinjaRotation
     // Logic to determine the action to take during the countdown phase before combat starts.
     protected override IAction? CountDownAction(float remainTime)
     {
+        var realInHuton = IsLastAction(false, HutonPvE);
         // Clears ninjutsu setup if countdown is more than 6 seconds or if Suiton is the aim but shouldn't be.
         if (remainTime > 6) ClearNinjutsu();
 
