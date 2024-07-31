@@ -128,7 +128,7 @@ public sealed class VPR_Default : ViperRotation
         //}
 
         //Ranged
-        if (WrithingSnapPvE.CanUse(out act)) return true;
+        if (WrithingSnapPvE.CanUse(out act, usedUp: true)) return true;
 
         return base.GeneralGCD(out act);
     }
