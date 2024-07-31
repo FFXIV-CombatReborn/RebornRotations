@@ -37,10 +37,7 @@ public sealed class NIN_Default : NinjaRotation
         {
             // If within 10 seconds to start, consider using Hide or setting up Huton.
             if (_ninActionAim == null && TenPvE.Cooldown.IsCoolingDown && HidePvE.CanUse(out act)) return act;
-            if (!realInHuton)
-            {
-                SetNinjutsu(HutonPvE);
-            }
+
         }
         return base.CountDownAction(remainTime);
     }
@@ -374,6 +371,7 @@ public sealed class NIN_Default : NinjaRotation
         {
             if (HellfrogMediumPvE.CanUse(out act)) return true;
             if (BhavacakraPvE.CanUse(out act)) return true;
+            if (TenriJindoPvE.CanUse(out act)) return true;
         }
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         // If none of the conditions are met, it falls back to the base class's implementation for attack ability.
@@ -401,14 +399,12 @@ public sealed class NIN_Default : NinjaRotation
             if (hasRaijuReady) return false;
         }
 
-
-
         //AOE
         if (HakkeMujinsatsuPvE.CanUse(out act)) return true;
         if (DeathBlossomPvE.CanUse(out act)) return true;
 
         //Single
-        if (!InTrickAttack && Kazematoi < 5 && ArmorCrushPvE.CanUse(out act)) return true;
+        if (!InTrickAttack && Kazematoi < 4 && ArmorCrushPvE.CanUse(out act)) return true;
         if (AeolianEdgePvE.CanUse(out act)) return true;
         if (GustSlashPvE.CanUse(out act)) return true;
         if (SpinningEdgePvE.CanUse(out act)) return true;
