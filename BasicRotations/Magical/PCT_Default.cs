@@ -66,57 +66,75 @@ public sealed class PCT_Default : PictomancerRotation
 	}
 	#endregion
 
-	#region Emergency Logic
-	// Determines emergency actions to take based on the next planned GCD action.
-	protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
-	{
-		if (InCombat)
-		{
-			switch (MotifSwiftCast)
-			{
-			case MotifSwift.CreatureMotif:
-				if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
-				{
-					if (SwiftcastPvE.CanUse(out act)) return true;
-				}
-				break;
-			case MotifSwift.WeaponMotif:
-				if (nextGCD == HammerMotifPvE)
-				{
-					if (SwiftcastPvE.CanUse(out act)) return true;
-				}
-				break;
-			case MotifSwift.LandscapeMotif:
-				if (nextGCD == StarrySkyMotifPvE)
-				{
-					if (SwiftcastPvE.CanUse(out act)) return true;
-				}
-				break;
-			case MotifSwift.AllMotif:
-				if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
-				{
-					if (SwiftcastPvE.CanUse(out act)) return true;
-				}else
-				if (nextGCD == HammerMotifPvE)
-				{
-					if (SwiftcastPvE.CanUse(out act)) return true;
-				}else
-				if (nextGCD == StarrySkyMotifPvE)
-				{
-					if (SwiftcastPvE.CanUse(out act)) return true;
-				}
-				break;
-			case MotifSwift.NoMotif:
-				break;
-			}
-		}
-		
-		return base.EmergencyAbility(nextGCD, out act);
-	}
-	#endregion
+    #region Additional oGCD Logic
 
-	#region oGCD Logic
-	protected override bool AttackAbility(IAction nextGCD, out IAction? act)
+    protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
+    {
+        if (InCombat)
+        {
+            switch (MotifSwiftCast)
+            {
+                case MotifSwift.CreatureMotif:
+                    if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
+                    {
+                        if (SwiftcastPvE.CanUse(out act)) return true;
+                    }
+                    break;
+                case MotifSwift.WeaponMotif:
+                    if (nextGCD == HammerMotifPvE)
+                    {
+                        if (SwiftcastPvE.CanUse(out act)) return true;
+                    }
+                    break;
+                case MotifSwift.LandscapeMotif:
+                    if (nextGCD == StarrySkyMotifPvE)
+                    {
+                        if (SwiftcastPvE.CanUse(out act)) return true;
+                    }
+                    break;
+                case MotifSwift.AllMotif:
+                    if (nextGCD == PomMotifPvE || nextGCD == WingMotifPvE || nextGCD == MawMotifPvE || nextGCD == ClawMotifPvE)
+                    {
+                        if (SwiftcastPvE.CanUse(out act)) return true;
+                    }
+                    else
+                    if (nextGCD == HammerMotifPvE)
+                    {
+                        if (SwiftcastPvE.CanUse(out act)) return true;
+                    }
+                    else
+                    if (nextGCD == StarrySkyMotifPvE)
+                    {
+                        if (SwiftcastPvE.CanUse(out act)) return true;
+                    }
+                    break;
+                case MotifSwift.NoMotif:
+                    break;
+            }
+        }
+
+        return base.EmergencyAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.SmudgePvE)]
+    protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
+    {
+        if (SmudgePvE.CanUse(out act)) return true;
+        return base.AttackAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.AddlePvE, ActionID.TemperaCoatPvE, ActionID.TemperaGrassaPvE)]
+    protected sealed override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
+    {
+        if (AddlePvE.CanUse(out act)) return true;
+        if (TemperaCoatPvE.CanUse(out act)) return true;
+        if (TemperaGrassaPvE.CanUse(out act)) return true;
+        return base.DefenseAreaAbility(nextGCD, out act);
+    }
+    #endregion
+
+    #region oGCD Logic
+    protected override bool AttackAbility(IAction nextGCD, out IAction? act)
 	{
 		if (Player.HasStatus(true, StatusID.StarryMuse))
 		{
@@ -147,14 +165,6 @@ public sealed class PCT_Default : PictomancerRotation
 		}
 
 		return base.AttackAbility(nextGCD, out act);
-	}
-
-	protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
-	{
-		act = null;
-
-
-		return base.MoveForwardAbility(nextGCD, out act);
 	}
 	#endregion
 

@@ -2,7 +2,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace DefaultRotations.Magical;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Magical/RDM_Default.cs")]
 [Api(3)]
 public sealed class RDM_Default : RedMageRotation
@@ -11,8 +11,8 @@ public sealed class RDM_Default : RedMageRotation
     private static BaseAction VerthunderStartUp { get; } = new BaseAction(ActionID.VerthunderPvE, false);
 
     [RotationConfig(CombatType.PvE, Name = "Use Vercure for Dualcast when out of combat.")]
-    public bool UseVercure { get; set; }
-    
+    public bool UseVercure { get; set; } = false;
+
     [RotationConfig(CombatType.PvE, Name = "Cast Reprise when moving with no instacast.")]
     public bool RangedSwordplay { get; set; } = false;
     
