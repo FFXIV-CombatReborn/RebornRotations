@@ -64,7 +64,7 @@ public sealed class SMN_Default : SummonerRotation
 		bool isTargetBoss = HostileTarget?.IsBossFromTTK() ?? false;
 		bool isTargetDying = HostileTarget?.IsDying() ?? false;
 		bool targetIsBossAndDying = isTargetBoss && isTargetDying;
-		bool inBigInvocation = InBahamut || InPhoenix || InSolarBahamut;
+		bool inBigInvocation = !SummonBahamutPvE.EnoughLevel || (InBahamut || InPhoenix || InSolarBahamut);
 		bool inSolarUnique = Player.Level == 100 ? !InBahamut && !InPhoenix && InSolarBahamut : InBahamut && !InPhoenix;
 		bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
 		bool elapsed1ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
