@@ -1,9 +1,9 @@
 ﻿namespace DefaultRotations.Magical;
 
-[Rotation("PCT Beta", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Healer/PCT_BETA.cs")]
+[Rotation("zPCT Beta", CombatType.PvE, GameVersion = "7.05")]
+[SourceCode(Path = "main/DefaultRotations/Magical/zPCT_BETA.cs")]
 [Api(3)]
-public sealed class PCT_BETA : PictomancerRotation
+public sealed class zPCT_BETA : PictomancerRotation
 {
     [RotationConfig(CombatType.PvE, Name = "Use HolyInWhite or CometInBlack while moving")]
     public bool HolyCometMoving { get; set; } = true;
