@@ -1,6 +1,6 @@
 ﻿namespace DefaultRotations.Healer;
 
-[Rotation("AST Beta", CombatType.PvE, GameVersion = "7.05")]
+[Rotation("zAST Beta", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Healer/AST_BETA.cs")]
 [Api(3)]
 public sealed class AST_BETA : AstrologianRotation
