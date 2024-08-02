@@ -6,6 +6,7 @@ namespace DefaultRotations.Healer;
 public sealed class WHM_Default :WhiteMageRotation
 {
     #region Config Options
+
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
 
@@ -25,6 +26,7 @@ public sealed class WHM_Default :WhiteMageRotation
 
     [Range(0, 10000, ConfigUnitType.None, 100)]
     [RotationConfig(CombatType.PvE, Name = "Casting cost requirement for Thin Air to be used")]
+
     public float ThinAirNeed { get; set; } = 1000;
     #endregion
 
