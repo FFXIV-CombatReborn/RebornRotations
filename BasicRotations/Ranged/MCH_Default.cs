@@ -16,14 +16,10 @@ public sealed class MCH_Default : MachinistRotation
     // Defines logic for actions to take during the countdown before combat starts.
     protected override IAction? CountDownAction(float remainTime)
     {
-        if (remainTime < 5)
-        {
-            if (ReassemblePvE.CanUse(out var act)) return act;
-        }
-        if (remainTime < 2)
-        {
-            if (UseBurstMedicine(out var act)) return act;
-        }
+        // ReassemblePvE's duration is 5s, need to fire the first GCD before it ends
+        if (remainTime < 5 && ReassemblePvE.CanUse(out var act)) return act;
+        // tincture needs to be used on -2s exactly
+        if (remainTime <= 2 && UseBurstMedicine(out act)) return act;
         return base.CountDownAction(remainTime);
     }
     #endregion
@@ -108,45 +104,42 @@ public sealed class MCH_Default : MachinistRotation
     #endregion
 
     #region GCD Logic
-    // Defines the general logic for determining which global cooldown (GCD) action to take.
     protected override bool GeneralGCD(out IAction? act)
     {
-        // Checks and executes AutoCrossbow or HeatBlast if conditions are met (overheated state).
+        // overheated aoe
         if (AutoCrossbowPvE.CanUse(out act)) return true;
+        // overheated single
         if (HeatBlastPvE.CanUse(out act)) return true;
 
-        // Executes Bioblaster, and then checks for AirAnchor or HotShot, and Drill based on availability and conditions.
+        // drill's aoe version
         if (BioblasterPvE.CanUse(out act, usedUp: true)) return true;
-        // Check if SpreadShot cannot be used
+
+        // single target --- need to update this strange condition writing!!!
         if (!SpreadShotPvE.CanUse(out _))
         {
-            // Check if AirAnchor can be used
+            // use AirAnchor if possible
             if (AirAnchorPvE.CanUse(out act)) return true;
-
-            // If not at the required level for AirAnchor and HotShot can be used
+            // or use HotShot if low level
             if (!AirAnchorPvE.EnoughLevel && HotShotPvE.CanUse(out act)) return true;
 
-            // Check if Drill can be used
+            // for opener: only use the first charge of Drill after AirAnchor when there are two
             if (DrillPvE.CanUse(out act, usedUp: false)) return true;
         }
 
-        // Special condition for using ChainSaw outside of AoE checks if no action is chosen within 4 GCDs.
-        if (!CombatElapsedLessGCD(1) && ChainSawPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        // ChainSaw is always used after Drill
+        if (ChainSawPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        // use combo finisher asap
         if (ExcavatorPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (!ChainSawPvE.Cooldown.WillHaveOneCharge(6f) && !CombatElapsedLessGCD(6))
-        {
-            if (DrillPvE.CanUse(out act, usedUp: true)) return true;
-        }
-
-        // AoE actions: ChainSaw and SpreadShot based on their usability.
-        if (SpreadShotPvE.CanUse(out _))
-        {
-            if (ChainSawPvE.CanUse(out act)) return true;
-            if (ExcavatorPvE.CanUse(out act)) return true;
-        }
+        // use FMF after ChainSaw combo in 'alternative opener'
         if (FullMetalFieldPvE.CanUse(out act)) return true;
+
+        // dont use the second charge of Drill if it's in opener, also save Drill for burst  --- need to combine this with the logic above!!!
+        if (!CombatElapsedLessGCD(6) && !ChainSawPvE.Cooldown.WillHaveOneCharge(6) && DrillPvE.CanUse(out act, usedUp: true)) return true;
+
+        // basic aoe
         if (SpreadShotPvE.CanUse(out act)) return true;
-        // Single target actions: CleanShot, SlugShot, and SplitShot based on their usability.
+        
+        // single target 123 combo
         if (CleanShotPvE.CanUse(out act)) return true;
         if (SlugShotPvE.CanUse(out act)) return true;
         if (SplitShotPvE.CanUse(out act)) return true;
