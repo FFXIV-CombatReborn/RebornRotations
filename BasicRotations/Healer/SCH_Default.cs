@@ -1,6 +1,6 @@
 namespace DefaultRotations.Healer;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Healer/SCH_Default.cs")]
 [Api(3)]
 public sealed class SCH_Default : ScholarRotation
@@ -115,14 +115,14 @@ public sealed class SCH_Default : ScholarRotation
     [RotationDesc(ActionID.SummonSeraphPvE, ActionID.ConsolationPvE, ActionID.WhisperingDawnPvE, ActionID.SacredSoilPvE, ActionID.IndomitabilityPvE)]
     protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
     {
-        if (WhisperingDawnPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
+        if (WhisperingDawnPvE_16537.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE_16538.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
         {
             if (SummonSeraphPvE.CanUse(out act)) return true;
         }
         if (ConsolationPvE.CanUse(out act, usedUp: true)) return true;
         if (FeyBlessingPvE.CanUse(out act)) return true;
 
-        if (WhisperingDawnPvE.CanUse(out act)) return true;
+        if (WhisperingDawnPvE_16537.CanUse(out act)) return true;
         if (SacredSoilPvE.CanUse(out act)) return true;
         if (IndomitabilityPvE.CanUse(out act)) return true;
 
@@ -147,10 +147,10 @@ public sealed class SCH_Default : ScholarRotation
     [RotationDesc(ActionID.FeyIlluminationPvE, ActionID.ExpedientPvE, ActionID.SummonSeraphPvE, ActionID.ConsolationPvE, ActionID.SacredSoilPvE)]
     protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
-        if (FeyIlluminationPvE.CanUse(out act)) return true;
+        if (FeyIlluminationPvE_16538.CanUse(out act)) return true;
         if (ExpedientPvE.CanUse(out act)) return true;
 
-        if (WhisperingDawnPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
+        if (WhisperingDawnPvE_16537.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE_16538.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
         {
             if (SummonSeraphPvE.CanUse(out act)) return true;
         }
