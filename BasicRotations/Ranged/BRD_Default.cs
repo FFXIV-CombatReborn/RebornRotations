@@ -1,6 +1,6 @@
 namespace DefaultRotations.Ranged;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.01",
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05",
     Description = "Please make sure that the three song times add up to 120 seconds, Wanderers default first song for now.")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/BRD_Default.cs")]
 [Api(3)]
@@ -140,7 +140,37 @@ public sealed class BRD_Default : BardRotation
             if (RagingStrikesPvE.Cooldown.IsCoolingDown && !Player.HasStatus(true, StatusID.RagingStrikes)) return true;
         }
 
-        if (BloodletterLogic(out act)) return true;
+        // Bloodletter Overcap protection
+        if (RagingStrikesPvE.Cooldown.IsCoolingDown && BloodletterMax == BloodletterPvE.Cooldown.CurrentCharges)
+        {
+            if (HeartbreakShotPvE.CanUse(out act)) return true;
+
+            if (RainOfDeathPvE.CanUse(out act)) return true;
+
+            if (BloodletterPvE.CanUse(out act)) return true;
+        }
+
+        // Prevents Bloodletter bumpcapping when MAGE is the stong due to Repetoire procs
+        if ((BloodletterPvE.Cooldown.CurrentCharges > 1) && Song == Song.MAGE)
+        {
+            if (HeartbreakShotPvE.CanUse(out act, usedUp: true)) return true;
+
+            if (RainOfDeathPvE.CanUse(out act, usedUp: true)) return true;
+
+            if (BloodletterPvE.CanUse(out act, usedUp: true)) return true;
+        }
+
+        // Allow full use of RagingStrikes
+        if (Player.HasStatus(true, StatusID.RagingStrikes))
+        {
+            if (HeartbreakShotPvE.CanUse(out act, usedUp: true)) return true;
+
+            if (RainOfDeathPvE.CanUse(out act, usedUp: true)) return true;
+
+            if (BloodletterPvE.CanUse(out act, usedUp: true)) return true;
+        }
+
+        //if (BloodletterLogic(out act)) return true;
 
         return base.AttackAbility(nextGCD, out act);
     }
@@ -155,26 +185,35 @@ public sealed class BRD_Default : BardRotation
             if (Player.HasStatus(true, StatusID.RagingStrikes) && Player.WillStatusEndGCD(1, 0, true, StatusID.RagingStrikes)) return true;
         }
 
-        if (ResonantArrowPvE.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.ResonantArrowReady)) return true;
+        if (ResonantArrowPvE.CanUse(out act)) return true;
 
         if (CanUseApexArrow(out act)) return true;
-        if (RadiantEncorePvE.CanUse(out act, skipComboCheck: true) && Player.HasStatus(true, StatusID.RadiantEncoreReady)) return true;
-        if (BlastArrowPvE.CanUse(out act, skipAoeCheck: true))
+        if (RadiantEncorePvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (BlastArrowPvE.CanUse(out act))
         {
             if (!Player.HasStatus(true, StatusID.RagingStrikes)) return true;
             if (Player.HasStatus(true, StatusID.RagingStrikes) && BarragePvE.Cooldown.IsCoolingDown) return true;
         }
 
         //aoe
-        if (ShadowbitePvE.CanUse(out act) && Player.HasStatus(true, StatusID.HawksEye, StatusID.HawksEye_3861, StatusID.Barrage)) return true;
-        if (WideVolleyPvE.CanUse(out act) && Player.HasStatus(true, StatusID.HawksEye, StatusID.HawksEye_3861, StatusID.Barrage)) return true;
+        if (ShadowbitePvE.CanUse(out act)) return true;
+        if (WideVolleyPvE.CanUse(out act)) return true;
         if (QuickNockPvE.CanUse(out act)) return true;
 
-        if (WindbitePvE.CanUse(out act)) return true;
-        if (VenomousBitePvE.CanUse(out act)) return true;
-        if (RefulgentArrowPvE.CanUse(out act, skipComboCheck: true) && Player.HasStatus(true, StatusID.HawksEye, StatusID.HawksEye_3861, StatusID.Barrage)) return true;
-        if (StraightShotPvE.CanUse(out act) && Player.HasStatus(true, StatusID.HawksEye, StatusID.HawksEye_3861, StatusID.Barrage)) return true;
-        if (HeavyShotPvE.CanUse(out act)) return true;
+        if (IronJawsPvE.EnoughLevel && (HostileTarget?.HasStatus(true, StatusID.Windbite, StatusID.Stormbite) == true) && (HostileTarget?.HasStatus(true, StatusID.VenomousBite, StatusID.CausticBite) == true))
+        {
+            // Do not use WindbitePvE or VenomousBitePvE if both statuses are present and IronJawsPvE has enough level
+        }
+        else
+        {
+            if (WindbitePvE.CanUse(out act)) return true;
+            if (VenomousBitePvE.CanUse(out act)) return true;
+        }
+
+
+        if (RefulgentArrowPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (StraightShotPvE.CanUse(out act)) return true;
+        if (HeavyShotPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.HawksEye_3861)) return true;
 
         return base.GeneralGCD(out act);
     }

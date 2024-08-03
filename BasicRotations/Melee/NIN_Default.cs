@@ -1,6 +1,6 @@
 namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Melee/NIN_Default.cs")]
 [Api(3)]
 public sealed class NIN_Default : NinjaRotation
@@ -19,11 +19,9 @@ public sealed class NIN_Default : NinjaRotation
     // Logic to determine the action to take during the countdown phase before combat starts.
     protected override IAction? CountDownAction(float remainTime)
     {
-
-        // Clears ninjutsu setup if countdown is more than 10 seconds or if Huton is the aim but shouldn't be.
-        if (remainTime > 10) ClearNinjutsu();
         var realInHuton = IsLastAction(false, HutonPvE);
-        if (realInHuton && _ninActionAim == HutonPvE) ClearNinjutsu();
+        // Clears ninjutsu setup if countdown is more than 6 seconds or if Suiton is the aim but shouldn't be.
+        if (remainTime > 6) ClearNinjutsu();
 
         // Decision-making for ninjutsu actions based on remaining time until combat starts.
         if (DoNinjutsu(out var act))
@@ -36,14 +34,11 @@ public sealed class NIN_Default : NinjaRotation
         {
             SetNinjutsu(SuitonPvE);
         }
-        else if (remainTime < 10)
+        else if (remainTime < 6)
         {
             // If within 10 seconds to start, consider using Hide or setting up Huton.
             if (_ninActionAim == null && TenPvE.Cooldown.IsCoolingDown && HidePvE.CanUse(out act)) return act;
-            if (!realInHuton)
-            {
-                SetNinjutsu(HutonPvE);
-            }
+
         }
         return base.CountDownAction(remainTime);
     }
@@ -377,6 +372,7 @@ public sealed class NIN_Default : NinjaRotation
         {
             if (HellfrogMediumPvE.CanUse(out act)) return true;
             if (BhavacakraPvE.CanUse(out act)) return true;
+            if (TenriJindoPvE.CanUse(out act)) return true;
         }
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         // If none of the conditions are met, it falls back to the base class's implementation for attack ability.
@@ -404,14 +400,12 @@ public sealed class NIN_Default : NinjaRotation
             if (hasRaijuReady) return false;
         }
 
-
-
         //AOE
         if (HakkeMujinsatsuPvE.CanUse(out act)) return true;
         if (DeathBlossomPvE.CanUse(out act)) return true;
 
         //Single
-        if (!InTrickAttack && Kazematoi < 5 && ArmorCrushPvE.CanUse(out act)) return true;
+        if (!InTrickAttack && Kazematoi < 4 && ArmorCrushPvE.CanUse(out act)) return true;
         if (AeolianEdgePvE.CanUse(out act)) return true;
         if (GustSlashPvE.CanUse(out act)) return true;
         if (SpinningEdgePvE.CanUse(out act)) return true;
