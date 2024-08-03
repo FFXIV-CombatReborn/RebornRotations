@@ -16,7 +16,9 @@ public sealed class SMN_Default : SummonerRotation
 
 		[Description("Topaz-Ruby-Emerald")] TopazRubyEmerald,
 
-		[Description("Emerald-Topaz-Ruby")] EmeraldTopazRuby
+		[Description("Emerald-Topaz-Ruby")] EmeraldTopazRuby,
+		
+		[Description("Ruby-Emerald-Topaz")] RubyEmeraldTopaz,
 	}
 
 	[RotationConfig(CombatType.PvE, Name = "Use Crimson Cyclone. Will use at any range, regardless of saftey use with caution.")]
@@ -154,6 +156,12 @@ public sealed class SMN_Default : SummonerRotation
 				if (SummonEmeraldPvE.CanUse(out act)) return true;
 				if (SummonTopazPvE.CanUse(out act)) return true;
 				if (SummonRubyPvE.CanUse(out act)) return true;
+				break;
+			
+			case SummonOrderType.RubyEmeraldTopaz:
+				if (SummonRubyPvE.CanUse(out act)) return true;
+				if (SummonEmeraldPvE.CanUse(out act)) return true;
+				if (SummonTopazPvE.CanUse(out act)) return true;
 				break;
 			}
 		}
