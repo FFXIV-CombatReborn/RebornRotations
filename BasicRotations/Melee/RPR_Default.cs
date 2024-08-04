@@ -50,7 +50,7 @@ public sealed class RPR_Default : ReaperRotation
                 && !CombatElapsedLess(3.5f) && ArcaneCirclePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        if (IsTargetBoss && IsTargetDying || NoEnshroudPooling || YesEnshroudPooling || IsIdealHost)
+        if ((!Player.HasStatus(true, StatusID.Executioner)) && (IsTargetBoss && IsTargetDying || NoEnshroudPooling || YesEnshroudPooling || IsIdealHost))
         {
             if (EnshroudPvE.CanUse(out act)) return true;
         }
