@@ -36,6 +36,9 @@ public sealed class SMN_Default : SummonerRotation
 	[RotationConfig(CombatType.PvE, Name = "Use radiant on cooldown. But still keeping one charge")]
 	public bool RadiantOnCooldown { get; set; } = true;
 	
+	[RotationConfig(CombatType.PvE, Name = "Use this if there's no other raid buff in your party")]
+	public bool SecondTypeOpenerLogic { get; set; } = false;
+	
 	#endregion
 
 
@@ -68,32 +71,76 @@ public sealed class SMN_Default : SummonerRotation
 		bool targetIsBossAndDying = isTargetBoss && isTargetDying;
 		bool inBigInvocation = !SummonBahamutPvE.EnoughLevel || (InBahamut || InPhoenix || InSolarBahamut);
 		bool inSolarUnique = Player.Level == 100 ? !InBahamut && !InPhoenix && InSolarBahamut : InBahamut && !InPhoenix;
-		bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
-		bool elapsed1ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
-		bool elapsed2ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(2);
-		bool burstInSolar = Player.Level == 100 ? InSolarBahamut : InBahamut;
-		
-		if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed0ChargeAfterInvocation)
+		if (SecondTypeOpenerLogic)
 		{
-			if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
+			bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
+			bool elapsed1ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
+			bool elapsed2ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(2);
+			bool burstInSolar = Player.Level == 100 ? InSolarBahamut : InBahamut;
+
+			if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed0ChargeAfterInvocation)
+			{
+				if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
+			}
+
+			if (inBigInvocation && (elapsed0ChargeAfterInvocation || targetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed0ChargeAfterInvocation || targetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnkindleBahamutPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnkindleSolarBahamutPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnkindlePhoenixPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && DeathflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+			if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && SunflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+			if (RekindlePvE.CanUse(out act, skipAoeCheck: true)) return true;
+			if (MountainBusterPvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+			if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && PainflarePvE.CanUse(out act)) return true;
+			if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && FesterPvE.CanUse(out act)) return true;
+
+			if ((elapsed2ChargeAfterInvocation || targetIsBossAndDying) && SearingFlashPvE.CanUse(out act, skipAoeCheck: true)) return true;
+			if (DoesAnyPlayerNeedHeal() && !inBigInvocation && LuxSolarisPvE.CanUse(out act)) return true;
+		}
+		else
+		{
+			bool elapsed0ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD() || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD();
+			bool elapsed1ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(1) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(1);
+			bool elapsed2ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(2) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(2);
+			bool elapsed3ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(3) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(3);
+			bool elapsed4ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(4) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(4);
+			bool elapsed6ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(6) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(6) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(6);
+			bool burstInSolar = Player.Level == 100 ? InSolarBahamut : InBahamut;
+
+			if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed0ChargeAfterInvocation && (SearingLightPvE.Cooldown.WillHaveOneCharge(5) || !SearingLightPvE.Cooldown.IsCoolingDown))
+			{
+				UseBurstMedicine(out act);
+			}
+			
+			if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed1ChargeAfterInvocation)
+			{
+				if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
+			}
+
+			if (inBigInvocation && (elapsed3ChargeAfterInvocation || targetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed3ChargeAfterInvocation || targetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed4ChargeAfterInvocation || targetIsBossAndDying) && EnkindleBahamutPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed4ChargeAfterInvocation || targetIsBossAndDying) && EnkindleSolarBahamutPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed4ChargeAfterInvocation || targetIsBossAndDying) && EnkindlePhoenixPvE.CanUse(out act)) return true;
+			if (inBigInvocation && (elapsed4ChargeAfterInvocation || targetIsBossAndDying) && DeathflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+			if (inBigInvocation && (elapsed4ChargeAfterInvocation || targetIsBossAndDying) && SunflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+			if (RekindlePvE.CanUse(out act, skipAoeCheck: true)) return true;
+			if (MountainBusterPvE.CanUse(out act, skipAoeCheck: true)) return true;
+			
+			if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) && elapsed2ChargeAfterInvocation && EnergyDrainPvE.Cooldown.WillHaveOneCharge(2) || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && PainflarePvE.CanUse(out act)) return true;
+			if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) && elapsed2ChargeAfterInvocation && EnergyDrainPvE.Cooldown.WillHaveOneCharge(2) || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && FesterPvE.CanUse(out act)) return true;
+
+			if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) && elapsed4ChargeAfterInvocation || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && PainflarePvE.CanUse(out act)) return true;
+			if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) && elapsed4ChargeAfterInvocation || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && FesterPvE.CanUse(out act)) return true;
+			
+			if ((elapsed6ChargeAfterInvocation || targetIsBossAndDying) && SearingFlashPvE.CanUse(out act, skipAoeCheck: true)) return true;
+			if (DoesAnyPlayerNeedHeal() && !inBigInvocation && LuxSolarisPvE.CanUse(out act)) return true;
 		}
 		
-		if (inBigInvocation && (elapsed0ChargeAfterInvocation || targetIsBossAndDying) && EnergySiphonPvE.CanUse(out act)) return true;
-		if (inBigInvocation && (elapsed0ChargeAfterInvocation || targetIsBossAndDying) && EnergyDrainPvE.CanUse(out act)) return true;
-		if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnkindleBahamutPvE.CanUse(out act)) return true;
-		if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnkindleSolarBahamutPvE.CanUse(out act)) return true;
-		if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && EnkindlePhoenixPvE.CanUse(out act)) return true;
-		if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && DeathflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
-		if (inBigInvocation && (elapsed1ChargeAfterInvocation || targetIsBossAndDying) && SunflarePvE.CanUse(out act, skipAoeCheck: true)) return true;
-
-		if (RekindlePvE.CanUse(out act, skipAoeCheck: true)) return true;
-		if (MountainBusterPvE.CanUse(out act, skipAoeCheck: true)) return true;
-
-		if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && PainflarePvE.CanUse(out act)) return true;
-		if ((inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && FesterPvE.CanUse(out act)) return true;
-		
-		if ((elapsed2ChargeAfterInvocation || targetIsBossAndDying) && SearingFlashPvE.CanUse(out act, skipAoeCheck: true)) return true;
-		if (DoesAnyPlayerNeedHeal() && !inBigInvocation && LuxSolarisPvE.CanUse(out act)) return true;
 
 		return base.AttackAbility(nextGCD, out act);
 	}
@@ -107,7 +154,7 @@ public sealed class SMN_Default : SummonerRotation
 			if (SwiftcastPvE.CanUse(out act)) return true;
 		}
 		
-		if ((RadiantOnCooldown && RadiantAegisPvE.Cooldown.CurrentCharges == 2 || RadiantAegisPvE.Cooldown.CurrentCharges == 1 && RadiantAegisPvE.Cooldown.WillHaveOneCharge(3)) && (anyBigInvocationIsCoolingDown && Player.Level <= 100) && RadiantAegisPvE.CanUse(out act)) return true;
+		if ((RadiantOnCooldown && RadiantAegisPvE.Cooldown.CurrentCharges == 2 || RadiantAegisPvE.Cooldown.CurrentCharges == 1 && RadiantAegisPvE.Cooldown.WillHaveOneCharge(5)) && (anyBigInvocationIsCoolingDown && Player.Level <= 100) && RadiantAegisPvE.CanUse(out act)) return true;
 		if (RadiantOnCooldown && Player.Level < 88 && anyBigInvocationIsCoolingDown && RadiantAegisPvE.CanUse(out act)) return true;
 		
 		return base.EmergencyAbility(nextGCD, out act);
@@ -122,7 +169,7 @@ public sealed class SMN_Default : SummonerRotation
 		if ((Player.HasStatus(false, StatusID.SearingLight) || SearingLightPvE.Cooldown.IsCoolingDown) && SummonBahamutPvE.CanUse(out act)) return true;
 		if (IsBurst && (!SearingLightPvE.Cooldown.IsCoolingDown && SummonSolarBahamutPvE.CanUse(out act))) return true;
 
-		if (AddSwiftcastOnGaruda && SlipstreamPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: true)) return true;
+		if (AddSwiftcastOnGaruda && SlipstreamPvE.CanUse(out act, skipAoeCheck: true, skipCastingCheck: !SwiftcastPvE.Cooldown.IsCoolingDown || HasSwift )) return true;
 		if (SlipstreamPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
 		if (CrimsonStrikePvE.CanUse(out act, skipAoeCheck: true)) return true;
