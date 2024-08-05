@@ -153,9 +153,9 @@ public sealed class RPR_Default : ReaperRotation
         if (NightmareScythePvE.CanUse(out act)) return true;
         if (SpinningScythePvE.CanUse(out act)) return true;
 
-        if (InfernalSlicePvE.CanUse(out act)) return true;
-        if (WaxingSlicePvE.CanUse(out act)) return true;
-        if (SlicePvE.CanUse(out act)) return true;
+        if (!Player.HasStatus(true, StatusID.Executioner) && InfernalSlicePvE.CanUse(out act)) return true;
+        if (!Player.HasStatus(true, StatusID.Executioner) && WaxingSlicePvE.CanUse(out act)) return true;
+        if (!Player.HasStatus(true, StatusID.Executioner) && SlicePvE.CanUse(out act)) return true;
 
         if (InCombat && !HasSoulReaver && HarvestMoonPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (HarpePvE.CanUse(out act)) return true;
