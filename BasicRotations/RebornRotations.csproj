@@ -17,7 +17,7 @@
     <Compile Include="Duty\VariantDefault" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="RotationSolverReborn.Basic" Version="7.0.5.13" />
+    <PackageReference Include="RotationSolverReborn.Basic" Version="7.0.5.17" />
   </ItemGroup>
   <ItemGroup>
 	  <Reference Include="Dalamud">
