@@ -88,7 +88,7 @@ public sealed class RPR_Default : ReaperRotation
 
         if (SoulsowPvE.CanUse(out act)) return true;
 
-        if (!ExecutionerReady && !HasSoulReaver )
+        if (!ExecutionerReady && !HasSoulReaver)
         {
             if (PerfectioPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
@@ -129,7 +129,7 @@ public sealed class RPR_Default : ReaperRotation
                 }
             }
         }
-        
+
 
 
         if (HasSoulReaver)
