@@ -122,7 +122,7 @@ public sealed class zPCT_BETA : PictomancerRotation
     [RotationDesc(ActionID.SmudgePvE)]
     protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
     {
-        
+
         if (SmudgePvE.CanUse(out act)) return true;
 
         return base.MoveForwardAbility(nextGCD, out act);

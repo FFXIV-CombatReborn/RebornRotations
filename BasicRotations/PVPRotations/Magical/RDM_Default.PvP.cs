@@ -109,7 +109,7 @@ public class RDM_DefaultPvP : RedMageRotation
 
         if (DisplacementPvP.CanUse(out act, skipAoeCheck: true)) return true;
         if (CorpsacorpsPvP.CanUse(out act, skipAoeCheck: true)) return true;
-        
+
         //if (BlackShiftPvP.CanUse(out act)) return true;
         //if (WhiteShiftPvP.CanUse(out act)) return true;
 
@@ -119,7 +119,7 @@ public class RDM_DefaultPvP : RedMageRotation
     protected override bool GeneralGCD(out IAction? act)
     {
         act = null;
-    
+
         // Early exits for Guard status or Sprint usage
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
         if (!Player.HasStatus(true, StatusID.Guard) && UseSprintPvP && !Player.HasStatus(true, StatusID.Sprint) && !InCombat && SprintPvP.CanUse(out act)) return true;
@@ -134,7 +134,7 @@ public class RDM_DefaultPvP : RedMageRotation
             if (EnchantedRedoublementPvP.CanUse(out act)) return true;
             if (VerholyPvP.CanUse(out act, skipAoeCheck: true)) return true;
         }
-    
+
         //Handling status from BlackShift
         if (Player.HasStatus(true, StatusID.BlackShift))
         {
@@ -145,7 +145,7 @@ public class RDM_DefaultPvP : RedMageRotation
             if (EnchantedRedoublementPvP_29694.CanUse(out act)) return true;
             if (VerflarePvP.CanUse(out act, skipAoeCheck: true)) return true;
         }
-    
+
         return base.GeneralGCD(out act);
     }
 

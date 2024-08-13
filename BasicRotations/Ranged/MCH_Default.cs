@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
-
 namespace DefaultRotations.Ranged;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
@@ -33,9 +31,9 @@ public sealed class MCH_Default : MachinistRotation
         bool isReassembleUsable =
             //Reassemble current # of charges and double proc protection
             ReassemblePvE.Cooldown.CurrentCharges > 0 && !Player.HasStatus(true, StatusID.Reassembled) &&
-            (nextGCD.IsTheSameTo(true, [ChainSawPvE, ExcavatorPvE, AirAnchorPvE]) || 
+            (nextGCD.IsTheSameTo(true, [ChainSawPvE, ExcavatorPvE, AirAnchorPvE]) ||
              (!ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, DrillPvE)) ||
-             (!DrillPvE.EnoughLevel && nextGCD.IsTheSameTo(true, CleanShotPvE)) || 
+             (!DrillPvE.EnoughLevel && nextGCD.IsTheSameTo(true, CleanShotPvE)) ||
              (!CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(true, HotShotPvE)));
 
         // Keeps Ricochet and Gauss cannon Even
@@ -96,7 +94,7 @@ public sealed class MCH_Default : MachinistRotation
         {
             if (RookAutoturretPvE.CanUse(out act)) return true;
         }
-        
+
         if (BarrelStabilizerPvE.CanUse(out act)) return true;
 
         return base.AttackAbility(nextGCD, out act);
@@ -138,7 +136,7 @@ public sealed class MCH_Default : MachinistRotation
 
         // basic aoe
         if (SpreadShotPvE.CanUse(out act)) return true;
-        
+
         // single target 123 combo
         if (CleanShotPvE.CanUse(out act)) return true;
         if (SlugShotPvE.CanUse(out act)) return true;
@@ -182,30 +180,30 @@ public sealed class MCH_Default : MachinistRotation
 
     private bool CanUseQueenMeow(out IAction? act)
     {
-    // Define conditions under which the Rook Autoturret/Queen can be used.
-    bool NoQueenLogic = SkipQueenLogic;
-    bool QueenOne = Battery >= 60 && CombatElapsedLess(25f);
-    bool QueenTwo = Battery >= 90 && !CombatElapsedLess(58f) && CombatElapsedLess(78f);
-    bool QueenThree = Battery >= 100 && !CombatElapsedLess(111f) && CombatElapsedLess(131f); 
-    bool QueenFour = Battery >= 50 && !CombatElapsedLess(148f) && CombatElapsedLess(168f); 
-    bool QueenFive = Battery >= 60 && !CombatElapsedLess(178f) && CombatElapsedLess(198f); 
-    bool QueenSix = Battery >= 100 && !CombatElapsedLess(230f) && CombatElapsedLess(250f); 
-    bool QueenSeven = Battery >= 50 && !CombatElapsedLess(268f) && CombatElapsedLess(288f); 
-    bool QueenEight = Battery >= 70 && !CombatElapsedLess(296f) && CombatElapsedLess(316f); 
-    bool QueenNine = Battery >= 100 && !CombatElapsedLess(350f) && CombatElapsedLess(370f); 
-    bool QueenTen = Battery >= 50 && !CombatElapsedLess(388f) && CombatElapsedLess(408f); 
-    bool QueenEleven = Battery >= 80 && !CombatElapsedLess(416f) && CombatElapsedLess(436f); 
-    bool QueenTwelve = Battery >= 100 && !CombatElapsedLess(470f) && CombatElapsedLess(490f); 
-    bool QueenThirteen = Battery >= 50 && !CombatElapsedLess(505f) && CombatElapsedLess(525f); 
-    bool QueenFourteen = Battery >= 60 && !CombatElapsedLess(538f) && CombatElapsedLess(558f); 
-    bool QueenFifteen = Battery >= 100 && !CombatElapsedLess(590f) && CombatElapsedLess(610f);
-    
-    if (NoQueenLogic||QueenOne||QueenTwo||QueenThree||QueenFour||QueenFive||QueenSix||QueenSeven||QueenEight||QueenNine||QueenTen||QueenEleven||QueenTwelve||QueenThirteen||QueenFourteen||QueenFifteen)
-    {
-        if (RookAutoturretPvE.CanUse(out act)) return true;
-    }
-    act = null;
-    return false;
+        // Define conditions under which the Rook Autoturret/Queen can be used.
+        bool NoQueenLogic = SkipQueenLogic;
+        bool QueenOne = Battery >= 60 && CombatElapsedLess(25f);
+        bool QueenTwo = Battery >= 90 && !CombatElapsedLess(58f) && CombatElapsedLess(78f);
+        bool QueenThree = Battery >= 100 && !CombatElapsedLess(111f) && CombatElapsedLess(131f);
+        bool QueenFour = Battery >= 50 && !CombatElapsedLess(148f) && CombatElapsedLess(168f);
+        bool QueenFive = Battery >= 60 && !CombatElapsedLess(178f) && CombatElapsedLess(198f);
+        bool QueenSix = Battery >= 100 && !CombatElapsedLess(230f) && CombatElapsedLess(250f);
+        bool QueenSeven = Battery >= 50 && !CombatElapsedLess(268f) && CombatElapsedLess(288f);
+        bool QueenEight = Battery >= 70 && !CombatElapsedLess(296f) && CombatElapsedLess(316f);
+        bool QueenNine = Battery >= 100 && !CombatElapsedLess(350f) && CombatElapsedLess(370f);
+        bool QueenTen = Battery >= 50 && !CombatElapsedLess(388f) && CombatElapsedLess(408f);
+        bool QueenEleven = Battery >= 80 && !CombatElapsedLess(416f) && CombatElapsedLess(436f);
+        bool QueenTwelve = Battery >= 100 && !CombatElapsedLess(470f) && CombatElapsedLess(490f);
+        bool QueenThirteen = Battery >= 50 && !CombatElapsedLess(505f) && CombatElapsedLess(525f);
+        bool QueenFourteen = Battery >= 60 && !CombatElapsedLess(538f) && CombatElapsedLess(558f);
+        bool QueenFifteen = Battery >= 100 && !CombatElapsedLess(590f) && CombatElapsedLess(610f);
+
+        if (NoQueenLogic || QueenOne || QueenTwo || QueenThree || QueenFour || QueenFive || QueenSix || QueenSeven || QueenEight || QueenNine || QueenTen || QueenEleven || QueenTwelve || QueenThirteen || QueenFourteen || QueenFifteen)
+        {
+            if (RookAutoturretPvE.CanUse(out act)) return true;
+        }
+        act = null;
+        return false;
     }
     #endregion
 }

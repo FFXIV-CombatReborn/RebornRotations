@@ -70,7 +70,7 @@ public sealed class GNB_Default : GunbreakerRotation
 
         if (DangerZonePvE.CanUse(out act) && !DoubleDownPvE.EnoughLevel)
         {
-            
+
             if (!IsFullParty && !(DangerZonePvE.Target.Target?.IsBossFromTTK() ?? false)) return true;
 
             if (!GnashingFangPvE.EnoughLevel && (Player.HasStatus(true, StatusID.NoMercy) || !NoMercyPvE.Cooldown.WillHaveOneCharge(15))) return true;
@@ -106,28 +106,28 @@ public sealed class GNB_Default : GunbreakerRotation
         if (IsLastAction(false, EyeGougePvE) && ReignOfBeastsPvE.CanUse(out act)) return true;
 
         if (Player.HasStatus(true, StatusID.NoMercy) && SonicBreakPvE.CanUse(out act)) return true;
-        
+
         if (areDDTargetsInRange)
         {
             if (Player.HasStatus(true, StatusID.NoMercy) && CanUseDoubleDown(out act)) return true;
             if (Player.HasStatus(true, StatusID.NoMercy) && IsLastGCD(ActionID.DoubleDownPvE) && BlastingZonePvE.CanUse(out act)) return true;
         }
-    
+
         if (NoMercyPvE.Cooldown.IsCoolingDown && BloodfestPvE.Cooldown.IsCoolingDown && BlastingZonePvE.CanUse(out act)) return true;
-        
+
         if (CanUseGnashingFang(out act)) return true;
 
         if (SavageClawPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (WickedTalonPvE.CanUse(out act, skipComboCheck: true)) return true;
 
         if (CanUseBurstStrike(out act)) return true;
-        
+
         if (FatedCirclePvE.CanUse(out act)) return true;
         if (DemonSlaughterPvE.CanUse(out act)) return true;
         if (DemonSlicePvE.CanUse(out act)) return true;
 
         if (Ammo == MaxAmmo && IsLastGCD(ActionID.BrutalShellPvE) && BurstStrikePvE.CanUse(out act)) return true;
-        
+
         if (SolidBarrelPvE.CanUse(out act)) return true;
         if (BrutalShellPvE.CanUse(out act)) return true;
         if (KeenEdgePvE.CanUse(out act)) return true;

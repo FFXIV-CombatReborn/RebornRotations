@@ -91,7 +91,7 @@ public sealed class MNK_DefaultPvP : MonkRotation
         if (RisingPhoenixPvP.CanUse(out act)) return true;
         if (PhantomRushPvP.CanUse(out act)) return true;
         if (SixsidedStarPvP.CanUse(out act)) return true;
-        if (EnlightenmentPvP.CanUse(out act, usedUp : true)) return true;
+        if (EnlightenmentPvP.CanUse(out act, usedUp: true)) return true;
 
         if (InCombat)
         {

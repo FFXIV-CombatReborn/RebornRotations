@@ -100,7 +100,7 @@ public sealed class GNB_DefaultPvP : GunbreakerRotation
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
         if (!Player.HasStatus(true, StatusID.Guard) && UseSprintPvP && !Player.HasStatus(true, StatusID.Sprint) && !InCombat && SprintPvP.CanUse(out act)) return true;
 
-        if(SolidBarrelPvP.CanUse(out act)) return true;
+        if (SolidBarrelPvP.CanUse(out act)) return true;
         if (BrutalShellPvP.CanUse(out act)) return true;
         if (KeenEdgePvP.CanUse(out act)) return true;
 

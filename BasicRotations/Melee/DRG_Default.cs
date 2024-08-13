@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
-
 namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
@@ -72,7 +70,7 @@ public sealed class DRG_Default : DragoonRotation
             if (GeirskogulPvE.CanUse(out act)) return true;
         }
 
-        if (BattleLitanyPvE.EnoughLevel && Player.HasStatus(true, StatusID.BattleLitany) && Player.HasStatus(true, StatusID.LanceCharge) 
+        if (BattleLitanyPvE.EnoughLevel && Player.HasStatus(true, StatusID.BattleLitany) && Player.HasStatus(true, StatusID.LanceCharge)
             || !BattleLitanyPvE.EnoughLevel && Player.HasStatus(true, StatusID.LanceCharge))
         {
             if (DragonfireDivePvE.CanUse(out act)) return true;

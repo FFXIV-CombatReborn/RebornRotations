@@ -3,7 +3,7 @@ namespace DefaultRotations.Healer;
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
 [SourceCode(Path = "main/DefaultRotations/Healer/WHM_Default.cs")]
 [Api(3)]
-public sealed class WHM_Default :WhiteMageRotation
+public sealed class WHM_Default : WhiteMageRotation
 {
     #region Config Options
 

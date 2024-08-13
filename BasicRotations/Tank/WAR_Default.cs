@@ -1,5 +1,3 @@
-using RotationSolver.Basic.Data;
-
 namespace DefaultRotations.Tank;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "Additional Contributions from Sascha")]
