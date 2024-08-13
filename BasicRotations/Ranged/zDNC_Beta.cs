@@ -1,6 +1,6 @@
 ﻿namespace DefaultRotations.Ranged;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.05", Description = "")]
+[Rotation("zDNC Beta", CombatType.PvE, GameVersion = "7.05", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/zDNC_Beta.cs")]
 [Api(3)]
 public sealed class zDNC_Beta : DancerRotation
