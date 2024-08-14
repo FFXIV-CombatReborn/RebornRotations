@@ -210,7 +210,11 @@ public class zPLD_Alpha : PaladinRotation
         if (RiotBladePvE.CanUse(out act) || FastBladePvE.CanUse(out act)) return true;
         
         //Range
-        if (HolyWhenAway(out act) && Player.CurrentMp > 3000) return true;
+         if (UseHolyWhenAway && Player.CurrentMp > 3000)
+        {
+            if (HolyCirclePvE.CanUse(out act) || HolySpiritPvE.CanUse(out act))
+                return true;
+        }
         
         if (UseShieldLob && ShieldLobPvE.CanUse(out act)) return true;
         
@@ -221,8 +225,6 @@ public class zPLD_Alpha : PaladinRotation
     #region Extra Methods
     
     private bool AtonementCombo(out IAction? act) => HolySpiritFirst(out act) || GoringBladePvE.CanUse(out act) || AtonementPvE.CanUse(out act) || SupplicationPvE.CanUse(out act) || SepulchrePvE.CanUse(out act) || HasDivineMight && HolyCirclePvE.CanUse(out act) || HasDivineMight && HolySpiritPvE.CanUse(out act);
-
-    private bool HolyWhenAway(out IAction? act) => UseHolyWhenAway && HolyCirclePvE.CanUse(out act) || HolySpiritPvE.CanUse(out act);
     
     private bool UseOath(out IAction? act)
     {
