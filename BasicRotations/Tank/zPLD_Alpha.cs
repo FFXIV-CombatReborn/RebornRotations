@@ -1,10 +1,10 @@
 ﻿
 namespace DefaultRotations.Tank;
 
-[Rotation("PLD Alpha", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Tank/PLD_Default.cs")]
+[Rotation("zPLD Alpha", CombatType.PvE, GameVersion = "7.05")]
+[SourceCode(Path = "main/DefaultRotations/Tank/zPLD_Alpha.cs")]
 [Api(3)]
-public class PLD_Alpha : PaladinRotation
+public class zPLD_Alpha : PaladinRotation
 {
     #region Config Options
 
