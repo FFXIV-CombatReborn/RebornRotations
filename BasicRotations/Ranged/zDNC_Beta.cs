@@ -1,4 +1,4 @@
-﻿namespace DefaultRotations.Ranged;
+namespace DefaultRotations.Ranged;
 
 [Rotation("zDNC Beta", CombatType.PvE, GameVersion = "7.05", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/zDNC_Beta.cs")]
@@ -80,12 +80,6 @@ public sealed class zDNC_Beta : DancerRotation
         // Prevent triple weaving by checking if an action was just used
         if (nextGCD.AnimationLockTime > 0.75f) return false;
 
-        if ((Player.HasStatus(true, StatusID.Devilment) || Feathers > 3 || !TechnicalStepPvE.EnoughLevel) && !FanDanceIiiPvE.CanUse(out _, skipAoeCheck: true))
-        {
-            if (FanDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
-            if (FanDanceIiPvE.CanUse(out act)) return true;
-        }
-
         // Skip using Flourish if Technical Step is about to come off cooldown
         if (!TechnicalStepPvE.Cooldown.ElapsedAfter(116) || TillanaPvE.CanUse(out act))
         {
@@ -97,6 +91,13 @@ public sealed class zDNC_Beta : DancerRotation
                     return true;
                 }
             }
+        }
+
+        //Use all feathers on burst
+        if ((Player.HasStatus(true, StatusID.Devilment) || Feathers > 3 || !TechnicalStepPvE.EnoughLevel) && !FanDanceIiiPvE.CanUse(out _, skipAoeCheck: true))
+        {
+            if (FanDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (FanDanceIiPvE.CanUse(out act)) return true;
         }
 
         // Other attacks
