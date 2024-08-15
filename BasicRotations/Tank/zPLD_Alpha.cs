@@ -82,13 +82,6 @@ public class zPLD_Alpha : PaladinRotation
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
         {
-            if (InCombat)
-            {
-                if (HasHonorReady && BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
-
-                if ((OathGauge >= WhenToSheltron) && (WhenToSheltron) > 0 && UseOath(out act)) return true;
-            }
-
             if (Player.HasStatus(true, StatusID.Cover) && HallowedWithCover && HallowedGroundPvE.CanUse(out act)) return true;
 
             if ((Player.HasStatus(true, StatusID.Rampart) || Player.HasStatus(true, StatusID.Sentinel)) &&
@@ -143,21 +136,22 @@ public class zPLD_Alpha : PaladinRotation
         if (WeaponRemain > 0.42f)
         {
             act = null;
-            /*
-            if (InCombat && !UseAdjustedBurst)
-            {
-                if (UseBurstMedicine(out act)) return true;
-                if (IsBurst && !CombatElapsedLess(5) && FightOrFlightPvE.CanUse(out act)) return true;
-            }
-            */
             
-            if (InCombat && !CombatElapsedLess(30) || (InCombat && !CombatElapsedLessGCD(AdjustedBurst)) || FightOrFlightPvE.Cooldown.IsCoolingDown && CombatElapsedLess(30))
+            if (HasHonorReady && BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            
+            if ((InCombat && !CombatElapsedLessGCD(AdjustedBurst)))
             {
                 if (FightOrFlightPvE.CanUse(out act)) return true;
                 if (RequiescatPvE.CanUse(out act, skipAoeCheck: true, usedUp: HasFightOrFlight)) return true;
+                if (OathGauge >= WhenToSheltron && WhenToSheltron > 0 && UseOath(out act)) return true;
             }
+            
             if (CombatElapsedLessGCD(AdjustedBurst + 1)) return false;
-
+            
+            if (FightOrFlightPvE.CanUse(out act)) return true;
+            if (RequiescatPvE.CanUse(out act, skipAoeCheck: true, usedUp: HasFightOrFlight)) return true;
+            if (OathGauge >= WhenToSheltron && WhenToSheltron > 0 && UseOath(out act)) return true;
+            
             if (CircleOfScornPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (SpiritsWithinPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
@@ -174,18 +168,11 @@ public class zPLD_Alpha : PaladinRotation
         //Minimizes Accidents in EX and Savage Hopefully
         if (IsInHighEndDuty && !InCombat){act = null; return false;}
         
-        // if (Player.TargetObject?.TargetObjectId == Player.GameObjectId && HolySpiritPvE.CanUse(out act)) return true;
-        
-        if (HasHonorReady && BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
-
         if (Player.HasStatus(true, StatusID.Requiescat))
         {
             if ((Player.Level >= 90) && (Player.StatusStack(true, StatusID.Requiescat) < 4))
             {
                 if (!TargetIsDying && PrioritizeAtonementCombo && !CombatElapsedLess(30) && (Player.StatusTime(true, StatusID.FightOrFlight) > 12) && AtonementCombo(out act)) return true;
-                //if (BladeOfValorPvE.CanUse(out act, skipAoeCheck: true)) return true;
-                //if (BladeOfTruthPvE.CanUse(out act, skipAoeCheck: true)) return true;
-                //if (BladeOfFaithPvE.CanUse(out act, skipAoeCheck: true)) return true;
                 if (ConfiteorPvE.CanUse(out act, skipAoeCheck: true)) return true;
             }
             if ((Player.Level >= 80) && (Player.StatusStack(true, StatusID.Requiescat) > 3))
@@ -197,84 +184,36 @@ public class zPLD_Alpha : PaladinRotation
             if (HolySpiritPvE.CanUse(out act)) return true;
         }
         
-        //if ((Player.TargetObject?.GetHealthRatio() < 0.05f) && AtonementCombo(out act)) return true;
-        
         //AOE
         if (HasDivineMight && HolyCirclePvE.CanUse(out act)) return true;
         if (ProminencePvE.CanUse(out act)) return true;
         if (TotalEclipsePvE.CanUse(out act)) return true;
 
         //Single
-        if (!CombatElapsedLess(8) && HasFightOrFlight && GoringBladePvE.CanUse(out act)) return true; // Dot
         if (UseShieldBash && ShieldBashPvE.CanUse(out act)) return true;
         
         if (Player.HasStatus(true, StatusID.FightOrFlight) && AtonementCombo(out act)) return true;
-
-        if (FightOrFlightPvE.Cooldown.WillHaveOneChargeGCD(4) &&
-            (HasSepulchreReady || HasSupplicationReady))
+        if (TargetIsDying && AtonementCombo(out act)) return true;
+        
+        //Helps ensure Atonement combo is ready for FoF in cases of unfortunate downtime
+        if (((!HasAtonementReady && (HasSepulchreReady || HasSupplicationReady || HasDivineMight)) ||
+             (HasAtonementReady && !HasDivineMight)) && 
+            !Player.HasStatus(true, StatusID.Medicated) && !RageOfHalonePvE.CanUse(out act, skipComboCheck: false))
         {
-            if (HolySpiritFirst(out act)) return true;
-            if (SepulchrePvE.CanUse(out act)) return true;
-            if (!HasSupplicationReady)
-                if (HasDivineMight && HolySpiritPvE.CanUse(out act)) return true;
-            if (RageOfHalonePvE.CanUse(out act))
-            {
-                if (SupplicationPvE.CanUse(out act)) return true;
-                return true;
-            }
-            if (RiotBladePvE.CanUse(out act)) return true;
-            if (FastBladePvE.CanUse(out act)) return true;
+            if (RiotBladePvE.CanUse(out act) || FastBladePvE.CanUse(out act)) return true;
         }
         
-        if (FightOrFlightPvE.Cooldown.WillHaveOneChargeGCD(2) && (HasSupplicationReady || !HasDivineMight))
-        {
-            if (RageOfHalonePvE.CanUse(out act)) return true;
-            if (RiotBladePvE.CanUse(out act)) return true;
-            if (FastBladePvE.CanUse(out act)) return true;
-        }
-            
+        if (!(HasSupplicationReady || HasSepulchreReady || HasDivineMight || HasAtonementReady) && RageOfHalonePvE.CanUse(out act)) return true;
         
-        if (FightOrFlightPvE.Cooldown.WillHaveOneChargeGCD(2) && HasDivineMight)
-        {
-            if (RageOfHalonePvE.CanUse(out act, skipAoeCheck: true)) return true;
-            if (HolySpiritFirst(out act)) return true;
-            if (AtonementPvE.CanUse(out act, skipAoeCheck: true)) return true;
-            if (HasDivineMight && HolySpiritPvE.CanUse(out act)) return true;
-        }
-
-        
-        if (((HasSupplicationReady || HasSepulchreReady || ((!HasSupplicationReady && !HasSepulchreReady && !HasAtonementReady && HasDivineMight)) &&
-            FightOrFlightPvE.Cooldown.WillHaveOneChargeGCD(5))))
-        {
-            if (HolySpiritFirst(out act)) return true;
-            if (AtonementPvE.CanUse(out act)) return true;
-            if (SupplicationPvE.CanUse(out act)) return true;
-            if (SepulchrePvE.CanUse(out act)) return true;
-            if (HasDivineMight && (HolySpiritPvE.CanUse(out act))) return true;
-            if (RageOfHalonePvE.CanUse(out act)) return true;
-            if (RiotBladePvE.CanUse(out act)) return true;
-            if (FastBladePvE.CanUse(out act)) return true;
-        }
-        
-        if (!(HasSupplicationReady || HasSepulchreReady || HasDivineMight) && RageOfHalonePvE.CanUse(out act)) return true;
-        
-        if (HolySpiritFirst(out act)) return true;
-
-        if (AtonementPvE.CanUse(out act, skipAoeCheck: true)) return true;
-       
-        if (HasSupplicationReady && (Player.StatusTime(true,StatusID.SupplicationReady) > 25) && (RiotBladePvE.CanUse(out act) || FastBladePvE.CanUse(out act))) return true;
-        
-        if (HasSupplicationReady && SupplicationPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (HasSepulchreReady && SepulchrePvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (HasDivineMight && HolySpiritPvE.CanUse(out act)) return true;
+        if (AtonementCombo(out act)) return true;
         
         if (RiotBladePvE.CanUse(out act) || FastBladePvE.CanUse(out act)) return true;
         
         //Range
-        if (UseHolyWhenAway)
+         if (UseHolyWhenAway && Player.CurrentMp > 3000)
         {
-            if (HolyCirclePvE.CanUse(out act)) return true;
-            if (HolySpiritPvE.CanUse(out act)) return true;
+            if (HolyCirclePvE.CanUse(out act) || HolySpiritPvE.CanUse(out act))
+                return true;
         }
         
         if (UseShieldLob && ShieldLobPvE.CanUse(out act)) return true;
@@ -285,8 +224,8 @@ public class zPLD_Alpha : PaladinRotation
 
     #region Extra Methods
     
-    private bool AtonementCombo(out IAction? act) => HolySpiritFirst(out act) || GoringBladePvE.CanUse(out act) || AtonementPvE.CanUse(out act) || SupplicationPvE.CanUse(out act) || SepulchrePvE.CanUse(out act) || HasDivineMight && HolyCirclePvE.CanUse(out act) ||HasDivineMight && HolySpiritPvE.CanUse(out act);
-
+    private bool AtonementCombo(out IAction? act) => HolySpiritFirst(out act) || GoringBladePvE.CanUse(out act) || AtonementPvE.CanUse(out act) || SupplicationPvE.CanUse(out act) || SepulchrePvE.CanUse(out act) || HasDivineMight && HolyCirclePvE.CanUse(out act) || HasDivineMight && HolySpiritPvE.CanUse(out act);
+    
     private bool UseOath(out IAction? act)
     {
         act = null; 
