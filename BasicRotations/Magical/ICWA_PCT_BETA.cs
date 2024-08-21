@@ -16,7 +16,9 @@ public sealed class IcWaPctBeta : PictomancerRotation
 	[Range(1, 5, ConfigUnitType.None, 1)]
 	[RotationConfig(CombatType.PvE, Name = "Paint overcap protection. How many paint do you need to be at before using a paint?")]
 	public bool UseCapCometHoly { get; set; } = true;
-	[RotationConfig(CombatType.PvE, Name = "Use the paint overcap protection or ( will still use comet while moving if the setup is on)")]
+	[RotationConfig(CombatType.PvE, Name = "Use the paint overcap protection ( will still use comet while moving if the setup is on)")]
+	public bool UseCapCometOnly { get; set; } = false;
+	[RotationConfig(CombatType.PvE, Name = "Use the paint overcap protection for comet only or ( will still use comet while moving if the setup is on)")]
 	public int HolyCometMax { get; set; } = 5;
 	public enum MotifSwift : byte
 	{
@@ -131,7 +133,7 @@ public sealed class IcWaPctBeta : PictomancerRotation
 	#region oGCD Logic
 	protected override bool AttackAbility(IAction nextGCD, out IAction? act)
 	{
-		bool burstTimingCheckerStriking = !ScenicMusePvE.Cooldown.WillHaveOneCharge(10) || Player.HasStatus(true, StatusID.StarryMuse);
+		bool burstTimingCheckerStriking = !ScenicMusePvE.Cooldown.WillHaveOneCharge(60) || Player.HasStatus(true, StatusID.StarryMuse);
 		if (CombatTime < 5)
 		{
 			if (StrikingMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && WeaponMotifDrawn) return true;
@@ -144,11 +146,11 @@ public sealed class IcWaPctBeta : PictomancerRotation
 		}
 		if (Player.Level < 92)
 		{
-			if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CombatTime > 3 ) return true;
+			if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CombatTime > 3 && IsBurst ) return true;
 		}
 		else
 		{
-			if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CombatTime > 5 ) return true;
+			if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CombatTime > 5 && IsBurst ) return true;
 		}
 		if (RetributionOfTheMadeenPvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true)) return true;
 		if (MogOfTheAgesPvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true)) return true;
@@ -163,18 +165,15 @@ public sealed class IcWaPctBeta : PictomancerRotation
 	#region GCD Logic
 	protected override bool GeneralGCD(out IAction? act)
 	{
-		bool burstTimingChecker = !ScenicMusePvE.Cooldown.WillHaveOneCharge(60) && SteelMusePvE.Cooldown.CurrentCharges != 1 || Player.HasStatus(true, StatusID.StarryMuse);
+		bool burstTimingChecker = !ScenicMusePvE.Cooldown.WillHaveOneCharge(52) && SteelMusePvE.Cooldown.CurrentCharges != 1 || Player.HasStatus(true, StatusID.StarryMuse);
 		//Opener requirements
 		if (CombatTime < 5)
 		{
 			if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
-			if (!CreatureMotifDrawn)
-			{
-				if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
-				if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
-				if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
-				if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
-			}
+			if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+			if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+			if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+			if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
 		}
 		// some gcd priority
 		if (RainbowDripPvE.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.RainbowBright)) return true;
@@ -187,29 +186,20 @@ public sealed class IcWaPctBeta : PictomancerRotation
 		//Cast when not in fight or no target available
 		if (!InCombat)
 		{
-			if (!CreatureMotifDrawn)
-			{
-				if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
-				if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
-				if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
-				if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
-			}
-			if (!WeaponMotifDrawn)
-			{
-				if (HammerMotifPvE.CanUse(out act)) return true;
-			}
-			if (!LandscapeMotifDrawn)
-			{
-				if (StarrySkyMotifPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
-			}
+			if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
+			if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
+			if (ClawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == ClawMotifPvE.ID) return true;
+			if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
+			if (HammerMotifPvE.CanUse(out act)) return true;
+			if (StarrySkyMotifPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
 			if (RainbowDripPvE.CanUse(out act)) return true;
 		}
 		// timings for motif casting
-		if (!LandscapeMotifDrawn && ScenicMusePvE.Cooldown.RecastTimeRemainOneCharge <= 15 && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
+		if (ScenicMusePvE.Cooldown.RecastTimeRemainOneCharge <= 15 && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
 		{
 			if (StarrySkyMotifPvE.CanUse(out act) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return true;
 		}
-		if (!CreatureMotifDrawn && (LivingMusePvE.Cooldown.HasOneCharge || LivingMusePvE.Cooldown.RecastTimeRemainOneCharge <= CreatureMotifPvE.Info.CastTime * 1.7) && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
+		if ((LivingMusePvE.Cooldown.HasOneCharge || LivingMusePvE.Cooldown.RecastTimeRemainOneCharge <= CreatureMotifPvE.Info.CastTime * 1.7) && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
 		{
 			if (PomMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == PomMotifPvE.ID) return true;
 			if (WingMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == WingMotifPvE.ID) return true;
@@ -217,7 +207,7 @@ public sealed class IcWaPctBeta : PictomancerRotation
 			if (MawMotifPvE.CanUse(out act) && CreatureMotifPvE.AdjustedID == MawMotifPvE.ID) return true;
 			;
 		}
-		if (!WeaponMotifDrawn && !HasHammerTime && (SteelMusePvE.Cooldown.HasOneCharge || SteelMusePvE.Cooldown.RecastTimeRemainOneCharge <= WeaponMotifPvE.Info.CastTime) && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
+		if ((SteelMusePvE.Cooldown.HasOneCharge || SteelMusePvE.Cooldown.RecastTimeRemainOneCharge <= WeaponMotifPvE.Info.CastTime) && !Player.HasStatus(true, StatusID.StarryMuse) && !Player.HasStatus(true, StatusID.Hyperphantasia))
 		{
 			if (HammerMotifPvE.CanUse(out act)) return true;
 		}
@@ -246,10 +236,10 @@ public sealed class IcWaPctBeta : PictomancerRotation
 			if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck: landscape) && !Player.HasStatus(true, StatusID.Hyperphantasia) && landscape) return true;
 		}
 		//white paint over cap protection
-		if ((Paint == HolyCometMax && !Player.HasStatus(true, StatusID.StarryMuse)) && UseCapCometHoly)
+		if ((Paint == HolyCometMax && !Player.HasStatus(true, StatusID.StarryMuse)) && (UseCapCometHoly || UseCapCometOnly))
 		{
 			if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
-			if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
+			if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && !UseCapCometOnly) return true;
 		}
 		//aoe sub
 		if (ThunderIiInMagentaPvE.CanUse(out act)) return true;
