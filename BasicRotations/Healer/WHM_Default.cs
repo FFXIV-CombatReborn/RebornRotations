@@ -1,6 +1,6 @@
 namespace DefaultRotations.Healer;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Healer/WHM_Default.cs")]
 [Api(3)]
 public sealed class WHM_Default : WhiteMageRotation
@@ -64,10 +64,13 @@ public sealed class WHM_Default : WhiteMageRotation
     protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
         act = null;
+
         if (TemperancePvE.Cooldown.IsCoolingDown && !TemperancePvE.Cooldown.WillHaveOneCharge(100)
             || LiturgyOfTheBellPvE.Cooldown.IsCoolingDown && !LiturgyOfTheBellPvE.Cooldown.WillHaveOneCharge(160)) return false;
 
         if (TemperancePvE.CanUse(out act)) return true;
+
+        if (DivineCaressPvE.CanUse(out act)) return true;
 
         if (LiturgyOfTheBellPvE.CanUse(out act, skipAoeCheck: true)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
@@ -89,7 +92,6 @@ public sealed class WHM_Default : WhiteMageRotation
     [RotationDesc(ActionID.AsylumPvE)]
     protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
     {
-        if (DivineCaressPvE.CanUse(out act)) return true;
         if (AsylumPvE.CanUse(out act)) return true;
         return base.HealAreaAbility(nextGCD, out act);
     }
