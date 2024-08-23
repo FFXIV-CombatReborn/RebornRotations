@@ -176,9 +176,8 @@ public sealed class zPCT_TESTING : PictomancerRotation
         // Weapon Painting Burst
         if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipComboCheck: true)) return true;
 
-        if (Player.HasStatus(true, StatusID.Hyperphantasia))
+        if (HolyCometMoving && IsMoving)
         {
-            if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true)) return true;
             if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true)) return true;
         }
 
@@ -186,7 +185,6 @@ public sealed class zPCT_TESTING : PictomancerRotation
         if (Player.HasStatus(true, StatusID.Hyperphantasia))
         {
             if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true)) return true;
         }
 
         //Paint overcap protection
