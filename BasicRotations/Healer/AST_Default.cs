@@ -11,6 +11,9 @@ public sealed class AST_Default : AstrologianRotation
 
     [RotationConfig(CombatType.PvE, Name = "Prevent actions while you have the bubble mit up")]
     public bool BubbleProtec { get; set; } = false;
+    
+    [RotationConfig(CombatType.PvE, Name = "Prioritize Microcosmos over all other healing when available")]
+    public bool MicroPrio { get; set; } = false;
 
     [Range(4, 20, ConfigUnitType.Seconds)]
     [RotationConfig(CombatType.PvE, Name = "Use Earthly Star during countdown timer.")]
@@ -104,6 +107,7 @@ public sealed class AST_Default : AstrologianRotation
     {
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
 
         if (AspectedBeneficPvE.CanUse(out act)
             && (IsMoving
@@ -120,6 +124,7 @@ public sealed class AST_Default : AstrologianRotation
     {
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
 
         if (AspectedHeliosPvE.CanUse(out act)) return true;
         if (HeliosPvE.CanUse(out act)) return true;
@@ -132,6 +137,7 @@ public sealed class AST_Default : AstrologianRotation
     {
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
 
         if (base.EmergencyAbility(nextGCD, out act)) return true;
 
@@ -198,6 +204,7 @@ public sealed class AST_Default : AstrologianRotation
     {
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
 
         if (InCombat && TheArrowPvE.CanUse(out act)) return true;
         if (InCombat && TheEwerPvE.CanUse(out act)) return true;
@@ -216,6 +223,7 @@ public sealed class AST_Default : AstrologianRotation
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
 
         if (MicrocosmosPvE.CanUse(out act)) return true;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
 
         if (CelestialOppositionPvE.CanUse(out act)) return true;
 
