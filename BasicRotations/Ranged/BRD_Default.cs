@@ -75,7 +75,7 @@ public sealed class BRD_Default : BardRotation
 
         if (IsBurst && Song != Song.NONE && MagesBalladPvE.EnoughLevel)
         {
-            if (RagingStrikesPvE.CanUse(out act))
+            if (RagingStrikesPvE.CanUse(out act, isLastAbility: true))
             {
                 if (BindWANDEnough && Song == Song.WANDERER && TheWanderersMinuetPvE.EnoughLevel) return true;
                 if (!BindWANDEnough) return true;
@@ -150,7 +150,7 @@ public sealed class BRD_Default : BardRotation
             if (BloodletterPvE.CanUse(out act)) return true;
         }
 
-        // Prevents Bloodletter bumpcapping when MAGE is the stong due to Repetoire procs
+        // Prevents Bloodletter bumpcapping when MAGE is the song due to Repetoire procs
         if ((BloodletterPvE.Cooldown.CurrentCharges > 1) && Song == Song.MAGE)
         {
             if (HeartbreakShotPvE.CanUse(out act, usedUp: true)) return true;
