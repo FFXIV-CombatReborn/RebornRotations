@@ -29,8 +29,8 @@ public sealed class VPR_Default : ViperRotation
         if (UncoiledTwinbloodPvE.CanUse(out act)) return true;
 
         //AOE Dread Combo
-        if (TwinfangThreshPvE.CanUse(out act)) return true;
-        if (TwinbloodThreshPvE.CanUse(out act)) return true;
+        if (TwinfangThreshPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (TwinbloodThreshPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         //Single Target Dread Combo
         if (TwinfangBitePvE.CanUse(out act)) return true;
@@ -114,8 +114,8 @@ public sealed class VPR_Default : ViperRotation
         }
 
         ////AOE Dread Combo
-        if (SwiftskinsDenPvE.CanUse(out act, skipComboCheck: true)) return true;
-        if (HuntersDenPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (SwiftskinsDenPvE.CanUse(out act, skipComboCheck: true, skipAoeCheck: true)) return true;
+        if (HuntersDenPvE.CanUse(out act, skipComboCheck: true, skipAoeCheck: true)) return true;
 
         if (VicepitPvE.Cooldown.CurrentCharges == 1 && VicepitPvE.Cooldown.RecastTimeRemainOneCharge < 10)
         {
