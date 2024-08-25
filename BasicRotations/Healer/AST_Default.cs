@@ -1,6 +1,6 @@
 namespace DefaultRotations.Healer;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.0")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Healer/AST_Default.cs")]
 [Api(3)]
 public sealed class AST_Default : AstrologianRotation
@@ -8,6 +8,12 @@ public sealed class AST_Default : AstrologianRotation
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Prevent actions while you have the bubble mit up")]
+    public bool BubbleProtec { get; set; } = false;
+    
+    [RotationConfig(CombatType.PvE, Name = "Prioritize Microcosmos over all other healing when available")]
+    public bool MicroPrio { get; set; } = false;
 
     [Range(4, 20, ConfigUnitType.Seconds)]
     [RotationConfig(CombatType.PvE, Name = "Use Earthly Star during countdown timer.")]
@@ -42,6 +48,9 @@ public sealed class AST_Default : AstrologianRotation
     [RotationDesc(ActionID.ExaltationPvE, ActionID.TheArrowPvE, ActionID.TheSpirePvE, ActionID.TheBolePvE, ActionID.TheEwerPvE)]
     protected override bool DefenseSingleAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
         if (InCombat && TheSpirePvE.CanUse(out act)) return true;
         if (InCombat && TheBolePvE.CanUse(out act)) return true;
 
@@ -53,6 +62,8 @@ public sealed class AST_Default : AstrologianRotation
     protected override bool DefenseAreaGCD(out IAction? act)
     {
         act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
         if (MacrocosmosPvE.Cooldown.IsCoolingDown && !MacrocosmosPvE.Cooldown.WillHaveOneCharge(150)
             || CollectiveUnconsciousPvE.Cooldown.IsCoolingDown && !CollectiveUnconsciousPvE.Cooldown.WillHaveOneCharge(40)) return false;
 
@@ -63,13 +74,15 @@ public sealed class AST_Default : AstrologianRotation
     [RotationDesc(ActionID.CollectiveUnconsciousPvE, ActionID.SunSignPvE)]
     protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
+        if (SunSignPvE.CanUse(out act)) return true;
+
         act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
         if (MacrocosmosPvE.Cooldown.IsCoolingDown && !MacrocosmosPvE.Cooldown.WillHaveOneCharge(150)
             || CollectiveUnconsciousPvE.Cooldown.IsCoolingDown && !CollectiveUnconsciousPvE.Cooldown.WillHaveOneCharge(40)) return false;
 
         if (CollectiveUnconsciousPvE.CanUse(out act)) return true;
-
-        if (SunSignPvE.CanUse(out act)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
     }
     #endregion
@@ -77,6 +90,9 @@ public sealed class AST_Default : AstrologianRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
         if (GravityPvE.CanUse(out act)) return true;
 
         if (CombustPvE.CanUse(out act)) return true;
@@ -89,6 +105,10 @@ public sealed class AST_Default : AstrologianRotation
     [RotationDesc(ActionID.AspectedBeneficPvE, ActionID.BeneficIiPvE, ActionID.BeneficPvE)]
     protected override bool HealSingleGCD(out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
         if (AspectedBeneficPvE.CanUse(out act)
             && (IsMoving
             || AspectedBeneficPvE.Target.Target?.GetHealthRatio() > AspectedBeneficHeal)) return true;
@@ -102,6 +122,10 @@ public sealed class AST_Default : AstrologianRotation
     [RotationDesc(ActionID.AspectedHeliosPvE, ActionID.HeliosPvE)]
     protected override bool HealAreaGCD(out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
         if (AspectedHeliosPvE.CanUse(out act)) return true;
         if (HeliosPvE.CanUse(out act)) return true;
         return base.HealAreaGCD(out act);
@@ -111,10 +135,15 @@ public sealed class AST_Default : AstrologianRotation
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
         if (base.EmergencyAbility(nextGCD, out act)) return true;
 
         if (!InCombat) return false;
 
+        if (OraclePvE.CanUse(out act)) return true;
         if (nextGCD.IsTheSameTo(true, AspectedHeliosPvE, HeliosPvE))
         {
             if (HoroscopePvE.CanUse(out act)) return true;
@@ -130,6 +159,9 @@ public sealed class AST_Default : AstrologianRotation
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
         if (AstralDrawPvE.CanUse(out act)) return true;
         if (UmbralDrawPvE.CanUse(out act)) return true;
         if (InCombat && TheBalancePvE.CanUse(out act)) return true;
@@ -139,6 +171,9 @@ public sealed class AST_Default : AstrologianRotation
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
         if (IsBurst && !IsMoving
             && DivinationPvE.CanUse(out act)) return true;
 
@@ -160,8 +195,6 @@ public sealed class AST_Default : AstrologianRotation
                 if (LordOfCrownsPvE.CanUse(out act)) return true;
             }
         }
-
-        if (OraclePvE.CanUse(out act)) return true;
         return base.AttackAbility(nextGCD, out act);
     }
 
@@ -169,6 +202,10 @@ public sealed class AST_Default : AstrologianRotation
         ActionID.CelestialIntersectionPvE)]
     protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
         if (InCombat && TheArrowPvE.CanUse(out act)) return true;
         if (InCombat && TheEwerPvE.CanUse(out act)) return true;
 
@@ -182,6 +219,12 @@ public sealed class AST_Default : AstrologianRotation
     [RotationDesc(ActionID.CelestialOppositionPvE, ActionID.StellarDetonationPvE, ActionID.HoroscopePvE, ActionID.HoroscopePvE_16558, ActionID.LadyOfCrownsPvE, ActionID.HeliosConjunctionPvE)]
     protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
+        if (MicrocosmosPvE.CanUse(out act)) return true;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
         if (CelestialOppositionPvE.CanUse(out act)) return true;
 
         if (StellarDetonationPvE.CanUse(out act)) return true;

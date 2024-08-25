@@ -14,6 +14,10 @@ public sealed class VPR_Default : ViperRotation
     [RotationConfig(CombatType.PvE, Name = "How many charges of Uncoiled Fury needs to be at before be used inside of melee (Ignores burst, leave at 3 to hold charges for out of melee uptime or burst only)")]
     public int MaxUncoiledStacksUser { get; set; } = 3;
 
+    [Range(0, 120, ConfigUnitType.None, 5)]
+    [RotationConfig(CombatType.PvE, Name = "How long has to pass on Serpents Ire's cooldown before the rotation starts pooling gauge for burst. Leave this alone if you dont know what youre doing. (Will still use Reawaken if you reach cap regardless of timer)")]
+    public int ReawakenDelayTimer { get; set; } = 75;
+
     #endregion
 
     #region Additional oGCD Logic
@@ -25,8 +29,8 @@ public sealed class VPR_Default : ViperRotation
         if (UncoiledTwinbloodPvE.CanUse(out act)) return true;
 
         //AOE Dread Combo
-        if (TwinfangThreshPvE.CanUse(out act)) return true;
-        if (TwinbloodThreshPvE.CanUse(out act)) return true;
+        if (TwinfangThreshPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (TwinbloodThreshPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         //Single Target Dread Combo
         if (TwinfangBitePvE.CanUse(out act)) return true;
@@ -83,7 +87,11 @@ public sealed class VPR_Default : ViperRotation
         if (SwiftTime > 10 &&
             HuntersTime > 10 &&
             !HasHunterVenom && !HasSwiftVenom &&
-            !HasPoisedBlood && !HasPoisedFang)
+            !HasPoisedBlood && !HasPoisedFang && SerpentsIrePvE.EnoughLevel && (!SerpentsIrePvE.Cooldown.ElapsedAfter(ReawakenDelayTimer) || SerpentOffering == 100) ||
+            SwiftTime > 10 &&
+            HuntersTime > 10 &&
+            !HasHunterVenom && !HasSwiftVenom &&
+            !HasPoisedBlood && !HasPoisedFang && !SerpentsIrePvE.EnoughLevel)
         {
             if (ReawakenPvE.CanUse(out act, skipComboCheck: true)) return true;
         }
@@ -105,10 +113,9 @@ public sealed class VPR_Default : ViperRotation
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
-
         ////AOE Dread Combo
-        if (SwiftskinsDenPvE.CanUse(out act, skipComboCheck: true)) return true;
-        if (HuntersDenPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (SwiftskinsDenPvE.CanUse(out act, skipComboCheck: true, skipAoeCheck: true)) return true;
+        if (HuntersDenPvE.CanUse(out act, skipComboCheck: true, skipAoeCheck: true)) return true;
 
         if (VicepitPvE.Cooldown.CurrentCharges == 1 && VicepitPvE.Cooldown.RecastTimeRemainOneCharge < 10)
         {

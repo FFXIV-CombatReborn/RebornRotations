@@ -23,8 +23,8 @@ internal class VariantDefault : VariantRotation
 
     public override bool HealSingleGCD(out IAction? act)
     {
-        if (VariantCurePvE.CanUse(out act)) return true;
-        if (VariantCurePvE_33862.CanUse(out act)) return true;
+        if (VariantCurePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (VariantCurePvE_33862.CanUse(out act, skipStatusProvideCheck: true)) return true;
         return base.HealSingleGCD(out act);
     }
 
