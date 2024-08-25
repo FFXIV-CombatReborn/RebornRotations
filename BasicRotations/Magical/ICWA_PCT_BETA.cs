@@ -156,7 +156,6 @@ public sealed class IcWaPctBeta : PictomancerRotation
 	#region GCD Logic
 	protected override bool GeneralGCD(out IAction? act)
 	{
-		bool burstTimingChecker = !ScenicMusePvE.Cooldown.WillHaveOneCharge(52) && SteelMusePvE.Cooldown.CurrentCharges != 1 || Player.HasStatus(true, StatusID.StarryMuse);
 		//Opener requirements
 		if (CombatTime < 5)
 		{
@@ -173,7 +172,7 @@ public sealed class IcWaPctBeta : PictomancerRotation
 			if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
 		}
 		if (StarPrismPvE.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.Starstruck)) return true;
-		if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && HasHammerTime && burstTimingChecker) return true;
+		if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && HasHammerTime) return true;
 		//Cast when not in fight or no target available
 		if (!InCombat)
 		{
@@ -206,7 +205,7 @@ public sealed class IcWaPctBeta : PictomancerRotation
 		// white/black paint use while moving
 		if (isMovingAndSwift)
 		{
-			if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && burstTimingChecker) return true;
+			if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
 			if (HolyCometMoving)
 			{
 				if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
