@@ -14,6 +14,14 @@ public sealed class VPR_Default : ViperRotation
     [RotationConfig(CombatType.PvE, Name = "How many charges of Uncoiled Fury needs to be at before be used inside of melee (Ignores burst, leave at 3 to hold charges for out of melee uptime or burst only)")]
     public int MaxUncoiledStacksUser { get; set; } = 3;
 
+    [Range(1, 30, ConfigUnitType.None, 1)]
+    [RotationConfig(CombatType.PvE, Name = "How long on the status time for Swift needs to be to allow reawaken use (setting this too low can lead to dropping buff)")]
+    public int SwiftTimer { get; set; } = 10;
+
+    [Range(1, 30, ConfigUnitType.None, 1)]
+    [RotationConfig(CombatType.PvE, Name = "How long on the status time for Hunt needs to be to allow reawaken use (setting this too low can lead to dropping buff)")]
+    public int HuntersTimer { get; set; } = 10;
+
     [Range(0, 120, ConfigUnitType.None, 5)]
     [RotationConfig(CombatType.PvE, Name = "How long has to pass on Serpents Ire's cooldown before the rotation starts pooling gauge for burst. Leave this alone if you dont know what youre doing. (Will still use Reawaken if you reach cap regardless of timer)")]
     public int ReawakenDelayTimer { get; set; } = 75;
@@ -84,12 +92,12 @@ public sealed class VPR_Default : ViperRotation
         if (FirstGenerationPvE.CanUse(out act)) return true;
 
 
-        if (SwiftTime > 10 &&
-            HuntersTime > 10 &&
+        if (SwiftTime > SwiftTimer &&
+            HuntersTime > HuntersTimer &&
             !HasHunterVenom && !HasSwiftVenom &&
             !HasPoisedBlood && !HasPoisedFang && SerpentsIrePvE.EnoughLevel && (!SerpentsIrePvE.Cooldown.ElapsedAfter(ReawakenDelayTimer) || SerpentOffering == 100) ||
-            SwiftTime > 10 &&
-            HuntersTime > 10 &&
+            SwiftTime > SwiftTimer &&
+            HuntersTime > HuntersTimer &&
             !HasHunterVenom && !HasSwiftVenom &&
             !HasPoisedBlood && !HasPoisedFang && !SerpentsIrePvE.EnoughLevel)
         {
