@@ -185,17 +185,27 @@ public sealed class SCH_Default : ScholarRotation
     protected override bool GeneralGCD(out IAction? act)
     {
         if (SummonEosPvE.CanUse(out act)) return true;
+        if (BiolysisPvE.CanUse(out act) && AllHostileTargets.Where(p => p.DistanceToPlayer() < 5).Count() < 4) return true;
+        if (BioIiPvE.CanUse(out act) && AllHostileTargets.Where(p => p.DistanceToPlayer() < 5).Count() < 4) return true;
         if (BioPvE.CanUse(out act) && AllHostileTargets.Where(p => p.DistanceToPlayer() < 5).Count() < 4) return true;
 
         //AOE
         if (ArtOfWarIiPvE.CanUse(out act)) return true;
         if (ArtOfWarPvE.CanUse(out act)) return true;
 
-        //Single
-        if (RuinPvE.CanUse(out act)) return true;
+        //Single cast
+        if (BroilIvPvP.CanUse(out act)) return true;
+        if (BroilIiiPvE.CanUse(out act)) return true;
+        if (BroilIiPvE.CanUse(out act)) return true;
+        if (BroilPvE.CanUse(out act)) return true;
+
+        //Single Instant for when moving.
         if (RuinIiPvE.CanUse(out act)) return true;
+        if (RuinPvE.CanUse(out act)) return true;
 
         //Add dot while moving.
+        if (BiolysisPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (BioIiPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         if (BioPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
 
         return base.GeneralGCD(out act);
