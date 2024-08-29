@@ -95,7 +95,6 @@ public sealed class SCH_Default : ScholarRotation
     {
         var haveLink = PartyMembers.Any(p => p.HasStatus(true, StatusID.FeyUnion_1223));
         if (ManifestationPvE.CanUse(out act)) return true;
-
         if (AetherpactPvE.CanUse(out act) && FairyGauge >= 70 && !haveLink) return true;
         if (ProtractionPvE.CanUse(out act)) return true;
         if (ExcogitationPvE.CanUse(out act)) return true;
@@ -108,6 +107,8 @@ public sealed class SCH_Default : ScholarRotation
     [RotationDesc(ActionID.FeyIlluminationPvE, ActionID.ExpedientPvE, ActionID.SummonSeraphPvE, ActionID.ConsolationPvE, ActionID.SacredSoilPvE)]
     protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
+        if (DeploymentTacticsPvE.CanUse(out act)) return true;
+
         if (SeraphismPvE.CanUse(out act)) return true;
 
         if (FeyIlluminationPvE_16538.CanUse(out act)) return true;
@@ -184,7 +185,10 @@ public sealed class SCH_Default : ScholarRotation
 
     protected override bool GeneralGCD(out IAction? act)
     {
+        // Summon Eos
         if (SummonEosPvE.CanUse(out act)) return true;
+
+        //Add dot
         if (BiolysisPvE.CanUse(out act) && AllHostileTargets.Where(p => p.DistanceToPlayer() < 5).Count() < 4) return true;
         if (BioIiPvE.CanUse(out act) && AllHostileTargets.Where(p => p.DistanceToPlayer() < 5).Count() < 4) return true;
         if (BioPvE.CanUse(out act) && AllHostileTargets.Where(p => p.DistanceToPlayer() < 5).Count() < 4) return true;
@@ -193,15 +197,15 @@ public sealed class SCH_Default : ScholarRotation
         if (ArtOfWarIiPvE.CanUse(out act)) return true;
         if (ArtOfWarPvE.CanUse(out act)) return true;
 
-        //Single cast
+        //Single target cast
         if (BroilIvPvP.CanUse(out act)) return true;
         if (BroilIiiPvE.CanUse(out act)) return true;
         if (BroilIiPvE.CanUse(out act)) return true;
         if (BroilPvE.CanUse(out act)) return true;
+        if (RuinPvE.CanUse(out act)) return true;
 
         //Single Instant for when moving.
         if (RuinIiPvE.CanUse(out act)) return true;
-        if (RuinPvE.CanUse(out act)) return true;
 
         //Add dot while moving.
         if (BiolysisPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;

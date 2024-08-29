@@ -42,7 +42,7 @@ public sealed class BRD_Default : BardRotation
         {
             if ((EmpyrealArrowPvE.Cooldown.IsCoolingDown && !EmpyrealArrowPvE.Cooldown.WillHaveOneChargeGCD(1) || !EmpyrealArrowPvE.EnoughLevel) && Repertoire != 3)
             {
-                if (!Player.HasStatus(true, StatusID.StraightShotReady) && BarragePvE.CanUse(out act)) return true;
+                if (!Player.HasStatus(true, StatusID.HawksEye_3861) && BarragePvE.CanUse(out act)) return true;
             }
         }
 
@@ -160,17 +160,7 @@ public sealed class BRD_Default : BardRotation
             if (BloodletterPvE.CanUse(out act, usedUp: true)) return true;
         }
 
-        // Allow full use of RagingStrikes
-        if (Player.HasStatus(true, StatusID.RagingStrikes))
-        {
-            if (HeartbreakShotPvE.CanUse(out act, usedUp: true)) return true;
-
-            if (RainOfDeathPvE.CanUse(out act, usedUp: true)) return true;
-
-            if (BloodletterPvE.CanUse(out act, usedUp: true)) return true;
-        }
-
-        //if (BloodletterLogic(out act)) return true;
+        if (BetterBloodletterLogic(out act)) return true;
 
         return base.AttackAbility(nextGCD, out act);
     }
@@ -238,34 +228,34 @@ public sealed class BRD_Default : BardRotation
 
         return false;
     }
-    private bool BloodletterLogic(out IAction? act)
+    private bool BetterBloodletterLogic(out IAction? act)
     {
-        bool isBattleVoice = BattleVoicePvE.CanUse(out _);
-        bool isRadiantFinale = RadiantFinalePvE.CanUse(out _);
-        bool isRagingNow = Player.HasStatus(true, StatusID.RagingStrikes);
-        bool isRagingSoon = RagingStrikesPvE.Cooldown.WillHaveOneCharge(30);
-        bool isBloodTrait = EnhancedBloodletterTrait.EnoughLevel && BloodletterPvE.Cooldown.CurrentCharges < 3;
-        bool isNoBloodTrait = !EnhancedBloodletterTrait.EnoughLevel && BloodletterPvE.Cooldown.CurrentCharges < 2;
-        bool isEmpyrealArrowCD = EmpyrealArrowPvE.Cooldown.IsCoolingDown;
-        bool isEmpyrealSoon = !EmpyrealArrowPvE.Cooldown.WillHaveOneChargeGCD();
-        bool isEmpyrealLevel = !EmpyrealArrowPvE.EnoughLevel;
-        bool isRepertoire = Repertoire != 3;
+        bool isRagingStrikesLevel = RagingStrikesPvE.EnoughLevel;
+        bool isBattleVoiceLevel = BattleVoicePvE.EnoughLevel;
+        bool isRadiantFinaleLevel = RadiantFinalePvE.EnoughLevel;
 
         if (HeartbreakShotPvE.CanUse(out act, usedUp: true))
         {
-            if (isBattleVoice || isRadiantFinale || (isRagingSoon && (isBloodTrait || isNoBloodTrait))) return false;
-            if (isEmpyrealArrowCD || isEmpyrealSoon || isEmpyrealLevel || isRepertoire) return true;
+            if ((!isRagingStrikesLevel) 
+                || (isRagingStrikesLevel && !isBattleVoiceLevel && Player.HasStatus(true, StatusID.RagingStrikes)) 
+                || (isBattleVoiceLevel && !isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice)) 
+                || isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice) && Player.HasStatus(true, StatusID.RadiantFinale)) return true;
         }
 
         if (RainOfDeathPvE.CanUse(out act, usedUp: true))
         {
-            if (isEmpyrealArrowCD || isEmpyrealSoon || isEmpyrealLevel || isRepertoire) return true;
+            if ((!isRagingStrikesLevel)
+                || (isRagingStrikesLevel && !isBattleVoiceLevel && Player.HasStatus(true, StatusID.RagingStrikes))
+                || (isBattleVoiceLevel && !isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice))
+                || isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice) && Player.HasStatus(true, StatusID.RadiantFinale)) return true;
         }
 
         if (BloodletterPvE.CanUse(out act, usedUp: true))
         {
-            if (isBattleVoice || isRadiantFinale || (isRagingSoon && (isBloodTrait || isNoBloodTrait))) return false;
-            if (isEmpyrealArrowCD || isEmpyrealSoon || isEmpyrealLevel || isRepertoire) return true;
+            if ((!isRagingStrikesLevel)
+                || (isRagingStrikesLevel && !isBattleVoiceLevel && Player.HasStatus(true, StatusID.RagingStrikes))
+                || (isBattleVoiceLevel && !isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice))
+                || isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice) && Player.HasStatus(true, StatusID.RadiantFinale)) return true;
         }
         return false;
     }

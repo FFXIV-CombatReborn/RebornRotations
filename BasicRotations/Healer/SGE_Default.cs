@@ -266,6 +266,43 @@ public sealed class SGE_Default : SageRotation
         return base.DefenseSingleGCD(out act);
     }
 
+    [RotationDesc(ActionID.PneumaPvE, ActionID.PrognosisPvE, ActionID.EukrasianPrognosisPvE, ActionID.EukrasianPrognosisIiPvE)]
+    protected override bool HealAreaGCD(out IAction? act)
+    {
+        if (PartyMembersAverHP < PneumaAOEPartyHeal || DyskrasiaPvE.CanUse(out _) && PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaAOETankHeal))
+        {
+            if (PneumaPvE.CanUse(out act)) return true;
+        }
+
+        if (Player.HasStatus(false, StatusID.EukrasianDiagnosis, StatusID.EukrasianPrognosis, StatusID.Galvanize))
+        {
+            if (PrognosisPvE.CanUse(out act)) return true;
+        }
+
+        if (EukrasianPrognosisIiPvE.CanUse(out _))
+        {
+            if (EukrasiaPvE.CanUse(out act)) return true;
+            act = EukrasianPrognosisIiPvE;
+            return true;
+        }
+
+        if (!EukrasianPrognosisIiPvE.EnoughLevel && EukrasianPrognosisPvE.CanUse(out _))
+        {
+            if (EukrasiaPvE.CanUse(out act)) return true;
+            act = EukrasianPrognosisPvE;
+            return true;
+        }
+
+        return base.HealAreaGCD(out act);
+    }
+
+    [RotationDesc(ActionID.DiagnosisPvE)]
+    protected override bool HealSingleGCD(out IAction? act)
+    {
+        if (DiagnosisPvE.CanUse(out act)) return true;
+        return base.HealSingleGCD(out act);
+    }
+
     protected override bool GeneralGCD(out IAction? act)
     {
         if (HostileTarget?.IsBossFromTTK() ?? false)
@@ -294,16 +331,16 @@ public sealed class SGE_Default : SageRotation
             }
         }
 
-        if (PhlegmaIiiPvE.CanUse(out act, usedUp: IsMoving, skipAoeCheck: true)) return true;
-        if (!PhlegmaIiiPvE.EnoughLevel && PhlegmaIiPvE.CanUse(out act, usedUp: IsMoving, skipAoeCheck: true)) return true;
-        if (!PhlegmaIiPvE.EnoughLevel && PhlegmaPvE.CanUse(out act, usedUp: IsMoving, skipAoeCheck: true)) return true;
+        if (PhlegmaIiiPvE.CanUse(out act, usedUp: IsMoving)) return true;
+        if (PhlegmaIiPvE.CanUse(out act, usedUp: IsMoving)) return true;
+        if (PhlegmaPvE.CanUse(out act, usedUp: IsMoving)) return true;
 
         if (PartyMembers.Any(b => b.GetHealthRatio() < PneumaSTPartyHeal && !b.IsDead) || PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaSTTankHeal && !t.IsDead))
         {
-            if (PneumaPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (PneumaPvE.CanUse(out act)) return true;
         }
 
-        if (IsMoving && ToxikonPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (IsMoving && ToxikonPvE.CanUse(out act)) return true;
 
         if (EukrasianDyskrasiaPvE.CanUse(out _, skipCastingCheck: true))
         {
@@ -337,43 +374,6 @@ public sealed class SGE_Default : SageRotation
         }
 
         return base.GeneralGCD(out act);
-    }
-
-    [RotationDesc(ActionID.PneumaPvE, ActionID.PrognosisPvE, ActionID.EukrasianPrognosisPvE, ActionID.EukrasianPrognosisIiPvE)]
-    protected override bool HealAreaGCD(out IAction? act)
-    {
-        if (PartyMembersAverHP < PneumaAOEPartyHeal || DyskrasiaPvE.CanUse(out _) && PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaAOETankHeal))
-        {
-            if (PneumaPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        }
-
-        if (Player.HasStatus(false, StatusID.EukrasianDiagnosis, StatusID.EukrasianPrognosis, StatusID.Galvanize))
-        {
-            if (PrognosisPvE.CanUse(out act)) return true;
-        }
-
-        if (EukrasianPrognosisIiPvE.CanUse(out _))
-        {
-            if (EukrasiaPvE.CanUse(out act)) return true;
-            act = EukrasianPrognosisIiPvE;
-            return true;
-        }
-
-        if (!EukrasianPrognosisIiPvE.EnoughLevel && EukrasianPrognosisPvE.CanUse(out _))
-        {
-            if (EukrasiaPvE.CanUse(out act)) return true;
-            act = EukrasianPrognosisPvE;
-            return true;
-        }
-
-        return base.HealAreaGCD(out act);
-    }
-
-    [RotationDesc(ActionID.DiagnosisPvE)]
-    protected override bool HealSingleGCD(out IAction? act)
-    {
-        if (DiagnosisPvE.CanUse(out act)) return true;
-        return base.HealSingleGCD(out act);
     }
     #endregion
 
