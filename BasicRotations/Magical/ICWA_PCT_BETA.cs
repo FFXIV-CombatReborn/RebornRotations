@@ -16,9 +16,9 @@ public sealed class IcWaPctBeta : PictomancerRotation
 	[Range(1, 5, ConfigUnitType.None, 1)]
 	[RotationConfig(CombatType.PvE, Name = "Paint overcap protection. How many paint do you need to be at before using a paint?")]
 	public bool UseCapCometHoly { get; set; } = true;
-	[RotationConfig(CombatType.PvE, Name = "Use the paint overcap protection ( will still use comet while moving if the setup is on)")]
+	[RotationConfig(CombatType.PvE, Name = "Use the paint overcap protection (will still use comet while moving if the setup is on)")]
 	public bool UseCapCometOnly { get; set; } = false;
-	[RotationConfig(CombatType.PvE, Name = "Use the paint overcap protection for comet only or ( will still use comet while moving if the setup is on)")]
+	[RotationConfig(CombatType.PvE, Name = "Use the paint overcap protection for comet only (will still use comet while moving if the setup is on)")]
 	public int HolyCometMax { get; set; } = 5;
 	public enum MotifSwift : byte
 	{
@@ -136,7 +136,7 @@ public sealed class IcWaPctBeta : PictomancerRotation
 		bool burstTimingCheckerStriking = !ScenicMusePvE.Cooldown.WillHaveOneCharge(60) || Player.HasStatus(true, StatusID.StarryMuse);
 		int adjustCombatTimeForOpener = Player.Level < 92 ? 2 : 5;
 		if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CombatTime > adjustCombatTimeForOpener && IsBurst) return true;
-		if (CombatTime > adjustCombatTimeForOpener && StrikingMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true)) return true;
+		if (CombatTime > adjustCombatTimeForOpener && StrikingMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && burstTimingCheckerStriking) return true;
 		if (SubtractivePalettePvE.CanUse(out act) && !Player.HasStatus(true, StatusID.SubtractivePalette)) return true;
 		if (Player.HasStatus(true, StatusID.StarryMuse))
 		{
