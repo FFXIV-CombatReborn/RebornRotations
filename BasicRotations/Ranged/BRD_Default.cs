@@ -1,3 +1,5 @@
+using Lumina.Excel.GeneratedSheets;
+
 namespace DefaultRotations.Ranged;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05",
@@ -22,6 +24,9 @@ public sealed class BRD_Default : BardRotation
     [RotationConfig(CombatType.PvE, Name = "Army's Paeon Uptime")]
     public float ARMYTime { get; set; } = 43;
 
+    [RotationConfig(CombatType.PvE, Name = "Use experimental buff oGCD logic")]
+    public bool NewLogicType { get; set; } = false;
+
     [RotationConfig(CombatType.PvE, Name = "First Song")]
     private Song FirstSong { get; set; } = Song.WANDERER;
 
@@ -29,6 +34,9 @@ public sealed class BRD_Default : BardRotation
     private float WANDRemainTime => 45 - WANDTime;
     private float MAGERemainTime => 45 - MAGETime;
     private float ARMYRemainTime => 45 - ARMYTime;
+
+    private static bool InBurstStatus => !Player.WillStatusEnd(0, true, StatusID.RagingStrikes);
+
     #endregion
 
     #region oGCD Logic
@@ -38,7 +46,7 @@ public sealed class BRD_Default : BardRotation
         {
             return base.EmergencyAbility(nextGCD, out act);
         }
-        else if ((!RagingStrikesPvE.EnoughLevel || Player.HasStatus(true, StatusID.RagingStrikes)) && (!BattleVoicePvE.EnoughLevel || Player.HasStatus(true, StatusID.BattleVoice)))
+        else if (!RagingStrikesPvE.EnoughLevel || Player.HasStatus(true, StatusID.RagingStrikes))
         {
             if ((EmpyrealArrowPvE.Cooldown.IsCoolingDown && !EmpyrealArrowPvE.Cooldown.WillHaveOneChargeGCD(1) || !EmpyrealArrowPvE.EnoughLevel) && Repertoire != 3)
             {
@@ -75,28 +83,50 @@ public sealed class BRD_Default : BardRotation
 
         if (IsBurst && Song != Song.NONE && MagesBalladPvE.EnoughLevel)
         {
-            if (RagingStrikesPvE.CanUse(out act, isLastAbility: true))
+            if (NewLogicType)
             {
-                if (BindWANDEnough && Song == Song.WANDERER && TheWanderersMinuetPvE.EnoughLevel) return true;
-                if (!BindWANDEnough) return true;
+                if (RadiantFinalePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+                if (BattleVoicePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+                if (RagingStrikesPvE.CanUse(out act, isLastAbility: true))
+                {
+                    if (RadiantFinalePvE.EnoughLevel)
+                    {
+                        if (Player.HasStatus(true, StatusID.RadiantFinale) && Player.HasStatus(true, StatusID.BattleVoice)) return true;
+                    }
+                    else if (!RadiantFinalePvE.EnoughLevel && BattleVoicePvE.EnoughLevel)
+                    {
+                        if (Player.HasStatus(true, StatusID.BattleVoice)) return true;
+                    }
+                    else
+                    {
+                        if (!BindWANDEnough) return true;
+                    }
+                }
             }
 
+            if (!NewLogicType)
+            { 
+                if (RagingStrikesPvE.CanUse(out act, isLastAbility: true))
+                {
+                    if (BindWANDEnough && Song == Song.WANDERER && TheWanderersMinuetPvE.EnoughLevel) return true;
+                    if (!BindWANDEnough) return true;
+                }
 
+                if (RadiantFinalePvE.CanUse(out act, skipAoeCheck: true))
+                {
+                    if (Player.HasStatus(true, StatusID.RagingStrikes) && RagingStrikesPvE.Cooldown.ElapsedOneChargeAfterGCD(1)) return true;
+                }
 
-            if (RadiantFinalePvE.CanUse(out act, skipAoeCheck: true))
+                if (BattleVoicePvE.CanUse(out act, skipAoeCheck: true))
+                {
+                    if (nextGCD.IsTheSameTo(true, RadiantFinalePvE)) return true;
 
+                    if (nextGCD.IsTheSameTo(true, RadiantEncorePvE)) return true;
 
-            {
-                if (Player.HasStatus(true, StatusID.RagingStrikes) && RagingStrikesPvE.Cooldown.ElapsedOneChargeAfterGCD(1)) return true;
-            }
-
-            if (BattleVoicePvE.CanUse(out act, skipAoeCheck: true))
-            {
-                if (nextGCD.IsTheSameTo(true, RadiantFinalePvE)) return true;
-
-                if (nextGCD.IsTheSameTo(true, RadiantEncorePvE)) return true;
-
-                if (Player.HasStatus(true, StatusID.RagingStrikes) && RagingStrikesPvE.Cooldown.ElapsedOneChargeAfterGCD(1)) return true;
+                    if (Player.HasStatus(true, StatusID.RagingStrikes) && RagingStrikesPvE.Cooldown.ElapsedOneChargeAfterGCD(1)) return true;
+                }
             }
         }
 
@@ -178,7 +208,11 @@ public sealed class BRD_Default : BardRotation
         if (ResonantArrowPvE.CanUse(out act)) return true;
 
         if (CanUseApexArrow(out act)) return true;
-        if (RadiantEncorePvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (RadiantEncorePvE.CanUse(out act, skipComboCheck: true))
+        {
+            if (InBurstStatus) return true;
+        }
+
         if (BlastArrowPvE.CanUse(out act))
         {
             if (!Player.HasStatus(true, StatusID.RagingStrikes)) return true;
