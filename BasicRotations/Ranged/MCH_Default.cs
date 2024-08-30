@@ -1,6 +1,6 @@
 namespace DefaultRotations.Ranged;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/MCH_Default.cs")]
 [Api(3)]
 public sealed class MCH_Default : MachinistRotation
@@ -8,6 +8,9 @@ public sealed class MCH_Default : MachinistRotation
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "(Warning: Queen logic is new and untested, uncheck to test new logic) Skip Queen Logic and uses Rook Autoturret/Automaton Queen immediately whenever you get 50 battery")]
     private bool SkipQueenLogic { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Prioritize Barrel Stabilizer use")]
+    private bool BSPrio { get; set; } = false;
     #endregion
 
     #region Countdown logic
@@ -65,6 +68,8 @@ public sealed class MCH_Default : MachinistRotation
     // Logic for using attack abilities outside of GCD, focusing on burst windows and cooldown management.
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
+        if (BSPrio && BarrelStabilizerPvE.CanUse(out act)) return true;
+
         // Check for not burning Hypercharge below level 52 on AOE
         bool LowLevelHyperCheck = !AutoCrossbowPvE.EnoughLevel && SpreadShotPvE.CanUse(out _);
 
