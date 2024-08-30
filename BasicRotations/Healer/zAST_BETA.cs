@@ -10,6 +10,9 @@ public sealed class zAST_BETA : AstrologianRotation
     [Range(4, 20, ConfigUnitType.Seconds)]
     [RotationConfig(CombatType.PvE, Name = "Use Earthly Star during countdown timer.")]
     public float UseEarthlyStarTime { get; set; } = 15;
+
+    [RotationConfig(CombatType.PvE, Name = "Use DOT while moving even if it does not need refresh (disabling is a damage down)")]
+    public bool DOTUpkeep { get; set; } = true;
     #endregion
 
     #region Countdown Logic
@@ -175,7 +178,7 @@ public sealed class zAST_BETA : AstrologianRotation
 
         if (FallMaleficPvE.CanUse(out act)) return true;
 
-        if (CombustIiiPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (CombustIiiPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
 
         return base.GeneralGCD(out act);
     }

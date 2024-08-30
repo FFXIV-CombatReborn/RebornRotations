@@ -21,6 +21,9 @@ public sealed class SCH_Default : ScholarRotation
     [Range(0, 1, ConfigUnitType.Percent)]
     [RotationConfig(CombatType.PvE, Name = "Remove Aetherpact to conserve resources if party member is above this percentage")]
     public float AetherpactRemove { get; set; } = 0.9f;
+
+    [RotationConfig(CombatType.PvE, Name = "Use DOT while moving even if it does not need refresh (disabling is a damage down)")]
+    public bool DOTUpkeep { get; set; } = true;
     #endregion
 
     #region Countdown Logic
@@ -208,9 +211,9 @@ public sealed class SCH_Default : ScholarRotation
         if (RuinIiPvE.CanUse(out act)) return true;
 
         //Add dot while moving.
-        if (BiolysisPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
-        if (BioIiPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
-        if (BioPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (BiolysisPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
+        if (BioIiPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
+        if (BioPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
 
         return base.GeneralGCD(out act);
     }

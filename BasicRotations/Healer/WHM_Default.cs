@@ -10,6 +10,9 @@ public sealed class WHM_Default : WhiteMageRotation
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
 
+    [RotationConfig(CombatType.PvE, Name = "Use DOT while moving even if it does not need refresh (disabling is a damage down)")]
+    public bool DOTUpkeep { get; set; } = true;
+
     [RotationConfig(CombatType.PvE, Name = "Use Lily at max stacks.")]
     public bool UseLilyWhenFull { get; set; } = true;
 
@@ -180,7 +183,7 @@ public sealed class WHM_Default : WhiteMageRotation
             if (UseLily(out act)) return true;
         }
 
-        if (AeroPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (AeroPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
 
         return base.GeneralGCD(out act);
     }

@@ -26,6 +26,9 @@ public sealed class AST_Default : AstrologianRotation
     [Range(0, 1, ConfigUnitType.Percent)]
     [RotationConfig(CombatType.PvE, Name = "Minimum HP threshold among party member needed to use Horoscope")]
     public float HoroscopeHeal { get; set; } = 0.3f;
+
+    [RotationConfig(CombatType.PvE, Name = "Use DOT while moving even if it does not need refresh (disabling is a damage down)")]
+    public bool DOTUpkeep { get; set; } = true;
     #endregion
 
     #region Countdown Logic
@@ -84,51 +87,6 @@ public sealed class AST_Default : AstrologianRotation
 
         if (CollectiveUnconsciousPvE.CanUse(out act)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
-    }
-    #endregion
-
-    #region GCD Logic
-    protected override bool GeneralGCD(out IAction? act)
-    {
-        act = null;
-        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
-
-        if (GravityPvE.CanUse(out act)) return true;
-
-        if (CombustPvE.CanUse(out act)) return true;
-        if (MaleficPvE.CanUse(out act)) return true;
-        if (CombustPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
-
-        return base.GeneralGCD(out act);
-    }
-
-    [RotationDesc(ActionID.AspectedBeneficPvE, ActionID.BeneficIiPvE, ActionID.BeneficPvE)]
-    protected override bool HealSingleGCD(out IAction? act)
-    {
-        act = null;
-        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
-        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
-
-        if (AspectedBeneficPvE.CanUse(out act)
-            && (IsMoving
-            || AspectedBeneficPvE.Target.Target?.GetHealthRatio() > AspectedBeneficHeal)) return true;
-
-        if (BeneficIiPvE.CanUse(out act)) return true;
-        if (BeneficPvE.CanUse(out act)) return true;
-
-        return base.HealSingleGCD(out act);
-    }
-
-    [RotationDesc(ActionID.AspectedHeliosPvE, ActionID.HeliosPvE)]
-    protected override bool HealAreaGCD(out IAction? act)
-    {
-        act = null;
-        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
-        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
-
-        if (AspectedHeliosPvE.CanUse(out act)) return true;
-        if (HeliosPvE.CanUse(out act)) return true;
-        return base.HealAreaGCD(out act);
     }
     #endregion
 
@@ -237,6 +195,51 @@ public sealed class AST_Default : AstrologianRotation
 
         if (HeliosConjunctionPvE.CanUse(out act)) return true;
         return base.HealAreaAbility(nextGCD, out act);
+    }
+    #endregion
+
+    #region GCD Logic
+    protected override bool GeneralGCD(out IAction? act)
+    {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
+        if (GravityPvE.CanUse(out act)) return true;
+
+        if (CombustPvE.CanUse(out act)) return true;
+        if (MaleficPvE.CanUse(out act)) return true;
+        if (CombustPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
+
+        return base.GeneralGCD(out act);
+    }
+
+    [RotationDesc(ActionID.AspectedBeneficPvE, ActionID.BeneficIiPvE, ActionID.BeneficPvE)]
+    protected override bool HealSingleGCD(out IAction? act)
+    {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
+        if (AspectedBeneficPvE.CanUse(out act)
+            && (IsMoving
+            || AspectedBeneficPvE.Target.Target?.GetHealthRatio() > AspectedBeneficHeal)) return true;
+
+        if (BeneficIiPvE.CanUse(out act)) return true;
+        if (BeneficPvE.CanUse(out act)) return true;
+
+        return base.HealSingleGCD(out act);
+    }
+
+    [RotationDesc(ActionID.AspectedHeliosPvE, ActionID.HeliosPvE)]
+    protected override bool HealAreaGCD(out IAction? act)
+    {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
+        if (AspectedHeliosPvE.CanUse(out act)) return true;
+        if (HeliosPvE.CanUse(out act)) return true;
+        return base.HealAreaGCD(out act);
     }
     #endregion
 
