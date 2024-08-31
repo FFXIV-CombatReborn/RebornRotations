@@ -1,5 +1,3 @@
-using Lumina.Excel.GeneratedSheets;
-
 namespace DefaultRotations.Ranged;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05",
@@ -9,6 +7,10 @@ namespace DefaultRotations.Ranged;
 public sealed class BRD_Default : BardRotation
 {
     #region Config Options
+
+    [RotationConfig(CombatType.PvE, Name = "Tincture/Gemdraught Usage (Experimental)")]
+    public bool ExperimentalPot { get; set; } = false;
+
     [RotationConfig(CombatType.PvE, Name = @"Use Raging Strikes on ""Wanderer's Minuet""")]
     public bool BindWAND { get; set; } = false;
 
@@ -39,6 +41,16 @@ public sealed class BRD_Default : BardRotation
 
     #endregion
 
+    #region Countdown logic
+    // Defines logic for actions to take during the countdown before combat starts.
+    protected override IAction? CountDownAction(float remainTime)
+    {
+        // tincture needs to be used on -2s exactly
+        if (remainTime <= 0.7f && UseBurstMedicine(out var act)) return act;
+        return base.CountDownAction(remainTime);
+    }
+    #endregion
+
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
@@ -60,6 +72,12 @@ public sealed class BRD_Default : BardRotation
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         act = null;
+
+        if (IsBurst && ExperimentalPot)
+        {
+            if (UseBurstMedicine(out act)) return true;
+        }
+
         if (Song == Song.NONE && InCombat)
         {
             switch (FirstSong)

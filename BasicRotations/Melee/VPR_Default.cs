@@ -7,6 +7,9 @@ public sealed class VPR_Default : ViperRotation
 {
     #region Config Options
 
+    [RotationConfig(CombatType.PvE, Name = "Tincture/Gemdraught Usage (Experimental)")]
+    public bool ExperimentalPot { get; set; } = false;
+
     [RotationConfig(CombatType.PvE, Name = "Use up all charges of Uncoiled Fury if you have used Tincture/Gemdraught (Overrides next option)")]
     public bool BurstUncoiledFury { get; set; } = true;
 
@@ -75,6 +78,11 @@ public sealed class VPR_Default : ViperRotation
         ////Serpent Combo oGCDs
         if (LastLashPvE.CanUse(out act)) return true;
         if (DeathRattlePvE.CanUse(out act)) return true;
+
+        if (IsBurst && ExperimentalPot)
+        {
+            if (UseBurstMedicine(out act)) return true;
+        }
 
         return base.AttackAbility(nextGCD, out act);
     }
