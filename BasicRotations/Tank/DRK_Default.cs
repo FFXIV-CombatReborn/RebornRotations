@@ -1,6 +1,6 @@
 namespace DefaultRotations.Tank;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Tank/DRK_Balance.cs")]
 [Api(3)]
 public sealed class DRK_Default : DarkKnightRotation
@@ -77,9 +77,11 @@ public sealed class DRK_Default : DarkKnightRotation
 
         //30
         if ((!RampartPvE.Cooldown.IsCoolingDown || RampartPvE.Cooldown.ElapsedAfter(60)) && ShadowWallPvE.CanUse(out act)) return true;
+        if ((!RampartPvE.Cooldown.IsCoolingDown || RampartPvE.Cooldown.ElapsedAfter(60)) && ShadowedVigilPvE.CanUse(out act)) return true;
 
         //20
         if (ShadowWallPvE.Cooldown.IsCoolingDown && ShadowWallPvE.Cooldown.ElapsedAfter(60) && RampartPvE.CanUse(out act)) return true;
+        if (ShadowedVigilPvE.Cooldown.IsCoolingDown && ShadowedVigilPvE.Cooldown.ElapsedAfter(60) && RampartPvE.CanUse(out act)) return true;
 
         if (ReprisalPvE.CanUse(out act)) return true;
 
@@ -142,6 +144,8 @@ public sealed class DRK_Default : DarkKnightRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        if (DisesteemPvE.CanUse(out act)) return true;
+
         //Use Blood
         if (UseBlood)
         {
@@ -175,7 +179,7 @@ public sealed class DRK_Default : DarkKnightRotation
         {
             // Conditions based on player statuses and ability cooldowns.
             if (!DeliriumPvE.EnoughLevel || !LivingShadowPvE.EnoughLevel) return true;
-            if (Player.HasStatus(true, StatusID.Delirium_1972) && LivingShadowPvE.Cooldown.IsCoolingDown) return true;
+            if ((Player.HasStatus(true, StatusID.Delirium_1972) || Player.HasStatus(true, StatusID.Delirium_3836)) && LivingShadowPvE.Cooldown.IsCoolingDown) return true;
             if ((DeliriumPvE.Cooldown.WillHaveOneChargeGCD(1) && !LivingShadowPvE.Cooldown.WillHaveOneChargeGCD(3)) || Blood >= 90 && !LivingShadowPvE.Cooldown.WillHaveOneChargeGCD(1)) return true;
 
             return false;
