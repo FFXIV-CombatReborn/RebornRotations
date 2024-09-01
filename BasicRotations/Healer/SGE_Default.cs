@@ -61,7 +61,8 @@ public sealed class SGE_Default : SageRotation
     #region Countdown Logic
     protected override IAction? CountDownAction(float remainTime)
     {
-        if (remainTime <= 1.5 && DosisPvE.CanUse(out var act)) return act;
+        if (remainTime < DosisPvE.Info.CastTime + CountDownAhead
+            && DosisPvE.CanUse(out var act)) return act;
         if (remainTime <= 3 && UseBurstMedicine(out act)) return act;
         return base.CountDownAction(remainTime);
     }

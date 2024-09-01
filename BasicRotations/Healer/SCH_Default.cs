@@ -9,11 +9,11 @@ public sealed class SCH_Default : ScholarRotation
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
 
-    [RotationConfig(CombatType.PvE, Name = "Recitation at 15 seconds remaining on Countdown.")]
-    public bool PrevDUN { get; set; } = false;
+    [RotationConfig(CombatType.PvE, Name = "Recitation during Countdown.")]
+    public bool PrevDUN { get; set; } = true;
 
-    [RotationConfig(CombatType.PvE, Name = "Give Adloquium/Galvanize to Tank during Countdown (Requires above enabled)")]
-    public bool GiveT { get; set; } = false;
+    [RotationConfig(CombatType.PvE, Name = "Use Adloquium during Countdown")]
+    public bool GiveT { get; set; } = true;
 
     [RotationConfig(CombatType.PvE, Name = "Use Sacred Soil while moving")]
     public bool SacredMove { get; set; } = false;
@@ -29,25 +29,15 @@ public sealed class SCH_Default : ScholarRotation
     #region Countdown Logic
     protected override IAction? CountDownAction(float remainTime)
     {
+        var tank = PartyMembers.GetJobCategory(JobRole.Tank);
+
         if (remainTime < RuinPvE.Info.CastTime + CountDownAhead
             && RuinPvE.CanUse(out var act)) return act;
+        if (remainTime < 3 && UseBurstMedicine(out act)) return act;
+        if (remainTime is < 4 and > 3 && DeploymentTacticsPvE.CanUse(out act)) return act;
+        if (remainTime is < 7 and > 6 && GiveT && AdloquiumPvE.CanUse(out act)) return act;
+        if (remainTime <= 15 && PrevDUN && RecitationPvE.CanUse(out act)) return act;
 
-        if (PrevDUN && remainTime <= 15 && !DeploymentTacticsPvE.Cooldown.IsCoolingDown && PartyMembers.Count() > 1)
-        {
-
-            if (!RecitationPvE.Cooldown.IsCoolingDown) return RecitationPvE;
-            if (!PartyMembers.Any((n) => n.HasStatus(true, StatusID.Galvanize)))
-            {
-                if (GiveT)
-                {
-                    return AdloquiumPvE;
-                }
-            }
-            else
-            {
-                return DeploymentTacticsPvE;
-            }
-        }
         return base.CountDownAction(remainTime);
     }
     #endregion

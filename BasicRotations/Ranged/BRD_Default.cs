@@ -45,7 +45,6 @@ public sealed class BRD_Default : BardRotation
     // Defines logic for actions to take during the countdown before combat starts.
     protected override IAction? CountDownAction(float remainTime)
     {
-        // tincture needs to be used on -2s exactly
         if (remainTime <= 0.7f && UseBurstMedicine(out var act)) return act;
         return base.CountDownAction(remainTime);
     }
