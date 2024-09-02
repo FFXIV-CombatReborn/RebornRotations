@@ -34,13 +34,6 @@ public sealed class DRK_Default : DarkKnightRotation
     // Decision-making for emergency abilities, focusing on Blood Weapon usage.
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
-        if (base.EmergencyAbility(nextGCD, out act)) return true;
-
-        if ((InCombat && CombatElapsedLess(2) || TimeSinceLastAction.TotalSeconds >= 10))
-        {
-            if (BloodWeaponPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        }
-
         return base.EmergencyAbility(nextGCD, out act);
     }
 
@@ -134,7 +127,7 @@ public sealed class DRK_Default : DarkKnightRotation
 
         if (InTwoMIsBurst)
         {
-            if (ShadowstridePvE.CanUse(out act, usedUp: true, skipAoeCheck: true) && !IsMoving) return true;
+            if (ShadowstridePvE.CanUse(out act, skipAoeCheck: true) && !IsMoving) return true;
         }
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         return base.AttackAbility(nextGCD, out act);
@@ -146,21 +139,24 @@ public sealed class DRK_Default : DarkKnightRotation
     {
         if (DisesteemPvE.CanUse(out act)) return true;
 
-        //Use Blood
-        if (UseBlood)
-        {
-            if (QuietusPvE.CanUse(out act, skipComboCheck: true)) return true;
-            if (BloodspillerPvE.CanUse(out act, skipComboCheck: true)) return true;
-        }
+        if (QuietusPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (ImpalementPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (ScarletDeliriumPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (ComeuppancePvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (TorcleaverPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (BloodspillerPvE.CanUse(out act, skipComboCheck: true)) return true;
 
         //AOE
         if (StalwartSoulPvE.CanUse(out act)) return true;
         if (UnleashPvE.CanUse(out act)) return true;
 
         //Single Target
-        if (SouleaterPvE.CanUse(out act)) return true;
-        if (SyphonStrikePvE.CanUse(out act)) return true;
-        if (HardSlashPvE.CanUse(out act)) return true;
+        if (!Player.HasStatus(true, StatusID.Delirium_1972) && !Player.HasStatus(true, StatusID.Delirium_3836))
+        {
+            if (SouleaterPvE.CanUse(out act)) return true;
+            if (SyphonStrikePvE.CanUse(out act)) return true;
+            if (HardSlashPvE.CanUse(out act)) return true;
+        }
 
         if (UnmendPvE.CanUse(out act)) return true;
 
@@ -179,6 +175,7 @@ public sealed class DRK_Default : DarkKnightRotation
         {
             // Conditions based on player statuses and ability cooldowns.
             if (!DeliriumPvE.EnoughLevel || !LivingShadowPvE.EnoughLevel) return true;
+            if (Player.HasStatus(true, StatusID.Delirium_3836)) return true;
             if ((Player.HasStatus(true, StatusID.Delirium_1972) || Player.HasStatus(true, StatusID.Delirium_3836)) && LivingShadowPvE.Cooldown.IsCoolingDown) return true;
             if ((DeliriumPvE.Cooldown.WillHaveOneChargeGCD(1) && !LivingShadowPvE.Cooldown.WillHaveOneChargeGCD(3)) || Blood >= 90 && !LivingShadowPvE.Cooldown.WillHaveOneChargeGCD(1)) return true;
 

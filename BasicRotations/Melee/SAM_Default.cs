@@ -11,6 +11,9 @@ public sealed class SAM_Default : SamuraiRotation
     [RotationConfig(CombatType.PvE, Name = "Use Kenki above.")]
     public int AddKenki { get; set; } = 50;
 
+    [RotationConfig(CombatType.PvE, Name = "Prevent Higanbana use if theres more than one target")]
+    public bool HiganbanaTargets { get; set; } = false;
+
     #endregion
 
     #region Countdown Logic
@@ -104,6 +107,7 @@ public sealed class SAM_Default : SamuraiRotation
     {
         if (MidareSetsugekkaPvE.CanUse(out act)) return true;
 
+        if (TenkaGokenPvE.CanUse(out act)) return true;
         if (TendoGokenPvE.CanUse(out act)) return true;
         if (TendoSetsugekkaPvE.CanUse(out act)) return true;
         if (TendoKaeshiGokenPvE.CanUse(out act)) return true;
@@ -124,9 +128,7 @@ public sealed class SAM_Default : SamuraiRotation
         if ((!IsTargetBoss || (HostileTarget?.HasStatus(true, StatusID.Higanbana) ?? false)) && HasMoon && HasFlower
             && OgiNamikiriPvE.CanUse(out act)) return true;
 
-        if (HiganbanaPvE.CanUse(out act)) return true;
-
-        if (TendoGokenPvE.CanUse(out act)) return true;
+        if (((HiganbanaTargets && NumberOfAllHostilesInRange >= 2) || !HiganbanaTargets) && HiganbanaPvE.CanUse(out act)) return true;
 
         if (TendoSetsugekkaPvE.CanUse(out act)) return true;
         if (MidareSetsugekkaPvE.CanUse(out act)) return true;

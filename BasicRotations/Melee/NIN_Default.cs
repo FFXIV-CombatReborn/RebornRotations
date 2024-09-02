@@ -1,8 +1,11 @@
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+
 namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Melee/NIN_Default.cs")]
 [Api(3)]
+
 public sealed class NIN_Default : NinjaRotation
 {
     #region Config Options
@@ -12,7 +15,7 @@ public sealed class NIN_Default : NinjaRotation
     [RotationConfig(CombatType.PvE, Name = "Use Unhide")]
     public bool AutoUnhide { get; set; } = true;
 
-    public bool IsShadowWalking = (Player.HasStatus(true, StatusID.ShadowWalker));
+    public bool IsShadowWalking = Player.HasStatus(true, StatusID.ShadowWalker);
     #endregion
 
     #region CountDown Logic
@@ -75,42 +78,42 @@ public sealed class NIN_Default : NinjaRotation
     private bool ChoiceNinjutsu(out IAction? act)
     {
         act = null;
+
+        if (!JinPvE.CanUse(out _) || !ChiPvE.CanUse(out _) || !TenPvE.CanUse(out _)) return false;
         // Ensures that the action ID currently considered for Ninjutsu is actually valid for Ninjutsu execution.
         if (AdjustId(ActionID.NinjutsuPvE) != ActionID.NinjutsuPvE) return false;
         // If more than 4.5 seconds have passed since the last action, it clears any pending Ninjutsu to avoid stale actions.
         if (TimeSinceLastAction.TotalSeconds > 4.5) ClearNinjutsu();
-        // Prevents choosing a new Ninjutsu if the timing is too tight.
-        if (_ninActionAim != null && WeaponRemain < 0.1) return false;
 
         // Checks for Kassatsu status to prioritize high-impact Ninjutsu due to its buff.
         if (Player.HasStatus(true, StatusID.Kassatsu))
         {
             // Attempts to set high-damage AoE Ninjutsu if available under Kassatsu's effect.
             // These are prioritized due to Kassatsu's enhancement of Ninjutsu abilities.
-            if (GokaMekkyakuPvE.CanUse(out _))
+            if (GokaMekkyakuPvE.CanUse(out _) && ChiPvE.CanUse(out _) && TenPvE.CanUse(out _))
             {
                 SetNinjutsu(GokaMekkyakuPvE);
                 return false;
             }
-            if (HyoshoRanryuPvE.CanUse(out _))
+            if (HyoshoRanryuPvE.CanUse(out _) && TenPvE.CanUse(out _) && JinPvE.CanUse(out _))
             {
                 SetNinjutsu(HyoshoRanryuPvE);
                 return false;
             }
 
-            /*if (HutonPvE.CanUse(out _))
+            if (HutonPvE.CanUse(out _) && TenPvE.CanUse(out _) && ChiPvE.CanUse(out _) && JinPvE.CanUse(out _))
             {
                 SetNinjutsu(HutonPvE);
                 return false;
-            }*/
+            }
 
-            if (KatonPvE.CanUse(out _))
+            if (KatonPvE.CanUse(out _) && ChiPvE.CanUse(out _) && TenPvE.CanUse(out _))
             {
                 SetNinjutsu(KatonPvE);
                 return false;
             }
 
-            if (RaitonPvE.CanUse(out _))
+            if (RaitonPvE.CanUse(out _) && TenPvE.CanUse(out _) && ChiPvE.CanUse(out _))
             {
                 SetNinjutsu(RaitonPvE);
                 return false;
@@ -131,16 +134,16 @@ public sealed class NIN_Default : NinjaRotation
             // Also considers using Suiton for vulnerability debuff on the enemy if conditions are optimal.
 
             //Aoe
-            if (KatonPvE.CanUse(out _))
+            if (KatonPvE.CanUse(out _) && ChiPvE.CanUse(out _) && TenPvE.CanUse(out _))
             {
-                if (!Player.HasStatus(true, StatusID.Doton) && !IsMoving && !IsLastGCD(false, DotonPvE) && (!TenChiJinPvE.Cooldown.WillHaveOneCharge(6)) || !TenChiJinPvE.Cooldown.IsCoolingDown)
+                if (!Player.HasStatus(true, StatusID.Doton) && !IsMoving && !IsLastGCD(false, DotonPvE) && (!TenChiJinPvE.Cooldown.WillHaveOneCharge(6)) || !TenChiJinPvE.Cooldown.IsCoolingDown && TenPvE.CanUse(out _) && ChiPvE.CanUse(out _) && JinPvE.CanUse(out _))
                     SetNinjutsu(DotonPvE);
                 else SetNinjutsu(KatonPvE);
                 return false;
             }
 
             //Vulnerable
-            if (IsBurst && TrickAttackPvE.Cooldown.WillHaveOneCharge(18) && SuitonPvE.CanUse(out _) && !Player.HasStatus(true, StatusID.Suiton))
+            if (IsBurst && TrickAttackPvE.Cooldown.WillHaveOneCharge(18) && SuitonPvE.CanUse(out _) && !Player.HasStatus(true, StatusID.Suiton) && TenPvE.CanUse(out _) && ChiPvE.CanUse(out _) && JinPvE.CanUse(out _))
             {
                 SetNinjutsu(SuitonPvE);
                 return false;
@@ -149,7 +152,7 @@ public sealed class NIN_Default : NinjaRotation
             //Single
             if (TenPvE.CanUse(out _, usedUp: InTrickAttack && !Player.HasStatus(false, StatusID.RaijuReady)))
             {
-                if (RaitonPvE.CanUse(out _))
+                if (RaitonPvE.CanUse(out _) && TenPvE.CanUse(out _) && ChiPvE.CanUse(out _))
                 {
                     SetNinjutsu(RaitonPvE);
                     return false;
@@ -248,7 +251,7 @@ public sealed class NIN_Default : NinjaRotation
             act = _ninActionAim.Setting.Ninjutsu![0];
             return true;
         }
-        //Finished
+        //Second
         else if ((uint)id == _ninActionAim.ID)
         {
             if (_ninActionAim.CanUse(out act, skipAoeCheck: true)) return true;
@@ -258,7 +261,7 @@ public sealed class NIN_Default : NinjaRotation
                 return true;
             }
         }
-        //Second
+        //Third
         else if ((uint)id == FumaShurikenPvE.ID)
         {
             if (_ninActionAim.Setting.Ninjutsu!.Length > 1
@@ -268,7 +271,7 @@ public sealed class NIN_Default : NinjaRotation
                 return true;
             }
         }
-        //Third
+        //Finished
         else if ((uint)id == KatonPvE.ID || (uint)id == RaitonPvE.ID || (uint)id == HyotonPvE.ID)
         {
             if (_ninActionAim.Setting.Ninjutsu!.Length > 2

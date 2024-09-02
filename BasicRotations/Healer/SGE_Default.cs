@@ -1,6 +1,6 @@
 namespace DefaultRotations.Healer;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Healer/SGE_Default.cs")]
 [Api(3)]
 public sealed class SGE_Default : SageRotation
@@ -200,6 +200,9 @@ public sealed class SGE_Default : SageRotation
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
+        // If not in combat and lacking the Kardia status, attempt to use KardiaPvE
+        if (!InCombat && !Player.HasStatus(true, StatusID.Kardia) && KardiaPvE.CanUse(out act)) return true;
+
         if (KardiaPvE.CanUse(out act)) return true;
 
         if (Addersgall <= 1 && RhizomataPvE.CanUse(out act)) return true;
