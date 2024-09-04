@@ -113,18 +113,18 @@ public sealed class VPR_Default : ViperRotation
         }
 
         // Uncoiled Fury Overcap protection
-        if (MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser)
+        if (MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser && !Player.HasStatus(true, StatusID.Reawakened))
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
-        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated))
+        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated) && !Player.HasStatus(true, StatusID.Reawakened))
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
         //Uncoiled fury use
-        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30))
+        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30) && !Player.HasStatus(true, StatusID.Reawakened))
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
