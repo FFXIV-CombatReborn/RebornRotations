@@ -10,17 +10,17 @@ public class zPLD_Alpha : PaladinRotation
 
     [RotationConfig(CombatType.PvE, Name = "Use Hallowed Ground with Cover")]
     private bool HallowedWithCover { get; set; } = true;
-    
-    [Range(1, 8,ConfigUnitType.Pixels)]
-    [RotationConfig(CombatType.PvE,Name = "How many GCDs to delay burst by (Assumes you open with Holy Spirit, 2 is best for melee opening) ")]
+
+    [Range(1, 8, ConfigUnitType.Pixels)]
+    [RotationConfig(CombatType.PvE, Name = "How many GCDs to delay burst by (Assumes you open with Holy Spirit, 2 is best for melee opening) ")]
     private int AdjustedBurst { get; set; } = 3;
-    
+
     [RotationConfig(CombatType.PvE, Name = "Prioritize Atonement Combo During Fight or Flight outside of Opener (Might not good for Dungeons Packs)")]
     private bool PrioritizeAtonementCombo { get; set; } = false;
-    
+
     [RotationConfig(CombatType.PvE, Name = "Use Holy Spirit First (For if you want to MinMax it)")]
     private bool MinMaxHolySpirit { get; set; } = false;
-    
+
     [RotationConfig(CombatType.PvE, Name = "Use Divine Veil at 15 seconds remaining on Countdown")]
     private bool UseDivineVeilPre { get; set; } = false;
 
@@ -29,13 +29,13 @@ public class zPLD_Alpha : PaladinRotation
 
     [RotationConfig(CombatType.PvE, Name = "Use Shield Bash when Low Blow is cooling down")]
     private bool UseShieldBash { get; set; } = true;
-    
-    [RotationConfig(CombatType.PvE,Name = "Allow the Use of Shield Lob")]
+
+    [RotationConfig(CombatType.PvE, Name = "Allow the Use of Shield Lob")]
     private bool UseShieldLob { get; set; } = true;
-    
+
     [RotationConfig(CombatType.PvE, Name = "Maximize Damage if Target if considered dying")]
     private bool BurstTargetIfConsideredDying { get; set; } = false;
-    
+
     [Range(0, 100, ConfigUnitType.Pixels)]
     [RotationConfig(CombatType.PvE, Name = "Use Sheltron at minimum X Oath to prevent over cap (Set to 0 to disable)")]
     private int WhenToSheltron { get; set; } = 100;
@@ -64,16 +64,16 @@ public class zPLD_Alpha : PaladinRotation
     private const ActionID ConfiteorPvEActionId = (ActionID)16459;
     private new readonly IBaseAction ConfiteorPvE = new BaseAction(ConfiteorPvEActionId);
     #endregion
-    
+
     #region Countdown Logic
     protected override IAction? CountDownAction(float remainTime)
-    {   
+    {
         if (remainTime < HolySpiritPvE.Info.CastTime + CountDownAhead
             && HolySpiritPvE.CanUse(out var act)) return act;
 
         if (remainTime < 15 && UseDivineVeilPre
             && DivineVeilPvE.CanUse(out act)) return act;
-        
+
         return base.CountDownAction(remainTime);
     }
     #endregion
@@ -136,22 +136,22 @@ public class zPLD_Alpha : PaladinRotation
         if (WeaponRemain > 0.42f)
         {
             act = null;
-            
+
             if (HasHonorReady && BladeOfHonorPvE.CanUse(out act, skipAoeCheck: true)) return true;
-            
+
             if ((InCombat && !CombatElapsedLessGCD(AdjustedBurst)))
             {
                 if (FightOrFlightPvE.CanUse(out act)) return true;
                 if (RequiescatPvE.CanUse(out act, skipAoeCheck: true, usedUp: HasFightOrFlight)) return true;
                 if (OathGauge >= WhenToSheltron && WhenToSheltron > 0 && UseOath(out act)) return true;
             }
-            
+
             if (CombatElapsedLessGCD(AdjustedBurst + 1)) return false;
-            
+
             if (FightOrFlightPvE.CanUse(out act)) return true;
             if (RequiescatPvE.CanUse(out act, skipAoeCheck: true, usedUp: HasFightOrFlight)) return true;
             if (OathGauge >= WhenToSheltron && WhenToSheltron > 0 && UseOath(out act)) return true;
-            
+
             if (CircleOfScornPvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (SpiritsWithinPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
@@ -163,11 +163,11 @@ public class zPLD_Alpha : PaladinRotation
     #endregion
 
     #region GCD Logic
-    protected override bool GeneralGCD(out IAction? act) 
+    protected override bool GeneralGCD(out IAction? act)
     {
         //Minimizes Accidents in EX and Savage Hopefully
-        if (IsInHighEndDuty && !InCombat){act = null; return false;}
-        
+        if (IsInHighEndDuty && !InCombat) { act = null; return false; }
+
         if (Player.HasStatus(true, StatusID.Requiescat))
         {
             if ((Player.Level >= 90) && (Player.StatusStack(true, StatusID.Requiescat) < 4))
@@ -183,7 +183,7 @@ public class zPLD_Alpha : PaladinRotation
             if (HolyCirclePvE.CanUse(out act)) return true;
             if (HolySpiritPvE.CanUse(out act)) return true;
         }
-        
+
         //AOE
         if (HasDivineMight && HolyCirclePvE.CanUse(out act)) return true;
         if (ProminencePvE.CanUse(out act)) return true;
@@ -191,44 +191,44 @@ public class zPLD_Alpha : PaladinRotation
 
         //Single
         if (UseShieldBash && ShieldBashPvE.CanUse(out act)) return true;
-        
+
         if (Player.HasStatus(true, StatusID.FightOrFlight) && AtonementCombo(out act)) return true;
         if (TargetIsDying && AtonementCombo(out act)) return true;
-        
+
         //Helps ensure Atonement combo is ready for FoF in cases of unfortunate downtime
         if (((!HasAtonementReady && (HasSepulchreReady || HasSupplicationReady || HasDivineMight)) ||
-             (HasAtonementReady && !HasDivineMight)) && 
+             (HasAtonementReady && !HasDivineMight)) &&
             !Player.HasStatus(true, StatusID.Medicated) && !RageOfHalonePvE.CanUse(out act, skipComboCheck: false))
         {
             if (RiotBladePvE.CanUse(out act) || FastBladePvE.CanUse(out act)) return true;
         }
-        
+
         if (!(HasSupplicationReady || HasSepulchreReady || HasDivineMight || HasAtonementReady) && RageOfHalonePvE.CanUse(out act)) return true;
-        
+
         if (AtonementCombo(out act)) return true;
-        
+
         if (RiotBladePvE.CanUse(out act) || FastBladePvE.CanUse(out act)) return true;
-        
+
         //Range
-         if (UseHolyWhenAway && Player.CurrentMp > 3000)
+        if (UseHolyWhenAway && Player.CurrentMp > 3000)
         {
             if (HolyCirclePvE.CanUse(out act) || HolySpiritPvE.CanUse(out act))
                 return true;
         }
-        
+
         if (UseShieldLob && ShieldLobPvE.CanUse(out act)) return true;
-        
+
         return base.GeneralGCD(out act);
     }
     #endregion
 
     #region Extra Methods
-    
+
     private bool AtonementCombo(out IAction? act) => HolySpiritFirst(out act) || GoringBladePvE.CanUse(out act) || AtonementPvE.CanUse(out act) || SupplicationPvE.CanUse(out act) || SepulchrePvE.CanUse(out act) || HasDivineMight && HolyCirclePvE.CanUse(out act) || HasDivineMight && HolySpiritPvE.CanUse(out act);
-    
+
     private bool UseOath(out IAction? act)
     {
-        act = null; 
+        act = null;
         if ((InterventionPvE.Target.Target?.GetHealthRatio() <= InterventionRatio) && InterventionPvE.CanUse(out act)) return true;
         if (SheltronPvE.CanUse(out act)) return true;
         return false;

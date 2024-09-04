@@ -11,7 +11,7 @@ public sealed class AST_Default : AstrologianRotation
 
     [RotationConfig(CombatType.PvE, Name = "Prevent actions while you have the bubble mit up")]
     public bool BubbleProtec { get; set; } = false;
-    
+
     [RotationConfig(CombatType.PvE, Name = "Prioritize Microcosmos over all other healing when available")]
     public bool MicroPrio { get; set; } = false;
 
