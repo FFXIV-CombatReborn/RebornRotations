@@ -45,6 +45,7 @@ public sealed class BRD_Default : BardRotation
     // Defines logic for actions to take during the countdown before combat starts.
     protected override IAction? CountDownAction(float remainTime)
     {
+        // tincture needs to be used on -0.7s exactly
         if (remainTime <= 0.7f && UseBurstMedicine(out var act)) return act;
         return base.CountDownAction(remainTime);
     }
@@ -124,7 +125,7 @@ public sealed class BRD_Default : BardRotation
             }
 
             if (!NewLogicType)
-            { 
+            {
                 if (RagingStrikesPvE.CanUse(out act, isLastAbility: true))
                 {
                     if (BindWANDEnough && Song == Song.WANDERER && TheWanderersMinuetPvE.EnoughLevel) return true;
@@ -287,9 +288,9 @@ public sealed class BRD_Default : BardRotation
 
         if (HeartbreakShotPvE.CanUse(out act, usedUp: true))
         {
-            if ((!isRagingStrikesLevel) 
-                || (isRagingStrikesLevel && !isBattleVoiceLevel && Player.HasStatus(true, StatusID.RagingStrikes)) 
-                || (isBattleVoiceLevel && !isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice)) 
+            if ((!isRagingStrikesLevel)
+                || (isRagingStrikesLevel && !isBattleVoiceLevel && Player.HasStatus(true, StatusID.RagingStrikes))
+                || (isBattleVoiceLevel && !isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice))
                 || isRadiantFinaleLevel && Player.HasStatus(true, StatusID.RagingStrikes) && Player.HasStatus(true, StatusID.BattleVoice) && Player.HasStatus(true, StatusID.RadiantFinale)) return true;
         }
 

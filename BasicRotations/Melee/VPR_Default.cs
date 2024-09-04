@@ -147,11 +147,11 @@ public sealed class VPR_Default : ViperRotation
         }
         if (VicewinderPvE.CanUse(out act, usedUp: true)) return true;
         //AOE Serpent Combo
-        if (JaggedMawPvE.CanUse(out act)) return true;
-        if (BloodiedMawPvE.CanUse(out act)) return true;
+        if (JaggedMawPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (BloodiedMawPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-        if (HuntersBitePvE.CanUse(out act)) return true;
-        if (SwiftskinsBitePvE.CanUse(out act)) return true;
+        if (HuntersBitePvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (SwiftskinsBitePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (ReavingMawPvE.CanUse(out act)) return true;
         if (SteelMawPvE.CanUse(out act)) return true;

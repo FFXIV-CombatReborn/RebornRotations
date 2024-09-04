@@ -1,5 +1,3 @@
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
-
 namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
