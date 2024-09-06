@@ -7,11 +7,11 @@ public sealed class VPR_Default : ViperRotation
 {
     #region Config Options
 
-    [RotationConfig(CombatType.PvE, Name = "Tincture/Gemdraught Usage (Experimental)")]
-    public bool ExperimentalPot { get; set; } = false;
-
     [RotationConfig(CombatType.PvE, Name = "Use up all charges of Uncoiled Fury if you have used Tincture/Gemdraught (Overrides next option)")]
     public bool BurstUncoiledFury { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Allow Uncoiled Fury and Writhing Snap to overwrite oGCDs when at range")]
+    public bool UFGhosting { get; set; } = true;
 
     [Range(1, 3, ConfigUnitType.None, 1)]
     [RotationConfig(CombatType.PvE, Name = "How many charges of Uncoiled Fury needs to be at before be used inside of melee (Ignores burst, leave at 3 to hold charges for out of melee uptime or burst only)")]
@@ -30,6 +30,8 @@ public sealed class VPR_Default : ViperRotation
     public int ReawakenDelayTimer { get; set; } = 75;
 
     #endregion
+
+    private static bool IsInBurst => Player.Level > 50 && !Player.WillStatusEnd(0, true, StatusID.RagingStrikes);
 
     #region Additional oGCD Logic
     [RotationDesc]
@@ -79,11 +81,6 @@ public sealed class VPR_Default : ViperRotation
         if (LastLashPvE.CanUse(out act)) return true;
         if (DeathRattlePvE.CanUse(out act)) return true;
 
-        if (IsBurst && ExperimentalPot)
-        {
-            if (UseBurstMedicine(out act)) return true;
-        }
-
         return base.AttackAbility(nextGCD, out act);
     }
     #endregion
@@ -113,18 +110,18 @@ public sealed class VPR_Default : ViperRotation
         }
 
         // Uncoiled Fury Overcap protection
-        if ((MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser) && !Player.HasStatus(true, StatusID.ReadyToReawaken))
+        if ((MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
-        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated) && !Player.HasStatus(true, StatusID.ReadyToReawaken))
+        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
         //Uncoiled fury use
-        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30) && !Player.HasStatus(true, StatusID.ReadyToReawaken))
+        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
@@ -169,8 +166,8 @@ public sealed class VPR_Default : ViperRotation
         if (SteelFangsPvE.CanUse(out act)) return true;
 
         //Ranged
-        if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
-        if (WrithingSnapPvE.CanUse(out act)) return true;
+        if ((UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)) && UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
+        if ((UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)) && WrithingSnapPvE.CanUse(out act)) return true;
 
         return base.GeneralGCD(out act);
     }

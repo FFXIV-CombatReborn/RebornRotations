@@ -91,7 +91,6 @@ public sealed class DRK_Default : DarkKnightRotation
 
         if (IsBurst)
         {
-            if (UseBurstMedicine(out act)) return true;
             if (InCombat && DeliriumPvE.CanUse(out act)) return true;
             if (DeliriumPvE.EnoughLevel && DeliriumPvE.Cooldown.ElapsedAfterGCD(1) && !DeliriumPvE.Cooldown.ElapsedAfterGCD(3)
                 && BloodWeaponPvE.CanUse(out act)) return true;

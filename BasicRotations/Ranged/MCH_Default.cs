@@ -68,7 +68,10 @@ public sealed class MCH_Default : MachinistRotation
     // Logic for using attack abilities outside of GCD, focusing on burst windows and cooldown management.
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        if (BSPrio && BarrelStabilizerPvE.CanUse(out act)) return true;
+        if (BSPrio && IsBurst)
+        {
+            if (BarrelStabilizerPvE.CanUse(out act)) return true;
+        }
 
         // Check for not burning Hypercharge below level 52 on AOE
         bool LowLevelHyperCheck = !AutoCrossbowPvE.EnoughLevel && SpreadShotPvE.CanUse(out _);
@@ -100,7 +103,10 @@ public sealed class MCH_Default : MachinistRotation
             if (RookAutoturretPvE.CanUse(out act)) return true;
         }
 
-        if (BarrelStabilizerPvE.CanUse(out act)) return true;
+        if (IsBurst)
+        {
+            if (BarrelStabilizerPvE.CanUse(out act)) return true;
+        }
 
         return base.AttackAbility(nextGCD, out act);
     }

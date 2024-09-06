@@ -101,7 +101,6 @@ public class BLM_Default : BlackMageRotation
     [RotationDesc(ActionID.RetracePvE, ActionID.SwiftcastPvE, ActionID.TriplecastPvE, ActionID.AmplifierPvE)]
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
-        if (IsBurst && UseBurstMedicine(out act)) return true;
         if (InUmbralIce)
         {
             if (UmbralIceStacks == 2 && !HasFire

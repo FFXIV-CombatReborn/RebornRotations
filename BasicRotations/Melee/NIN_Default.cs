@@ -313,9 +313,6 @@ public sealed class NIN_Default : NinjaRotation
         // First priority is given to Kassatsu if it's available, allowing for an immediate powerful Ninjutsu.
         if (KassatsuPvE.CanUse(out act)) return true;
 
-        // Next, checks if a burst medicine is available and appropriate to use.
-        if (UseBurstMedicine(out act)) return true;
-
         if (TenriJindoPvE.CanUse(out act)) return true;
 
         // If in a burst phase and not just starting combat, checks if Mug is available to generate additional Ninki.

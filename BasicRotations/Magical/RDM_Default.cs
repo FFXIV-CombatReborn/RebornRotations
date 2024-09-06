@@ -144,8 +144,6 @@ public sealed class RDM_Default : RedMageRotation
              //If nothing else to use and player moving - fire reprise.
              EnchantedReprisePvE.CanUse(out act))) return true;
 
-        if (IsBurst && UseBurstMedicine(out act)) return true;
-
         //Attack abilities.
         if (PrefulgencePvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (ViceOfThornsPvE.CanUse(out act, skipAoeCheck: true)) return true;
