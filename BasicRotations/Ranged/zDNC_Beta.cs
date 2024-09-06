@@ -202,9 +202,11 @@ public sealed class zDNC_Beta : DancerRotation
         }
 
         // Further prioritized GCD abilities
-        if ((burst || (Esprit >= 85 && !TechnicalStepPvE.Cooldown.ElapsedAfter(115))) && SaberDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (((Esprit >= 85 && !TechnicalStepPvE.Cooldown.ElapsedAfter(115))) && SaberDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (burst && SaberDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         bool standardReady = StandardStepPvE.Cooldown.ElapsedAfter(28);
         bool technicalReady = TechnicalStepPvE.Cooldown.ElapsedAfter(118);
