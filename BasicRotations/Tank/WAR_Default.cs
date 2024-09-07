@@ -1,6 +1,6 @@
 namespace DefaultRotations.Tank;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "Additional Contributions from Sascha")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Tank/WAR_Default.cs")]
 [Api(3)]
 public sealed class WAR_Default : WarriorRotation
@@ -29,17 +29,7 @@ public sealed class WAR_Default : WarriorRotation
     #region Countdown Logic
     protected override IAction? CountDownAction(float remainTime)
     {
-        if (remainTime <= CountDownAhead)
-        {
-            if (HasTankStance)
-            {
-                if (ProvokePvE.CanUse(out var act)) return act;
-            }
-            else
-            {
-                if (TomahawkPvE.CanUse(out var act)) return act;
-            }
-        }
+        if (remainTime < 0.54f && TomahawkPvE.CanUse(out var act)) return act;
         return base.CountDownAction(remainTime);
     }
     #endregion
@@ -51,8 +41,6 @@ public sealed class WAR_Default : WarriorRotation
 
         if (CombatElapsedLessGCD(1)) return false;
 
-        if (UseBurstMedicine(out act)) return true;
-
         if (Player.HasStatus(false, StatusID.SurgingTempest)
             && !Player.WillStatusEndGCD(2, 0, true, StatusID.SurgingTempest)
             || !MythrilTempestPvE.EnoughLevel)
@@ -61,7 +49,7 @@ public sealed class WAR_Default : WarriorRotation
 
         }
 
-        if (IsBurstStatus)
+        if (IsBurstStatus && (InnerReleaseStacks == 0 || InnerReleaseStacks == 3))
         {
             if (InfuriatePvE.CanUse(out act, usedUp: true)) return true;
         }
@@ -90,6 +78,8 @@ public sealed class WAR_Default : WarriorRotation
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
+        if (IsBurstStatus && UseBurstMedicine(out act)) return true;
+
         if (Player.GetHealthRatio() < ThrillOfBattleHeal)
         {
             if (ThrillOfBattlePvE.CanUse(out act)) return true;
@@ -143,40 +133,46 @@ public sealed class WAR_Default : WarriorRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
-        if (IsLastAction(false, InnerReleasePvE))
+        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
         {
+            if (ChaoticCyclonePvE.CanUse(out act)) return true;
+            if (InnerChaosPvE.CanUse(out act)) return true;
+        }
+
+        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && !Player.HasStatus(true, StatusID.NascentChaos) && InnerReleaseStacks > 0)
+        {
+            if (DecimatePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
             if (FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         }
 
-        if (Player.HasStatus(false, StatusID.SurgingTempest) &&
-       (IsBurstStatus || !Player.HasStatus(false, StatusID.NascentChaos) || BeastGauge > 80))
-        {
-            if (SteelCyclonePvE.CanUse(out act)) return true;
-            if (InnerBeastPvE.CanUse(out act)) return true;
-        }
-
-        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest))
+        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && InnerReleaseStacks == 0)
         {
             if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
             {
                 if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
             }
-
-            // New check for Primal Ruination
-            if (Player.HasStatus(false, StatusID.PrimalRuinationReady) && !Player.HasStatus(false, StatusID.InnerRelease))
-            {
-                if (PrimalRuinationPvE.CanUse(out act, skipAoeCheck: true)) return true;
-            }
-
+            if (PrimalRuinationPvE.CanUse(out act)) return true;
         }
 
+        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && !Player.HasStatus(true, StatusID.NascentChaos) && Player.Level <= 60)
+        {
+            if (SteelCyclonePvE.CanUse(out act)) return true;
+            if (InnerBeastPvE.CanUse(out act)) return true;
+        }
+
+        // AOE
+        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && DecimatePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         if (MythrilTempestPvE.CanUse(out act)) return true;
         if (OverpowerPvE.CanUse(out act)) return true;
+
+        // Single Target
+        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
         if (StormsEyePvE.CanUse(out act)) return true;
         if (StormsPathPvE.CanUse(out act)) return true;
         if (MaimPvE.CanUse(out act)) return true;
         if (HeavySwingPvE.CanUse(out act)) return true;
 
+        // Ranged
         if (TomahawkPvE.CanUse(out act)) return true;
 
         return base.GeneralGCD(out act);

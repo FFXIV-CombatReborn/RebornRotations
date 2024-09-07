@@ -19,6 +19,12 @@ public sealed class WHM_Default : WhiteMageRotation
     [RotationConfig(CombatType.PvE, Name = "Regen on Tank at 5 seconds remaining on Prepull Countdown.")]
     public bool UsePreRegen { get; set; } = true;
 
+    [RotationConfig(CombatType.PvE, Name = "Use Divine Carress as soon as its available")]
+    public bool UseDivine { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Use Asylum as soon a single player heal (i.e. tankbusters) while moving, in addition to normal logic")]
+    public bool AsylumSingle { get; set; } = false;
+
     [Range(0, 1, ConfigUnitType.Percent)]
     [RotationConfig(CombatType.PvE, Name = "Minimum health threshold party member needs to be to use Benediction")]
     public float BenedictionHeal { get; set; } = 0.3f;
@@ -51,6 +57,8 @@ public sealed class WHM_Default : WhiteMageRotation
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        if (Player.WillStatusEndGCD(0, 3, true, StatusID.DivineGrace) && DivineCaressPvE.CanUse(out act)) return true;
+
         if (nextGCD is IBaseAction action && action.Info.MPNeed >= ThinAirNeed &&
             ThinAirPvE.CanUse(out act)) return true;
 
@@ -61,6 +69,12 @@ public sealed class WHM_Default : WhiteMageRotation
         }
 
         return base.EmergencyAbility(nextGCD, out act);
+    }
+
+    protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
+    {
+        if (UseDivine && DivineCaressPvE.CanUse(out act)) return true;
+        return base.GeneralAbility(nextGCD, out act);
     }
 
     [RotationDesc(ActionID.TemperancePvE, ActionID.LiturgyOfTheBellPvE)]
@@ -105,7 +119,7 @@ public sealed class WHM_Default : WhiteMageRotation
         if (BenedictionPvE.CanUse(out act) &&
             RegenPvE.Target.Target?.GetHealthRatio() < BenedictionHeal) return true;
 
-        if (!IsMoving && AsylumPvE.CanUse(out act)) return true;
+        if (AsylumSingle && !IsMoving && AsylumPvE.CanUse(out act)) return true;
 
         if (DivineBenisonPvE.CanUse(out act)) return true;
 
