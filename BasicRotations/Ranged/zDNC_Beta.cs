@@ -185,12 +185,15 @@ public sealed class zDNC_Beta : DancerRotation
             shouldUseLastDance = true;
         }
 
+        if (FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        // Prioritize Starfall over LD/SD if we're about to drop it
+        if (burst && DevilmentPvE.Cooldown.ElapsedAfter(15) && StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
         if (shouldUseLastDance)
         {
             if (LastDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
-
-        if (FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (HoldStepForTargets)
         {
