@@ -185,11 +185,13 @@ public sealed class zDNC_Beta : DancerRotation
             shouldUseLastDance = true;
         }
 
-        // Prioritize Starfall/FM over LD/SD if we're about to drop burst
-        if (burst && DevilmentPvE.Cooldown.ElapsedAfter(15))
+        if (burst)
         {
-            if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
-            if (FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
+            // Make sure Starfall gets used before end of burst
+            if (DevilmentPvE.Cooldown.ElapsedAfter(15) && StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+            // Make sure to FM with enough time left in burst window to LD and SFD while leaving a GCD for a Sabre if needed
+            if (DevilmentPvE.Cooldown.ElapsedAfter(10) && FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
         if (shouldUseLastDance)
