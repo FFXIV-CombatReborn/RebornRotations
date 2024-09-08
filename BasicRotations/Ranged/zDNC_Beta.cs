@@ -185,8 +185,6 @@ public sealed class zDNC_Beta : DancerRotation
             shouldUseLastDance = true;
         }
 
-        if (FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
-
         // Prioritize Starfall over LD/SD if we're about to drop it
         if (burst && DevilmentPvE.Cooldown.ElapsedAfter(15) && StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
@@ -203,6 +201,8 @@ public sealed class zDNC_Beta : DancerRotation
         {
             if (UseStandardStep(out act)) return true;
         }
+
+        if (FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         // Further prioritized GCD abilities
         if ((burst || (Esprit >= 85 && !TechnicalStepPvE.Cooldown.ElapsedAfter(115))) && SaberDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
