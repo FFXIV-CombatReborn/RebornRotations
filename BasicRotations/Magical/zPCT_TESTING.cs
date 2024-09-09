@@ -16,10 +16,10 @@ public sealed class zPCT_TESTING : PictomancerRotation
     public bool RainbowDripSwift { get; set; } = true;
 
     [RotationConfig(CombatType.PvE, Name = "Use swiftcast on Motif")]
-    public bool MotifSwiftCastSwift { get; set; } = false;
+    public bool MotifSwiftCastSwift { get; set; } = true;
 
     [RotationConfig(CombatType.PvE, Name = "Which Motif")]
-    public CanvasFlags MotifSwiftCast { get; set; } = CanvasFlags.Pom;
+    public CanvasFlags MotifSwiftCast { get; set; } = CanvasFlags.Weapon;
 
     #region Countdown logic
     // Defines logic for actions to take during the countdown before combat starts.
@@ -174,29 +174,28 @@ public sealed class zPCT_TESTING : PictomancerRotation
     protected override bool GeneralGCD(out IAction? act)
     {
         // Weapon Painting Burst
-        if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipComboCheck: true)) return true;
+        if (HammerStampPvE.CanUse(out act, skipComboCheck: true)) return true;
 
         if (HolyCometMoving && IsMoving)
         {
-            if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (HolyInWhitePvE.CanUse(out act)) return true;
         }
 
         //Use up paint if in Hyperphantasia
         if (Player.HasStatus(true, StatusID.Hyperphantasia))
         {
-            if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (CometInBlackPvE.CanUse(out act)) return true;
         }
 
         //Paint overcap protection
         if (Paint == HolyCometMax)
         {
-            if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true)) return true;
-            if (HolyInWhitePvE.CanUse(out act, skipCastingCheck: true)) return true;
+            if (HolyInWhitePvE.CanUse(out act)) return true;
         }
 
         // Landscape Paining Burst
         if (RainbowDripPvE.CanUse(out act)) return true;
-        if (StarPrismPvE.CanUse(out act, skipCastingCheck: true)) return true;
+        if (StarPrismPvE.CanUse(out act)) return true;
 
         //Advanced Paintings
         if (StarrySkyMotifPvE.CanUse(out act)) return true;
