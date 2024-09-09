@@ -46,7 +46,28 @@ public sealed class AST_Default : AstrologianRotation
     }
     #endregion
 
-    #region Defensive Logic
+    #region oGCD Logic
+    protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
+    {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
+        if (!InCombat) return false;
+
+        if (OraclePvE.CanUse(out act)) return true;
+        if (nextGCD.IsTheSameTo(true, AspectedHeliosPvE, HeliosPvE))
+        {
+            if (HoroscopePvE.CanUse(out act)) return true;
+            if (NeutralSectPvE.CanUse(out act)) return true;
+        }
+
+        if (nextGCD.IsTheSameTo(true, BeneficPvE, BeneficIiPvE, AspectedBeneficPvE))
+        {
+            if (SynastryPvE.CanUse(out act)) return true;
+        }
+        return base.EmergencyAbility(nextGCD, out act);
+    }
 
     [RotationDesc(ActionID.ExaltationPvE, ActionID.TheArrowPvE, ActionID.TheSpirePvE, ActionID.TheBolePvE, ActionID.TheEwerPvE)]
     protected override bool DefenseSingleAbility(IAction nextGCD, out IAction? act)
@@ -88,31 +109,46 @@ public sealed class AST_Default : AstrologianRotation
         if (CollectiveUnconsciousPvE.CanUse(out act)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
     }
-    #endregion
 
-    #region oGCD Logic
-    protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
+    [RotationDesc(ActionID.TheArrowPvE, ActionID.TheEwerPvE, ActionID.EssentialDignityPvE,
+        ActionID.CelestialIntersectionPvE)]
+    protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
     {
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
         if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
 
-        if (base.EmergencyAbility(nextGCD, out act)) return true;
+        if (InCombat && TheArrowPvE.CanUse(out act)) return true;
+        if (InCombat && TheEwerPvE.CanUse(out act)) return true;
 
-        if (!InCombat) return false;
+        if (EssentialDignityPvE.CanUse(out act, usedUp: true)) return true;
 
-        if (OraclePvE.CanUse(out act)) return true;
-        if (nextGCD.IsTheSameTo(true, AspectedHeliosPvE, HeliosPvE))
-        {
-            if (HoroscopePvE.CanUse(out act)) return true;
-            if (NeutralSectPvE.CanUse(out act)) return true;
-        }
+        if (CelestialIntersectionPvE.CanUse(out act, usedUp: true)) return true;
 
-        if (nextGCD.IsTheSameTo(true, BeneficPvE, BeneficIiPvE, AspectedBeneficPvE))
-        {
-            if (SynastryPvE.CanUse(out act)) return true;
-        }
-        return base.EmergencyAbility(nextGCD, out act);
+        return base.HealSingleAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.CelestialOppositionPvE, ActionID.StellarDetonationPvE, ActionID.HoroscopePvE, ActionID.HoroscopePvE_16558, ActionID.LadyOfCrownsPvE, ActionID.HeliosConjunctionPvE)]
+    protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
+    {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
+        if (MicrocosmosPvE.CanUse(out act)) return true;
+        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+
+        if (CelestialOppositionPvE.CanUse(out act)) return true;
+
+        if (StellarDetonationPvE.CanUse(out act)) return true;
+
+        if (HoroscopePvE.CanUse(out act)) return true;
+
+        if (HoroscopePvE_16558.CanUse(out act)) return true;
+
+        if (LadyOfCrownsPvE.CanUse(out act)) return true;
+
+        if (HeliosConjunctionPvE.CanUse(out act)) return true;
+        return base.HealAreaAbility(nextGCD, out act);
     }
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
@@ -155,64 +191,9 @@ public sealed class AST_Default : AstrologianRotation
         }
         return base.AttackAbility(nextGCD, out act);
     }
-
-    [RotationDesc(ActionID.TheArrowPvE, ActionID.TheEwerPvE, ActionID.EssentialDignityPvE,
-        ActionID.CelestialIntersectionPvE)]
-    protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
-    {
-        act = null;
-        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
-        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
-
-        if (InCombat && TheArrowPvE.CanUse(out act)) return true;
-        if (InCombat && TheEwerPvE.CanUse(out act)) return true;
-
-        if (EssentialDignityPvE.CanUse(out act)) return true;
-
-        if (CelestialIntersectionPvE.CanUse(out act, usedUp: true)) return true;
-
-        return base.HealSingleAbility(nextGCD, out act);
-    }
-
-    [RotationDesc(ActionID.CelestialOppositionPvE, ActionID.StellarDetonationPvE, ActionID.HoroscopePvE, ActionID.HoroscopePvE_16558, ActionID.LadyOfCrownsPvE, ActionID.HeliosConjunctionPvE)]
-    protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
-    {
-        act = null;
-        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
-
-        if (MicrocosmosPvE.CanUse(out act)) return true;
-        if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
-
-        if (CelestialOppositionPvE.CanUse(out act)) return true;
-
-        if (StellarDetonationPvE.CanUse(out act)) return true;
-
-        if (HoroscopePvE.CanUse(out act)) return true;
-
-        if (HoroscopePvE_16558.CanUse(out act)) return true;
-
-        if (LadyOfCrownsPvE.CanUse(out act)) return true;
-
-        if (HeliosConjunctionPvE.CanUse(out act)) return true;
-        return base.HealAreaAbility(nextGCD, out act);
-    }
     #endregion
 
     #region GCD Logic
-    protected override bool GeneralGCD(out IAction? act)
-    {
-        act = null;
-        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
-
-        if (GravityPvE.CanUse(out act)) return true;
-
-        if (CombustPvE.CanUse(out act)) return true;
-        if (MaleficPvE.CanUse(out act)) return true;
-        if (CombustPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
-
-        return base.GeneralGCD(out act);
-    }
-
     [RotationDesc(ActionID.AspectedBeneficPvE, ActionID.BeneficIiPvE, ActionID.BeneficPvE)]
     protected override bool HealSingleGCD(out IAction? act)
     {
@@ -240,6 +221,20 @@ public sealed class AST_Default : AstrologianRotation
         if (AspectedHeliosPvE.CanUse(out act)) return true;
         if (HeliosPvE.CanUse(out act)) return true;
         return base.HealAreaGCD(out act);
+    }
+
+    protected override bool GeneralGCD(out IAction? act)
+    {
+        act = null;
+        if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+
+        if (GravityPvE.CanUse(out act)) return true;
+
+        if (CombustPvE.CanUse(out act)) return true;
+        if (MaleficPvE.CanUse(out act)) return true;
+        if (CombustPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
+
+        return base.GeneralGCD(out act);
     }
     #endregion
 
