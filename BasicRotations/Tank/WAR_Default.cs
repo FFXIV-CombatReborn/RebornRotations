@@ -78,8 +78,6 @@ public sealed class WAR_Default : WarriorRotation
 
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
-        if (IsBurstStatus && UseBurstMedicine(out act)) return true;
-
         if (Player.GetHealthRatio() < ThrillOfBattleHeal)
         {
             if (ThrillOfBattlePvE.CanUse(out act)) return true;

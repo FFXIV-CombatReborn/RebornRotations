@@ -29,6 +29,9 @@ public sealed class VPR_Default : ViperRotation
     [RotationConfig(CombatType.PvE, Name = "How long has to pass on Serpents Ire's cooldown before the rotation starts pooling gauge for burst. Leave this alone if you dont know what youre doing. (Will still use Reawaken if you reach cap regardless of timer)")]
     public int ReawakenDelayTimer { get; set; } = 75;
 
+    [RotationConfig(CombatType.PvE, Name = "Experimental Pot Usage(used up to 5 seconds before SerpentsIre comes off cooldown)")]
+    public bool BurstMed { get; set; } = false;
+
     #endregion
 
     private static bool IsInBurst => Player.Level > 50 && !Player.WillStatusEnd(0, true, StatusID.RagingStrikes);
@@ -49,6 +52,10 @@ public sealed class VPR_Default : ViperRotation
         if (TwinfangBitePvE.CanUse(out act)) return true;
         if (TwinbloodBitePvE.CanUse(out act)) return true;
 
+        // Use burst medicine if cooldown for Technical Step has elapsed sufficiently
+        if (BurstMed && SerpentsIrePvE.EnoughLevel && SerpentsIrePvE.Cooldown.ElapsedAfter(85)
+            && UseBurstMedicine(out act)) return true;
+
         return base.EmergencyAbility(nextGCD, out act);
     }
 
@@ -62,7 +69,7 @@ public sealed class VPR_Default : ViperRotation
     [RotationDesc]
     protected sealed override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
-        if (FeintPvE.CanUse(out act)) return true;
+        if (SerpentCombo == SerpentCombo.NONE &&FeintPvE.CanUse(out act)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
     }
     #endregion

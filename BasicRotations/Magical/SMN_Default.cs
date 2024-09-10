@@ -110,11 +110,6 @@ public sealed class SMN_Default : SummonerRotation
             bool elapsed6ChargeAfterInvocation = SummonSolarBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(6) || SummonBahamutPvE.Cooldown.ElapsedOneChargeAfterGCD(6) || SummonPhoenixPvE.Cooldown.ElapsedOneChargeAfterGCD(6);
             bool burstInSolar = Player.Level == 100 ? InSolarBahamut : InBahamut;
 
-            if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed0ChargeAfterInvocation && (SearingLightPvE.Cooldown.WillHaveOneCharge(5) || !SearingLightPvE.Cooldown.IsCoolingDown))
-            {
-                UseBurstMedicine(out act);
-            }
-
             if (!Player.HasStatus(false, StatusID.SearingLight) && burstInSolar && elapsed1ChargeAfterInvocation)
             {
                 if (SearingLightPvE.CanUse(out act, skipAoeCheck: true)) return true;
