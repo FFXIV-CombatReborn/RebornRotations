@@ -84,8 +84,6 @@ public sealed class MCH_Default : MachinistRotation
         // Burst
         if (IsBurst)
         {
-            if (UseBurstMedicine(out act)) return true;
-
             {
                 if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && !CombatElapsedLessGCD(5) &&
                     (CombatElapsedLess(20) || ToolChargeSoon(out _)) && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;

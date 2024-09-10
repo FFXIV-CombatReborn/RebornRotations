@@ -35,17 +35,6 @@ public sealed class RPR_Default : ReaperRotation
 
         if (IsBurst)
         {
-            if (UseBurstMedicine(out act))
-            {
-                if (CombatElapsedLess(10))
-                {
-                    if (!CombatElapsedLess(5)) return true;
-                }
-                else
-                {
-                    if (ArcaneCirclePvE.Cooldown.WillHaveOneCharge(5)) return true;
-                }
-            }
             if ((HostileTarget?.HasStatus(true, StatusID.DeathsDesign) ?? false)
                 && !CombatElapsedLess(3.5f) && ArcaneCirclePvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
