@@ -135,7 +135,7 @@ public sealed class IcWaPctBeta : PictomancerRotation
     {
         bool burstTimingCheckerStriking = !ScenicMusePvE.Cooldown.WillHaveOneCharge(60) || Player.HasStatus(true, StatusID.StarryMuse);
         int adjustCombatTimeForOpener = Player.Level < 92 ? 2 : 5;
-        if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CombatTime > adjustCombatTimeForOpener && IsBurst) return true;
+        //if (ScenicMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && CombatTime > adjustCombatTimeForOpener && IsBurst) return true; this needs to be corrected, cannot call sceneic muse, not valid action
         if (CombatTime > adjustCombatTimeForOpener && StrikingMusePvE.CanUse(out act, skipCastingCheck: true, skipStatusProvideCheck: true, skipComboCheck: true, skipAoeCheck: true, usedUp: true) && burstTimingCheckerStriking) return true;
         if (SubtractivePalettePvE.CanUse(out act) && !Player.HasStatus(true, StatusID.SubtractivePalette)) return true;
         if (Player.HasStatus(true, StatusID.StarryMuse))
@@ -172,7 +172,9 @@ public sealed class IcWaPctBeta : PictomancerRotation
             if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0) return true;
         }
         if (StarPrismPvE.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.Starstruck)) return true;
-        if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && HasHammerTime) return true;
+        if (PolishingHammerPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (HammerBrushPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (HammerStampPvE.CanUse(out act, skipComboCheck: true)) return true;
         //Cast when not in fight or no target available
         if (!InCombat)
         {
@@ -205,7 +207,9 @@ public sealed class IcWaPctBeta : PictomancerRotation
         // white/black paint use while moving
         if (isMovingAndSwift)
         {
-            if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;
+            if (PolishingHammerPvE.CanUse(out act, skipComboCheck: true)) return true;
+            if (HammerBrushPvE.CanUse(out act, skipComboCheck: true)) return true;
+            if (HammerStampPvE.CanUse(out act, skipComboCheck: true)) return true;
             if (HolyCometMoving)
             {
                 if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true)) return true;

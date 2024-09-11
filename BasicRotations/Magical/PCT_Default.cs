@@ -205,7 +205,6 @@ public sealed class PCT_Default : PictomancerRotation
         // white/black paint use while moving
         if (IsMoving)
         {
-            if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Player.HasStatus(true, StatusID.HammerTime) && InCombat) return true;
             if (HolyCometMoving)
             {
                 if (CometInBlackPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Paint > 0 && Player.HasStatus(true, StatusID.MonochromeTones)) return true;
@@ -213,7 +212,9 @@ public sealed class PCT_Default : PictomancerRotation
             }
         }
 
-        if (HammerStampPvE.CanUse(out act, skipCastingCheck: true, skipAoeCheck: true) && Player.HasStatus(true, StatusID.HammerTime) && InCombat) return true;
+        if (PolishingHammerPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (HammerBrushPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (HammerStampPvE.CanUse(out act, skipComboCheck: true)) return true;
 
         if (!InCombat)
         {
