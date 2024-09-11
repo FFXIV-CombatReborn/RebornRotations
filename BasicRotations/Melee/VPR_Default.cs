@@ -69,7 +69,7 @@ public sealed class VPR_Default : ViperRotation
     [RotationDesc]
     protected sealed override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
-        if (SerpentCombo == SerpentCombo.NONE &&FeintPvE.CanUse(out act)) return true;
+        if (SerpentCombo == SerpentCombo.NONE && FeintPvE.CanUse(out act)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
     }
     #endregion
@@ -103,7 +103,6 @@ public sealed class VPR_Default : ViperRotation
         if (SecondGenerationPvE.CanUse(out act)) return true;
         if (FirstGenerationPvE.CanUse(out act)) return true;
 
-
         if (SwiftTime > SwiftTimer &&
             HuntersTime > HuntersTimer &&
             !HasHunterVenom && !HasSwiftVenom &&
@@ -117,18 +116,18 @@ public sealed class VPR_Default : ViperRotation
         }
 
         // Uncoiled Fury Overcap protection
-        if ((MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
+        if ((MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && SerpentCombo == SerpentCombo.NONE)
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
-        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
+        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && SerpentCombo == SerpentCombo.NONE)
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
         //Uncoiled fury use
-        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
+        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && SerpentCombo == SerpentCombo.NONE)
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
