@@ -174,6 +174,8 @@ public sealed class zPCT_TESTING : PictomancerRotation
     protected override bool GeneralGCD(out IAction? act)
     {
         // Weapon Painting Burst
+        if (PolishingHammerPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (HammerBrushPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (HammerStampPvE.CanUse(out act, skipComboCheck: true)) return true;
 
         if (HolyCometMoving && IsMoving)
