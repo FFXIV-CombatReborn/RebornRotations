@@ -105,7 +105,6 @@ public class PLD_Default : PaladinRotation
 
         if (InCombat)
         {
-            if (UseBurstMedicine(out act)) return true;
             if (IsBurst && !CombatElapsedLess(5) && FightOrFlightPvE.CanUse(out act)) return true;
         }
         if (CombatElapsedLess(8)) return false;

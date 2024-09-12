@@ -96,8 +96,8 @@ public sealed class zDNC_Beta : DancerRotation
         //Use all feathers on burst
         if ((Player.HasStatus(true, StatusID.Devilment) || Feathers > 3 || !TechnicalStepPvE.EnoughLevel) && !FanDanceIiiPvE.CanUse(out _, skipAoeCheck: true))
         {
-            if (FanDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
             if (FanDanceIiPvE.CanUse(out act)) return true;
+            if (FanDancePvE.CanUse(out act)) return true;
         }
 
         // Other attacks

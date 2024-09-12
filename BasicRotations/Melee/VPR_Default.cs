@@ -29,6 +29,9 @@ public sealed class VPR_Default : ViperRotation
     [RotationConfig(CombatType.PvE, Name = "How long has to pass on Serpents Ire's cooldown before the rotation starts pooling gauge for burst. Leave this alone if you dont know what youre doing. (Will still use Reawaken if you reach cap regardless of timer)")]
     public int ReawakenDelayTimer { get; set; } = 75;
 
+    [RotationConfig(CombatType.PvE, Name = "Experimental Pot Usage(used up to 5 seconds before SerpentsIre comes off cooldown)")]
+    public bool BurstMed { get; set; } = false;
+
     #endregion
 
     private static bool IsInBurst => Player.Level > 50 && !Player.WillStatusEnd(0, true, StatusID.RagingStrikes);
@@ -49,6 +52,10 @@ public sealed class VPR_Default : ViperRotation
         if (TwinfangBitePvE.CanUse(out act)) return true;
         if (TwinbloodBitePvE.CanUse(out act)) return true;
 
+        // Use burst medicine if cooldown for Technical Step has elapsed sufficiently
+        if (SerpentCombo == SerpentCombo.NONE && BurstMed && SerpentsIrePvE.EnoughLevel && SerpentsIrePvE.Cooldown.ElapsedAfter(115)
+            && UseBurstMedicine(out act)) return true;
+
         return base.EmergencyAbility(nextGCD, out act);
     }
 
@@ -60,14 +67,37 @@ public sealed class VPR_Default : ViperRotation
     }
 
     [RotationDesc]
+    protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
+    {
+        if (SerpentCombo == SerpentCombo.NONE && SecondWindPvE.CanUse(out act)) return true;
+        if (SerpentCombo == SerpentCombo.NONE && BloodbathPvE.CanUse(out act)) return true;
+        return base.HealSingleAbility(nextGCD, out act);
+    }
+
+    [RotationDesc]
     protected sealed override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
-        if (FeintPvE.CanUse(out act)) return true;
+        if (SerpentCombo == SerpentCombo.NONE && FeintPvE.CanUse(out act)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
+    }
+
+    [RotationDesc]
+    protected sealed override bool AntiKnockbackAbility(IAction nextGCD, out IAction? act)
+    {
+        if (SerpentCombo == SerpentCombo.NONE && ArmsLengthPvE.CanUse(out act)) return true;
+        return base.AntiKnockbackAbility(nextGCD, out act);
+    }
+
+    [RotationDesc]
+    protected sealed override bool InterruptAbility(IAction nextGCD, out IAction? act)
+    {
+        if (SerpentCombo == SerpentCombo.NONE && LegSweepPvE.CanUse(out act)) return true;
+        return base.InterruptAbility(nextGCD, out act);
     }
     #endregion
 
     #region oGCD Logic
+
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         ////Reawaken Combo
@@ -96,7 +126,6 @@ public sealed class VPR_Default : ViperRotation
         if (SecondGenerationPvE.CanUse(out act)) return true;
         if (FirstGenerationPvE.CanUse(out act)) return true;
 
-
         if (SwiftTime > SwiftTimer &&
             HuntersTime > HuntersTimer &&
             !HasHunterVenom && !HasSwiftVenom &&
@@ -110,18 +139,18 @@ public sealed class VPR_Default : ViperRotation
         }
 
         // Uncoiled Fury Overcap protection
-        if ((MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
+        if ((MaxRattling == RattlingCoilStacks || RattlingCoilStacks >= MaxUncoiledStacksUser) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && SerpentCombo == SerpentCombo.NONE)
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
-        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
+        if (BurstUncoiledFury && Player.HasStatus(true, StatusID.Medicated) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && SerpentCombo == SerpentCombo.NONE)
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
 
         //Uncoiled fury use
-        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && (UFGhosting || (!UFGhosting && SerpentCombo == SerpentCombo.NONE)))
+        if (SerpentsIrePvE.Cooldown.JustUsedAfter(30) && !Player.HasStatus(true, StatusID.ReadyToReawaken) && SerpentCombo == SerpentCombo.NONE)
         {
             if (UncoiledFuryPvE.CanUse(out act, usedUp: true)) return true;
         }
