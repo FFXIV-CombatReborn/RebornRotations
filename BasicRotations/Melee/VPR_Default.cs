@@ -53,7 +53,7 @@ public sealed class VPR_Default : ViperRotation
         if (TwinbloodBitePvE.CanUse(out act)) return true;
 
         // Use burst medicine if cooldown for Technical Step has elapsed sufficiently
-        if (BurstMed && SerpentsIrePvE.EnoughLevel && SerpentsIrePvE.Cooldown.ElapsedAfter(85)
+        if (SerpentCombo == SerpentCombo.NONE && BurstMed && SerpentsIrePvE.EnoughLevel && SerpentsIrePvE.Cooldown.ElapsedAfter(115)
             && UseBurstMedicine(out act)) return true;
 
         return base.EmergencyAbility(nextGCD, out act);
@@ -67,14 +67,37 @@ public sealed class VPR_Default : ViperRotation
     }
 
     [RotationDesc]
+    protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
+    {
+        if (SerpentCombo == SerpentCombo.NONE && SecondWindPvE.CanUse(out act)) return true;
+        if (SerpentCombo == SerpentCombo.NONE && BloodbathPvE.CanUse(out act)) return true;
+        return base.HealSingleAbility(nextGCD, out act);
+    }
+
+    [RotationDesc]
     protected sealed override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
     {
         if (SerpentCombo == SerpentCombo.NONE && FeintPvE.CanUse(out act)) return true;
         return base.DefenseAreaAbility(nextGCD, out act);
     }
+
+    [RotationDesc]
+    protected sealed override bool AntiKnockbackAbility(IAction nextGCD, out IAction? act)
+    {
+        if (SerpentCombo == SerpentCombo.NONE && ArmsLengthPvE.CanUse(out act)) return true;
+        return base.AntiKnockbackAbility(nextGCD, out act);
+    }
+
+    [RotationDesc]
+    protected sealed override bool InterruptAbility(IAction nextGCD, out IAction? act)
+    {
+        if (SerpentCombo == SerpentCombo.NONE && LegSweepPvE.CanUse(out act)) return true;
+        return base.InterruptAbility(nextGCD, out act);
+    }
     #endregion
 
     #region oGCD Logic
+
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         ////Reawaken Combo
