@@ -437,14 +437,5 @@ public sealed class NIN_Default : NinjaRotation
 
     // Checks if no ninjutsu action is currently selected or if the Rabbit Medium has been invoked.
     private static bool NoNinjutsu => AdjustId(ActionID.NinjutsuPvE) is ActionID.NinjutsuPvE or ActionID.RabbitMediumPvE;
-
-    // Displays the current status of the rotation, including the aimed ninjutsu action, if any.
-    public override void DisplayStatus()
-    {
-
-        ImGui.Text(Ninki.ToString());
-
-        base.DisplayStatus();
-    }
     #endregion
 }

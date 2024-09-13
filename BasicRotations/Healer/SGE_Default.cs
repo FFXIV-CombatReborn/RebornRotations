@@ -1,5 +1,3 @@
-using RotationSolver.Basic.Helpers;
-
 namespace DefaultRotations.Healer;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
@@ -225,7 +223,7 @@ public sealed class SGE_Default : SageRotation
     {
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && EgeiroPvE.CanUse(out _)) return false;
 
         if (EukrasianPrognosisIiPvE.CanUse(out act))
         {
@@ -263,7 +261,7 @@ public sealed class SGE_Default : SageRotation
     {
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && EgeiroPvE.CanUse(out _)) return false;
 
         if (EukrasianDiagnosisPvE.CanUse(out act))
         {
@@ -288,7 +286,7 @@ public sealed class SGE_Default : SageRotation
     {
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && EgeiroPvE.CanUse(out _)) return false;
 
         if (PartyMembersAverHP < PneumaAOEPartyHeal || DyskrasiaPvE.CanUse(out _) && PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaAOETankHeal))
         {
@@ -322,7 +320,7 @@ public sealed class SGE_Default : SageRotation
     {
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && EgeiroPvE.CanUse(out _)) return false;
 
         if (DiagnosisPvE.CanUse(out _) && !EukrasianDiagnosisPvE.CanUse(out _, skipCastingCheck: true))
         {
@@ -339,9 +337,9 @@ public sealed class SGE_Default : SageRotation
     {
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && EgeiroPvE.CanUse(out _)) return false;
 
-        if (!InCombat & EukrasiaPvE.CanUse(out act)) return true;
+        if (!InCombat && !Player.HasStatus(true, StatusID.Eukrasia) && EukrasiaPvE.CanUse(out act)) return true;
 
         if (HostileTarget?.IsBossFromTTK() ?? false)
         {

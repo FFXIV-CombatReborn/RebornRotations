@@ -203,7 +203,7 @@ public sealed class AST_Default : AstrologianRotation
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
         if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && AscendPvE.CanUse(out _)) return false;
 
         if (AspectedBeneficPvE.CanUse(out act)
             && (IsMoving
@@ -221,7 +221,7 @@ public sealed class AST_Default : AstrologianRotation
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
         if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && AscendPvE.CanUse(out _)) return false;
 
         if (AspectedHeliosPvE.CanUse(out act)) return true;
         if (HeliosPvE.CanUse(out act)) return true;

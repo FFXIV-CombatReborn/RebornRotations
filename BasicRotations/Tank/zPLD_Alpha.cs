@@ -94,16 +94,6 @@ public class zPLD_Alpha : PaladinRotation
         return base.EmergencyAbility(nextGCD, out act);
     }
 
-    [RotationDesc(ActionID.ReprisalPvE, ActionID.DivineVeilPvE)]
-    protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
-    {
-
-        if (DivineVeilPvE.CanUse(out act)) return true;
-        if (!Player.HasStatus(true, StatusID.Bulwark) && ReprisalPvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (PassageOfArmsPvE.CanUse(out act)) return true;
-        return base.DefenseAreaAbility(nextGCD, out act);
-    }
-
     [RotationDesc(ActionID.SentinelPvE, ActionID.RampartPvE, ActionID.BulwarkPvE, ActionID.SheltronPvE, ActionID.ReprisalPvE)]
     protected override bool DefenseSingleAbility(IAction nextGCD, out IAction? act)
     {
@@ -124,11 +114,20 @@ public class zPLD_Alpha : PaladinRotation
             if ((SentinelPvE.EnoughLevel && SentinelPvE.Cooldown.IsCoolingDown && SentinelPvE.Cooldown.ElapsedAfter(60) || !SentinelPvE.EnoughLevel) && RampartPvE.CanUse(out act)) return true;
 
             // If Reprisal can be used, use it and return true.
-            if (ReprisalPvE.CanUse(out act)) return true;
+            if (ReprisalPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         }
-
         return base.DefenseSingleAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.DivineVeilPvE, ActionID.PassageOfArmsPvE)]
+    protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
+    {
+        if (DivineVeilPvE.CanUse(out act)) return true;
+
+        if (PassageOfArmsPvE.CanUse(out act)) return true;
+
+        return base.DefenseAreaAbility(nextGCD, out act);
     }
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
