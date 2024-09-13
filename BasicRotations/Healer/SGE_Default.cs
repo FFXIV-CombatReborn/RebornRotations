@@ -8,7 +8,6 @@ public sealed class SGE_Default : SageRotation
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
-    #endregion
 
     [RotationConfig(CombatType.PvE, Name = "Enable Swiftcast Restriction Logic to attempt to prevent actions other than Raise when you have swiftcast")]
     public bool SwiftLogic { get; set; } = true;
@@ -60,6 +59,8 @@ public sealed class SGE_Default : SageRotation
     [Range(0, 1, ConfigUnitType.Percent)]
     [RotationConfig(CombatType.PvE, Name = "Health threshold tank party member needs to use Pneuma as an AOE heal")]
     public float PneumaAOETankHeal { get; set; } = 0.6f;
+
+    #endregion
 
     #region Countdown Logic
     protected override IAction? CountDownAction(float remainTime)
@@ -322,7 +323,7 @@ public sealed class SGE_Default : SageRotation
 
         if (HasSwift && SwiftLogic && EgeiroPvE.CanUse(out _)) return false;
 
-        if (DiagnosisPvE.CanUse(out _) && !EukrasianDiagnosisPvE.CanUse(out _, skipCastingCheck: true))
+        if (DiagnosisPvE.CanUse(out _) && !EukrasianDiagnosisPvE.CanUse(out _, skipCastingCheck: true) && InCombat)
         {
             StatusHelper.StatusOff(StatusID.Eukrasia);
             if (DiagnosisPvE.CanUse(out act))
@@ -390,7 +391,7 @@ public sealed class SGE_Default : SageRotation
 
         if (DyskrasiaPvE.CanUse(out _))
         {
-            if ((EukrasianDyskrasiaPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDyskrasiaPvE.Setting.TargetStatusProvide ?? []) ?? false))
+            if ((EukrasianDyskrasiaPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDyskrasiaPvE.Setting.TargetStatusProvide ?? []) ?? false) && InCombat)
             {
                 StatusHelper.StatusOff(StatusID.Eukrasia);
             }
@@ -414,7 +415,7 @@ public sealed class SGE_Default : SageRotation
 
         if (DosisPvE.CanUse(out _))
         {
-            if ((EukrasianDosisPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDosisPvE.Setting.TargetStatusProvide ?? []) ?? false))
+            if ((EukrasianDosisPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDosisPvE.Setting.TargetStatusProvide ?? []) ?? false) && InCombat)
             {
                 StatusHelper.StatusOff(StatusID.Eukrasia);
             }
