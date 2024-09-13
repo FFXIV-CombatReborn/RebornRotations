@@ -8,6 +8,10 @@ public sealed class BRD_Default : BardRotation
 {
     #region Config Options
 
+    [Range(1, 5, ConfigUnitType.Seconds, 0.1f)]
+    [RotationConfig(CombatType.PvE, Name = "Buff Alighnment Timer (Experimental, do not touch if you don't understand it)")]
+    public float BuffAlignment { get; set; } = 1;
+
     [Range(1, 45, ConfigUnitType.Seconds, 1)]
     [RotationConfig(CombatType.PvE, Name = "Wanderer's Minuet Uptime")]
     public float WANDTime { get; set; } = 43;
@@ -89,7 +93,7 @@ public sealed class BRD_Default : BardRotation
         if (IsBurst && Song != Song.NONE && MagesBalladPvE.EnoughLevel)
         {
             if (((!RadiantFinalePvE.EnoughLevel && !RagingStrikesPvE.Cooldown.IsCoolingDown)
-                    || (RadiantFinalePvE.EnoughLevel && !RadiantFinalePvE.Cooldown.IsCoolingDown && RagingStrikesPvE.EnoughLevel && !RagingStrikesPvE.Cooldown.IsCoolingDown))
+                    || (RadiantFinalePvE.EnoughLevel && !RadiantFinalePvE.Cooldown.IsCoolingDown && RagingStrikesPvE.EnoughLevel && (!RagingStrikesPvE.Cooldown.IsCoolingDown || RagingStrikesPvE.Cooldown.WillHaveOneCharge(BuffAlignment))))
                     && BattleVoicePvE.CanUse(out act, isLastAbility: false)) return true;
 
             if (!Player.WillStatusEnd(0, true, StatusID.BattleVoice) && RadiantFinalePvE.CanUse(out act)) return true;

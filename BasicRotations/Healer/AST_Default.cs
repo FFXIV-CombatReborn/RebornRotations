@@ -6,6 +6,9 @@ namespace DefaultRotations.Healer;
 public sealed class AST_Default : AstrologianRotation
 {
     #region Config Options
+    [RotationConfig(CombatType.PvE, Name = "Enable Swiftcast Restriction Logic to attempt to prevent actions other than Raise when you have swiftcast")]
+    public bool SwiftLogic { get; set; } = true;
+
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
 
@@ -200,6 +203,7 @@ public sealed class AST_Default : AstrologianRotation
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
         if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+        if (HasSwift && SwiftLogic) return false;
 
         if (AspectedBeneficPvE.CanUse(out act)
             && (IsMoving
@@ -217,6 +221,7 @@ public sealed class AST_Default : AstrologianRotation
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
         if (MicroPrio && Player.HasStatus(true, StatusID.Macrocosmos)) return false;
+        if (HasSwift && SwiftLogic) return false;
 
         if (AspectedHeliosPvE.CanUse(out act)) return true;
         if (HeliosPvE.CanUse(out act)) return true;
@@ -227,6 +232,7 @@ public sealed class AST_Default : AstrologianRotation
     {
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
+        if (HasSwift && SwiftLogic) return false;
 
         if (GravityPvE.CanUse(out act)) return true;
 
