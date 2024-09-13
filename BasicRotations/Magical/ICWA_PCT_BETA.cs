@@ -7,6 +7,7 @@ namespace DefaultRotations.Magical;
 [Api(3)]
 public sealed class IcWaPctBeta : PictomancerRotation
 {
+    #region Config Options
     public override MedicineType MedicineType => MedicineType.Intelligence;
     public static IBaseAction RainbowPrePull { get; } = new BaseAction((ActionID)34688);
     [RotationConfig(CombatType.PvE, Name = "Use HolyInWhite or CometInBlack while moving")]
@@ -28,6 +29,9 @@ public sealed class IcWaPctBeta : PictomancerRotation
         [Description("AllMotif")] AllMotif,
         [Description("NoMotif(ManualSwifcast")] NoMotif
     }
+
+    #endregion
+
     #region Countdown logic
     // Defines logic for actions to take during the countdown before combat starts.
     protected override IAction? CountDownAction(float remainTime)

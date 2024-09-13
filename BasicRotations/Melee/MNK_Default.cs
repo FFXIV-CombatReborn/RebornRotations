@@ -200,8 +200,4 @@ public sealed class MNK_Default : MonkRotation
         return base.GeneralGCD(out act);
     }
     #endregion
-
-    #region Extra Methods
-
-    #endregion
 }
