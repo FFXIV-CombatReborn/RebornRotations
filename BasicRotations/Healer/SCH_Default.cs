@@ -6,6 +6,9 @@ namespace DefaultRotations.Healer;
 public sealed class SCH_Default : ScholarRotation
 {
     #region Config Options
+    [RotationConfig(CombatType.PvE, Name = "Enable Swiftcast Restriction Logic to attempt to prevent actions other than Raise when you have swiftcast")]
+    public bool SwiftLogic { get; set; } = true;
+
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
 
@@ -31,8 +34,10 @@ public sealed class SCH_Default : ScholarRotation
     {
         var tank = PartyMembers.GetJobCategory(JobRole.Tank);
 
+        if (SummonEosPvE.CanUse(out var act)) return act;
+
         if (remainTime < RuinPvE.Info.CastTime + CountDownAhead
-            && RuinPvE.CanUse(out var act)) return act;
+            && RuinPvE.CanUse(out act)) return act;
         if (remainTime < 3 && UseBurstMedicine(out act)) return act;
         if (remainTime is < 4 and > 3 && DeploymentTacticsPvE.CanUse(out act)) return act;
         if (remainTime is < 7 and > 6 && GiveT && AdloquiumPvE.CanUse(out act)) return act;
@@ -155,6 +160,10 @@ public sealed class SCH_Default : ScholarRotation
     [RotationDesc(ActionID.SuccorPvE)]
     protected override bool HealAreaGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (SuccorPvE.CanUse(out act)) return true;
 
         return base.HealAreaGCD(out act);
@@ -163,6 +172,10 @@ public sealed class SCH_Default : ScholarRotation
     [RotationDesc(ActionID.AdloquiumPvE, ActionID.PhysickPvE)]
     protected override bool HealSingleGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (AdloquiumPvE.CanUse(out act)) return true;
         if (PhysickPvE.CanUse(out act)) return true;
 
@@ -172,12 +185,20 @@ public sealed class SCH_Default : ScholarRotation
     [RotationDesc(ActionID.SuccorPvE)]
     protected override bool DefenseAreaGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (SuccorPvE.CanUse(out act)) return true;
         return base.DefenseAreaGCD(out act);
     }
 
     protected override bool GeneralGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         // Summon Eos
         if (SummonEosPvE.CanUse(out act)) return true;
 

@@ -1,3 +1,5 @@
+using RotationSolver.Basic.Helpers;
+
 namespace DefaultRotations.Healer;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
@@ -9,6 +11,9 @@ public sealed class SGE_Default : SageRotation
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
     #endregion
+
+    [RotationConfig(CombatType.PvE, Name = "Enable Swiftcast Restriction Logic to attempt to prevent actions other than Raise when you have swiftcast")]
+    public bool SwiftLogic { get; set; } = true;
 
     [Range(0, 1, ConfigUnitType.Percent)]
     [RotationConfig(CombatType.PvE, Name = "Health threshold party member needs to be to use Taurochole")]
@@ -218,6 +223,10 @@ public sealed class SGE_Default : SageRotation
     #region GCD Logic 
     protected override bool DefenseAreaGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (EukrasianPrognosisIiPvE.CanUse(out act))
         {
             if (EukrasianPrognosisIiPvE.Target.Target?.HasStatus(false,
@@ -252,6 +261,10 @@ public sealed class SGE_Default : SageRotation
     [RotationDesc(ActionID.EukrasianDiagnosisPvE)]
     protected override bool DefenseSingleGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (EukrasianDiagnosisPvE.CanUse(out act))
         {
             if (EukrasianDiagnosisPvE.Target.Target?.HasStatus(true,
@@ -273,6 +286,10 @@ public sealed class SGE_Default : SageRotation
     [RotationDesc(ActionID.PneumaPvE, ActionID.PrognosisPvE, ActionID.EukrasianPrognosisPvE, ActionID.EukrasianPrognosisIiPvE)]
     protected override bool HealAreaGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (PartyMembersAverHP < PneumaAOEPartyHeal || DyskrasiaPvE.CanUse(out _) && PartyMembers.GetJobCategory(JobRole.Tank).Any(t => t.GetHealthRatio() < PneumaAOETankHeal))
         {
             if (PneumaPvE.CanUse(out act)) return true;
@@ -303,12 +320,29 @@ public sealed class SGE_Default : SageRotation
     [RotationDesc(ActionID.DiagnosisPvE)]
     protected override bool HealSingleGCD(out IAction? act)
     {
-        if (DiagnosisPvE.CanUse(out act)) return true;
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
+        if (DiagnosisPvE.CanUse(out _) && !EukrasianDiagnosisPvE.CanUse(out _, skipCastingCheck: true))
+        {
+            StatusHelper.StatusOff(StatusID.Eukrasia);
+            if (DiagnosisPvE.CanUse(out act))
+            {
+                return true;
+            }
+        }
         return base.HealSingleGCD(out act);
     }
 
     protected override bool GeneralGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
+        if (!InCombat & EukrasiaPvE.CanUse(out act)) return true;
+
         if (HostileTarget?.IsBossFromTTK() ?? false)
         {
             if (EukrasianDyskrasiaPvE.CanUse(out _, skipCastingCheck: true))
@@ -356,7 +390,19 @@ public sealed class SGE_Default : SageRotation
             }
         }
 
-        if (DyskrasiaPvE.CanUse(out act)) return true;
+        if (DyskrasiaPvE.CanUse(out _))
+        {
+            if ((EukrasianDyskrasiaPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDyskrasiaPvE.Setting.TargetStatusProvide ?? []) ?? false))
+            {
+                StatusHelper.StatusOff(StatusID.Eukrasia);
+            }
+
+            StatusHelper.StatusOff(StatusID.Eukrasia);
+            if (DyskrasiaPvE.CanUse(out act))
+            {
+                return true;
+            }
+        }
 
         if (EukrasianDosisPvE.CanUse(out _, skipCastingCheck: true))
         {
@@ -368,13 +414,16 @@ public sealed class SGE_Default : SageRotation
             }
         }
 
-        if (DosisPvE.CanUse(out act)) return true;
-
-        if (EukrasianDiagnosisPvE.CanUse(out _) && (EukrasianDiagnosisPvE.Target.Target?.IsJobCategory(JobRole.Tank) ?? false))
+        if (DosisPvE.CanUse(out _))
         {
-            if (EukrasiaPvE.CanUse(out act)) return true;
-            act = EukrasianDiagnosisPvE;
-            return true;
+            if ((EukrasianDosisPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDosisPvE.Setting.TargetStatusProvide ?? []) ?? false))
+            {
+                StatusHelper.StatusOff(StatusID.Eukrasia);
+            }
+            if (DosisPvE.CanUse(out act))
+            {
+                return true;
+            }
         }
 
         return base.GeneralGCD(out act);

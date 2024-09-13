@@ -6,6 +6,8 @@ namespace DefaultRotations.Healer;
 public sealed class WHM_Default : WhiteMageRotation
 {
     #region Config Options
+    [RotationConfig(CombatType.PvE, Name = "Enable Swiftcast Restriction Logic to attempt to prevent actions other than Raise when you have swiftcast")]
+    public bool SwiftLogic { get; set; } = true;
 
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
@@ -144,6 +146,10 @@ public sealed class WHM_Default : WhiteMageRotation
     [RotationDesc(ActionID.AfflatusRapturePvE, ActionID.MedicaIiPvE, ActionID.CureIiiPvE, ActionID.MedicaPvE)]
     protected override bool HealAreaGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (AfflatusRapturePvE.CanUse(out act)) return true;
 
         int hasMedica2 = PartyMembers.Count((n) => n.HasStatus(true, StatusID.MedicaIi));
@@ -160,6 +166,10 @@ public sealed class WHM_Default : WhiteMageRotation
     [RotationDesc(ActionID.AfflatusSolacePvE, ActionID.RegenPvE, ActionID.CureIiPvE, ActionID.CurePvE)]
     protected override bool HealSingleGCD(out IAction? act)
     {
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         if (AfflatusSolacePvE.CanUse(out act)) return true;
 
         if (RegenPvE.CanUse(out act) && (RegenPvE.Target.Target?.GetHealthRatio() > RegenHeal)) return true;
@@ -173,6 +183,11 @@ public sealed class WHM_Default : WhiteMageRotation
 
     protected override bool GeneralGCD(out IAction? act)
     {
+
+        act = null;
+
+        if (HasSwift && SwiftLogic) return false;
+
         //if (NotInCombatDelay && RegenDefense.CanUse(out act)) return true;
 
         if (AfflatusMiseryPvE.CanUse(out act, skipAoeCheck: true)) return true;
