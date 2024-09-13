@@ -94,7 +94,7 @@ public sealed class BRD_Default : BardRotation
         {
             if (((!RadiantFinalePvE.EnoughLevel && !RagingStrikesPvE.Cooldown.IsCoolingDown)
                     || (RadiantFinalePvE.EnoughLevel && !RadiantFinalePvE.Cooldown.IsCoolingDown && RagingStrikesPvE.EnoughLevel && (!RagingStrikesPvE.Cooldown.IsCoolingDown || RagingStrikesPvE.Cooldown.WillHaveOneCharge(BuffAlignment))))
-                    && BattleVoicePvE.CanUse(out act, isLastAbility: false)) return true;
+                    && (HostileTarget?.HasStatus(true, StatusID.Windbite, StatusID.Stormbite) == true) && (HostileTarget?.HasStatus(true, StatusID.VenomousBite, StatusID.CausticBite) == true) && BattleVoicePvE.CanUse(out act, isLastAbility: false)) return true;
 
             if (!Player.WillStatusEnd(0, true, StatusID.BattleVoice) && RadiantFinalePvE.CanUse(out act)) return true;
 

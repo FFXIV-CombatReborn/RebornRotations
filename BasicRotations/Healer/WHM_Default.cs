@@ -148,7 +148,7 @@ public sealed class WHM_Default : WhiteMageRotation
     {
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && RaisePvE.CanUse(out _)) return false;
 
         if (AfflatusRapturePvE.CanUse(out act)) return true;
 
@@ -168,7 +168,7 @@ public sealed class WHM_Default : WhiteMageRotation
     {
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && RaisePvE.CanUse(out _)) return false;
 
         if (AfflatusSolacePvE.CanUse(out act)) return true;
 
@@ -186,7 +186,7 @@ public sealed class WHM_Default : WhiteMageRotation
 
         act = null;
 
-        if (HasSwift && SwiftLogic) return false;
+        if (HasSwift && SwiftLogic && RaisePvE.CanUse(out _)) return false;
 
         //if (NotInCombatDelay && RegenDefense.CanUse(out act)) return true;
 
@@ -233,10 +233,5 @@ public sealed class WHM_Default : WhiteMageRotation
         if (AfflatusSolacePvE.CanUse(out act)) return true;
         return false;
     }
-
-    /*public override void DisplayStatus()
-     {
-         ImGui.Text(LilyTime.ToString());
-     }*/
     #endregion
 }
