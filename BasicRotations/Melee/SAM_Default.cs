@@ -164,8 +164,4 @@ public sealed class SAM_Default : SamuraiRotation
     }
 
     #endregion
-
-    #region Extra Methods
-    private static bool HaveMeikyoShisui => Player.HasStatus(true, StatusID.MeikyoShisui);
-    #endregion
 }

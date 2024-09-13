@@ -32,7 +32,7 @@ public sealed class BRD_Default : BardRotation
     private float ARMYRemainTime => 45 - ARMYTime;
 
     private static bool InBurstStatus => (Player.Level > 50 && !Player.WillStatusEnd(0, true, StatusID.RagingStrikes))
-        || (Player.Level >= 50 && Player.Level < 90 && !Player.WillStatusEnd(0, true, StatusID.RagingStrikes) && !Player.WillStatusEnd(0, true, StatusID.BattleVoice)) 
+        || (Player.Level >= 50 && Player.Level < 90 && !Player.WillStatusEnd(0, true, StatusID.RagingStrikes) && !Player.WillStatusEnd(0, true, StatusID.BattleVoice))
         || (MinstrelsCodaTrait.EnoughLevel && !Player.WillStatusEnd(0, true, StatusID.RagingStrikes) && !Player.WillStatusEnd(0, true, StatusID.RadiantFinale) && !Player.WillStatusEnd(0, true, StatusID.BattleVoice));
 
     #endregion

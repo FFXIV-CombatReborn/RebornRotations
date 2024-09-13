@@ -428,14 +428,5 @@ public sealed class NIN_Default : NinjaRotation
     #region Extra Methods
     // Holds the next ninjutsu action to perform.
     private IBaseAction? _ninActionAim = null;
-
-    // Determines if Trick Attack is in its effective period.
-    private bool InTrickAttack => (KunaisBanePvE.Cooldown.IsCoolingDown || TrickAttackPvE.Cooldown.IsCoolingDown) && (!KunaisBanePvE.Cooldown.ElapsedAfter(17) || !TrickAttackPvE.Cooldown.ElapsedAfter(17));
-
-    // Determines if Mug is in its effective period.
-    private bool InMug => MugPvE.Cooldown.IsCoolingDown && !MugPvE.Cooldown.ElapsedAfter(19);
-
-    // Checks if no ninjutsu action is currently selected or if the Rabbit Medium has been invoked.
-    private static bool NoNinjutsu => AdjustId(ActionID.NinjutsuPvE) is ActionID.NinjutsuPvE or ActionID.RabbitMediumPvE;
     #endregion
 }

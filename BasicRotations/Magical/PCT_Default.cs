@@ -5,6 +5,7 @@
 [Api(3)]
 public sealed class PCT_Default : PictomancerRotation
 {
+    #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use HolyInWhite or CometInBlack while moving")]
     public bool HolyCometMoving { get; set; } = true;
 
@@ -20,6 +21,8 @@ public sealed class PCT_Default : PictomancerRotation
 
     [RotationConfig(CombatType.PvE, Name = "Which Motif to use swiftcast on")]
     public CanvasFlags MotifSwiftCast { get; set; } = CanvasFlags.Weapon;
+
+    #endregion
 
     #region Countdown logic
     // Defines logic for actions to take during the countdown before combat starts.

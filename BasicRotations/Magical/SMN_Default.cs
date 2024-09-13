@@ -139,7 +139,6 @@ public sealed class SMN_Default : SummonerRotation
 
         return base.AttackAbility(nextGCD, out act);
     }
-    #endregion
 
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
@@ -154,6 +153,8 @@ public sealed class SMN_Default : SummonerRotation
 
         return base.EmergencyAbility(nextGCD, out act);
     }
+    
+    #endregion
 
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
@@ -225,23 +226,4 @@ public sealed class SMN_Default : SummonerRotation
         return PartyMembersAverHP < 0.8f;
     }
     #endregion
-
-
-    // public override void DisplayStatus()
-    // {
-    // 	bool isTargetBoss = HostileTarget?.IsBossFromTTK() ?? false;
-    // 	bool isTargetDying = HostileTarget?.IsDying() ?? false;
-    // 	bool inSolarUnique = !InBahamut && !InPhoenix && InSolarBahamut;
-    //
-    // 	IAction act;
-    // 	var condition1 = $"inSolarUnique: {inSolarUnique}, Not Enough SearingLightPvE Level: {!SearingLightPvE.EnoughLevel}, isTargetBoss: {isTargetBoss}, isTargetDying: {isTargetDying}, PainflarePvE Can Use: {PainflarePvE.CanUse(out act)}";
-    // 	var condition2 = $"inSolarUnique: {inSolarUnique}, Not Enough SearingLightPvE Level: {!SearingLightPvE.EnoughLevel}, isTargetBoss: {isTargetBoss}, isTargetDying: {isTargetDying}, FesterPvE Can Use: {FesterPvE.CanUse(out act)}, NecrotizePvE Can Use: {NecrotizePvE.CanUse(out act)}";
-    //
-    // 	var conditionG = (inSolarUnique && Player.HasStatus(false, StatusID.SearingLight) || !SearingLightPvE.EnoughLevel || isTargetBoss && isTargetDying) && EnergyDrainPvE.IsInCooldown && (FesterPvE.CanUse(out act) || NecrotizePvE.CanUse(out act));
-    // 	ImGui.Text(condition1);
-    // 	ImGui.Text(condition2);
-    // 	ImGui.Text(conditionG.ToString());
-    // 	base.DisplayStatus();
-    // }
-
 }
