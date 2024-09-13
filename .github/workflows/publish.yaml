@@ -15,7 +15,9 @@ jobs:
           submodules: recursive
 
       - name: Get Environment Variables
-        run: echo "tag=${{ github.ref_name }}" >> $GITHUB_ENV
+        run: |
+          $tag = "${{ github.ref }}" -replace 'refs/tags/', ''
+          "tag=$tag" | Out-File -Append -FilePath $Env:GITHUB_ENV
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
