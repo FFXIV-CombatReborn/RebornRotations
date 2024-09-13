@@ -12,6 +12,10 @@ public sealed class WAR_Default : WarriorRotation
     [RotationConfig(CombatType.PvE, Name = "Use Bloodwhetting/Raw intuition on single enemies")]
     public bool SoloIntuition { get; set; } = false;
 
+    [Range(1, 20, ConfigUnitType.Yalms)]
+    [RotationConfig(CombatType.PvE, Name = "Max distance you can be from the boss for Primal Rend use (Danger, setting too high will get you killed)")]
+    public float PrimalRendDistance { get; set; } = 2;
+
     [Range(0, 1, ConfigUnitType.Percent)]
     [RotationConfig(CombatType.PvE, Name = "Nascent Flash Heal Threshold")]
     public float FlashHeal { get; set; } = 0.6f;
@@ -147,7 +151,7 @@ public sealed class WAR_Default : WarriorRotation
         {
             if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
             {
-                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < 2) return true;
+                if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < PrimalRendDistance) return true;
             }
             if (PrimalRuinationPvE.CanUse(out act)) return true;
         }
