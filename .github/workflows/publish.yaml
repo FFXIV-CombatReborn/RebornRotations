@@ -15,26 +15,28 @@ jobs:
           submodules: recursive
 
       - name: Get Environment Variables
-        run: |
-          $tag = "${{ github.ref }}" -replace 'refs/tags/', ''
+        run: echo "tag=${{ github.ref_name }}" >> $GITHUB_ENV
 
-          "tag=$tag" | Out-File -Append -FilePath $Env:GITHUB_ENV
-          
       - name: Set up .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
 
       - name: Download Dalamud Latest
         run: |
           Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
-          Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+          if ($?) {
+            Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+          } else {
+            Write-Error "Failed to download Dalamud Latest"
+            exit 1
+          }
 
       - name: Restore Nuget Packages
         run: dotnet restore BasicRotations/RebornRotations.csproj
 
       - name: Build Rotations
-        run: dotnet build --no-restore -c Release BasicRotations/RebornRotations.csproj -p:AssemblyVersion=${{ env.tag }} -p:FileVersion=${{ env.tag }} -p:InformationalVersion=${{ env.tag }} --output .\build
+        run: dotnet build --no-restore -c Release BasicRotations/RebornRotations.csproj -p:AssemblyVersion=${{ env.tag }} -p:FileVersion=${{ env.tag }} -p:InformationalVersion=${{ env.tag }} --output ./build
 
       - name: Publish Rotations
         uses: softprops/action-gh-release@v2
@@ -43,4 +45,3 @@ jobs:
             ./build/RebornRotations.dll
             ./build/RebornRotations.pdb
           token: ${{ secrets.GITHUB_TOKEN }}
-
