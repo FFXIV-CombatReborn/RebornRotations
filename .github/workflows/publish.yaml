@@ -36,7 +36,7 @@ jobs:
         run: dotnet restore BasicRotations/RebornRotations.csproj
 
       - name: Build Rotations
-        run: dotnet build --no-restore -c Release BasicRotations/RebornRotations.csproj -p:AssemblyVersion=${{ env.tag }} -p:FileVersion=${{ env.tag }} -p:InformationalVersion=${{ env.tag }} --output ./build
+        run: dotnet build --no-restore -c Release BasicRotations/RebornRotations.csproj -p:AssemblyVersion=${{ env.tag }} -p:FileVersion=${{ env.tag }} -p:InformationalVersion=${{ env.tag }} --output .\build
 
       - name: Publish Rotations
         uses: softprops/action-gh-release@v2
