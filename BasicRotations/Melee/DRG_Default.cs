@@ -81,7 +81,7 @@ public sealed class DRG_Default : DragoonRotation
         if (JumpPvE.CanUse(out act)) return true;
         if (HighJumpPvE.CanUse(out act)) return true;
 
-        if (StardiverPvE.CanUse(out act)) return true;
+        if (StardiverPvE.CanUse(out act, isFirstAbility: true)) return true;
         if (MirageDivePvE.CanUse(out act)) return true;
         if (NastrondPvE.CanUse(out act)) return true;
         if (StarcrossPvE.CanUse(out act)) return true;
