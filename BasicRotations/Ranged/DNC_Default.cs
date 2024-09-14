@@ -1,6 +1,6 @@
 namespace DefaultRotations.Ranged;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00", Description = "")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/DNC_Default.cs")]
 [Api(3)]
 public sealed class DNC_Default : DancerRotation
@@ -12,12 +12,13 @@ public sealed class DNC_Default : DancerRotation
     [RotationConfig(CombatType.PvE, Name = "Holds Standard Step if no targets in range (Warning, will drift & Buff may fall off)")]
     public bool HoldStepForTargets { get; set; } = false;
     #endregion
+    bool shouldUseLastDance = true;
 
     #region Countdown Logic
     // Override the method for actions to be taken during countdown phase of combat
     protected override IAction? CountDownAction(float remainTime)
     {
-        // If there are 15 or fewer seconds remaining in the countdown
+        // If there are 15 or fewer seconds remaining in the countdown 
         if (remainTime <= 15)
         {
             // Attempt to use Standard Step if applicable
@@ -76,29 +77,33 @@ public sealed class DNC_Default : DancerRotation
         // If currently in the middle of a dance, no attack ability should be executed
         if (IsDancing) return false;
 
-        // Logic for using Fan Dance abilities based on certain conditions
-        if ((Player.HasStatus(true, StatusID.Devilment) || Feathers > 3 || !TechnicalStepPvE.EnoughLevel) && !FanDanceIiiPvE.CanUse(out _, skipAoeCheck: true))
-        {
-            if (FanDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
-            if (FanDanceIiPvE.CanUse(out act)) return true;
-        }
+        // Prevent triple weaving by checking if an action was just used
+        if (nextGCD.AnimationLockTime > 0.75f) return false;
 
-        // Check for conditions to use Flourish
-        if (((Player.HasStatus(true, StatusID.Devilment)) && (Player.HasStatus(true, StatusID.TechnicalFinish))) || ((!Player.HasStatus(true, StatusID.Devilment)) && (!Player.HasStatus(true, StatusID.TechnicalFinish))))
+        // Skip using Flourish if Technical Step is about to come off cooldown
+        if (!TechnicalStepPvE.Cooldown.ElapsedAfter(116) || TillanaPvE.CanUse(out act))
         {
-            if (!Player.HasStatus(true, StatusID.ThreefoldFanDance) && FlourishPvE.CanUse(out act))
+            // Check for conditions to use Flourish
+            if (((Player.HasStatus(true, StatusID.Devilment)) && (Player.HasStatus(true, StatusID.TechnicalFinish))) || ((!Player.HasStatus(true, StatusID.Devilment)) && (!Player.HasStatus(true, StatusID.TechnicalFinish))))
             {
-                return true;
+                if (!Player.HasStatus(true, StatusID.ThreefoldFanDance) && FlourishPvE.CanUse(out act))
+                {
+                    return true;
+                }
             }
         }
 
-        // Attempt to use Fan Dance IV if available
-        if (FanDanceIvPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        //Use all feathers on burst
+        if ((Player.HasStatus(true, StatusID.Devilment) || Feathers > 3 || !TechnicalStepPvE.EnoughLevel) && !FanDanceIiiPvE.CanUse(out _, skipAoeCheck: true))
+        {
+            if (FanDanceIiPvE.CanUse(out act)) return true;
+            if (FanDancePvE.CanUse(out act)) return true;
+        }
 
-        // Attempt to use Closed Position if applicable
+        // Other attacks
+        if (FanDanceIvPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (UseClosedPosition(out act)) return true;
 
-        // Fallback to base class attack ability method if none of the above conditions are met
         return base.AttackAbility(nextGCD, out act);
     }
     #endregion
@@ -107,27 +112,52 @@ public sealed class DNC_Default : DancerRotation
     // Override the method for handling general Global Cooldown (GCD) actions
     protected override bool GeneralGCD(out IAction? act)
     {
-        // If not in combat and lacking the Closed Position status, attempt to use Closed Position
-        if (!InCombat && !Player.HasStatus(true, StatusID.ClosedPosition) && ClosedPositionPvE.CanUse(out act)) return true;
+        // Attempt to use Closed Position if applicable
+        if (!InCombat && !Player.HasStatus(true, StatusID.ClosedPosition) && ClosedPositionPvE.CanUse(out act))
+        {
+            return true;
+        }
 
-        // Attempt to execute Dance Finish GCD or Step GCD actions
-        if (FinishTheDance(out act)) return true;
-        if (ExecuteStepGCD(out act)) return true;
+        // Check if Standard Step or Technical Step is about to come off cooldown and hold GCD if necessary
+        if (StandardStepPvE.Cooldown.WillHaveOneCharge(0.25f) || TechnicalStepPvE.Cooldown.WillHaveOneCharge(0.25f))
+        { }
 
-        // Attempt to use Technical Step in burst mode and if in combat, checks for hostiles if bool is true
+        // Try to finish the dance if applicable
+        if (FinishTheDance(out act))
+        {
+            return true;
+        }
+
+        // Execute a Step GCD if available
+        if (ExecuteStepGCD(out act))
+        {
+            return true;
+        }
+
+        // Use Technical Step in burst mode if applicable
         if (HoldTechForTargets)
         {
-            if (HasHostilesInMaxRange && IsBurst && InCombat && TechnicalStepPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (HasHostilesInMaxRange && IsBurst && InCombat && TechnicalStepPvE.CanUse(out act, skipAoeCheck: true))
+
+            {
+                return true;
+            }
         }
-        if (!HoldTechForTargets)
+        else
         {
-            if (IsBurst && InCombat && TechnicalStepPvE.CanUse(out act, skipAoeCheck: true)) return true;
+            if (IsBurst && InCombat && TechnicalStepPvE.CanUse(out act, skipAoeCheck: true))
+            {
+                return true;
+            }
         }
 
-        // Delegate to AttackGCD method to handle attack actions during GCD
-        if (AttackGCD(out act, Player.HasStatus(true, StatusID.Devilment))) return true;
+        // Attempt to use a general attack GCD if none of the above conditions are met
+        if (AttackGCD(out act, Player.HasStatus(true, StatusID.Devilment)))
+        {
+            return true;
+        }
 
-        // Fallback to base class general GCD method if none of the above conditions are met
+        // Fallback to the base method if no custom GCD actions are found
         return base.GeneralGCD(out act);
     }
     #endregion
@@ -138,41 +168,69 @@ public sealed class DNC_Default : DancerRotation
     {
         act = null;
 
-        // Prevent action if currently dancing or holding too many feathers
         if (IsDancing || Feathers > 3) return false;
 
-        // Logic for using Saber Dance and Starfall Dance based on burst mode or Esprit levels
-        if ((burst || Esprit >= 85) && SaberDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
-
-        // Additional logic for using Tillana and Standard Step based on various checks
         if (!DevilmentPvE.CanUse(out _, skipComboCheck: true))
         {
             if (TillanaPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
-        if (LastDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (TechnicalStepPvE.Cooldown.ElapsedAfter(103))
+        {
+            shouldUseLastDance = false;
+        }
+
+        if (TechnicalStepPvE.Cooldown.ElapsedAfter(1) && !TechnicalStepPvE.Cooldown.ElapsedAfter(103))
+        {
+            shouldUseLastDance = true;
+        }
+
+        if (burst)
+        {
+            // Make sure Starfall gets used before end of burst
+            if (DevilmentPvE.Cooldown.ElapsedAfter(15) && StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+            // Make sure to FM with enough time left in burst window to LD and SFD while leaving a GCD for a Sabre if needed
+            if (DevilmentPvE.Cooldown.ElapsedAfter(10) && FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
+        }
+
+        if (shouldUseLastDance)
+        {
+            if (LastDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+        }
 
         if (HoldStepForTargets)
         {
             if (HasHostilesInMaxRange && UseStandardStep(out act)) return true;
-
         }
         if (!HoldStepForTargets)
         {
             if (UseStandardStep(out act)) return true;
         }
-        // Attempt to use various dance moves based on availability and conditions
-        if (BloodshowerPvE.CanUse(out act)) return true;
-        if (FountainfallPvE.CanUse(out act)) return true;
-        if (RisingWindmillPvE.CanUse(out act)) return true;
-        if (ReverseCascadePvE.CanUse(out act)) return true;
-        if (BladeshowerPvE.CanUse(out act)) return true;
-        if (WindmillPvE.CanUse(out act)) return true;
-        if (FountainPvE.CanUse(out act)) return true;
-        if (CascadePvE.CanUse(out act)) return true;
 
-        // Return false if no action is determined to be taken
+        if (FinishingMovePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        // Further prioritized GCD abilities
+        if ((burst || (Esprit >= 85 && !TechnicalStepPvE.Cooldown.ElapsedAfter(115))) && SaberDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        bool standardReady = StandardStepPvE.Cooldown.ElapsedAfter(28);
+        bool technicalReady = TechnicalStepPvE.Cooldown.ElapsedAfter(118);
+
+        if (!(standardReady || technicalReady) &&
+            (!shouldUseLastDance || !LastDancePvE.CanUse(out act, skipAoeCheck: true)))
+        {
+            if (BloodshowerPvE.CanUse(out act)) return true;
+            if (FountainfallPvE.CanUse(out act)) return true;
+            if (RisingWindmillPvE.CanUse(out act)) return true;
+            if (ReverseCascadePvE.CanUse(out act)) return true;
+            if (BladeshowerPvE.CanUse(out act)) return true;
+            if (WindmillPvE.CanUse(out act)) return true;
+            if (FountainPvE.CanUse(out act)) return true;
+            if (CascadePvE.CanUse(out act)) return true;
+        }
+
         return false;
     }
     // Method for Standard Step Logic
