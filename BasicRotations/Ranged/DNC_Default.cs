@@ -57,7 +57,7 @@ public sealed class DNC_Default : DancerRotation
             && UseBurstMedicine(out act)) return true;
 
         //If dancing or about to dance avoid using abilities to avoid animation lock delaying the GCD, except for Devilment
-        if(!IsDancing && !StandardStepPvE.Cooldown.WillHaveOneCharge(1f) && !TechnicalStepPvE.Cooldown.WillHaveOneCharge(1f))
+        if(!IsDancing && !(StandardStepPvE.Cooldown.ElapsedAfter(28) || TechnicalStepPvE.Cooldown.ElapsedAfter(118)))
             return base.EmergencyAbility(nextGCD, out act); // Fallback to base class method if none of the above conditions are met
 
         act = null;
@@ -70,7 +70,7 @@ public sealed class DNC_Default : DancerRotation
         act = null;
 
         //If dancing or about to dance avoid using abilities to avoid animation lock delaying the GCD
-        if (IsDancing || StandardStepPvE.Cooldown.WillHaveOneCharge(1f) || TechnicalStepPvE.Cooldown.WillHaveOneCharge(1f)) return false;
+        if (IsDancing || StandardStepPvE.Cooldown.ElapsedAfter(28) || TechnicalStepPvE.Cooldown.ElapsedAfter(118)) return false;
 
         // Prevent triple weaving by checking if an action was just used
         if (nextGCD.AnimationLockTime > 0.75f) return false;
@@ -211,8 +211,8 @@ public sealed class DNC_Default : DancerRotation
 
         if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-        bool standardReady = StandardStepPvE.Cooldown.WillHaveOneCharge(2.5f);
-        bool technicalReady = TechnicalStepPvE.Cooldown.WillHaveOneCharge(2.5f);
+        bool standardReady = StandardStepPvE.Cooldown.ElapsedAfter(28);
+        bool technicalReady = TechnicalStepPvE.Cooldown.ElapsedAfter(118);
 
         if (!(standardReady || technicalReady) &&
             (!shouldUseLastDance || !LastDancePvE.CanUse(out act, skipAoeCheck: true)))
