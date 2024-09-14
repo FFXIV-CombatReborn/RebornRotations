@@ -395,8 +395,6 @@ public sealed class SGE_Default : SageRotation
             {
                 StatusHelper.StatusOff(StatusID.Eukrasia);
             }
-
-            StatusHelper.StatusOff(StatusID.Eukrasia);
             if (DyskrasiaPvE.CanUse(out act))
             {
                 return true;
