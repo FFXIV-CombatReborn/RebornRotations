@@ -52,21 +52,16 @@ public sealed class DNC_Default : DancerRotation
             if (DevilmentPvE.CanUse(out act)) return true;
         }
 
-        // If currently dancing, defer to the base class emergency handling
-        if (IsDancing)
-        {
-            return base.EmergencyAbility(nextGCD, out act);
-        }
-
         // Use burst medicine if cooldown for Technical Step has elapsed sufficiently
         if (TechnicalStepPvE.Cooldown.ElapsedAfter(115)
             && UseBurstMedicine(out act)) return true;
 
-        // Attempt to use Fan Dance III if available
-        if (FanDanceIiiPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        //If dancing or about to dance avoid using abilities to avoid animation lock delaying the GCD, except for Devilment
+        if(!IsDancing && !StandardStepPvE.Cooldown.WillHaveOneCharge(1f) && !TechnicalStepPvE.Cooldown.WillHaveOneCharge(1f))
+            return base.EmergencyAbility(nextGCD, out act); // Fallback to base class method if none of the above conditions are met
 
-        // Fallback to base class method if none of the above conditions are met
-        return base.EmergencyAbility(nextGCD, out act);
+        act = null;
+        return false;
     }
 
     // Override the method for handling attack abilities
@@ -74,8 +69,8 @@ public sealed class DNC_Default : DancerRotation
     {
         act = null;
 
-        // If currently in the middle of a dance, no attack ability should be executed
-        if (IsDancing) return false;
+        //If dancing or about to dance avoid using abilities to avoid animation lock delaying the GCD
+        if (IsDancing || StandardStepPvE.Cooldown.WillHaveOneCharge(1f) || TechnicalStepPvE.Cooldown.WillHaveOneCharge(1f)) return false;
 
         // Prevent triple weaving by checking if an action was just used
         if (nextGCD.AnimationLockTime > 0.75f) return false;
@@ -93,8 +88,13 @@ public sealed class DNC_Default : DancerRotation
             }
         }
 
-        //Use all feathers on burst
-        if ((Player.HasStatus(true, StatusID.Devilment) || Feathers > 3 || !TechnicalStepPvE.EnoughLevel) && !FanDanceIiiPvE.CanUse(out _, skipAoeCheck: true))
+        // Attempt to use Fan Dance III if available
+        if (FanDanceIiiPvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        IAction[] FeathersGCDs = [ReverseCascadePvE, FountainfallPvE, RisingWindmillPvE, BloodshowerPvE];
+
+        //Use all feathers on burst or if about to overcap
+        if ((!DevilmentPvE.EnoughLevel || Player.HasStatus(true, StatusID.Devilment) || (Feathers > 3 && FeathersGCDs.Contains(nextGCD))) && !Player.HasStatus(true, StatusID.ThreefoldFanDance))
         {
             if (FanDanceIiPvE.CanUse(out act)) return true;
             if (FanDancePvE.CanUse(out act)) return true;
@@ -117,10 +117,6 @@ public sealed class DNC_Default : DancerRotation
         {
             return true;
         }
-
-        // Check if Standard Step or Technical Step is about to come off cooldown and hold GCD if necessary
-        if (StandardStepPvE.Cooldown.WillHaveOneCharge(0.25f) || TechnicalStepPvE.Cooldown.WillHaveOneCharge(0.25f))
-        { }
 
         // Try to finish the dance if applicable
         if (FinishTheDance(out act))
@@ -166,9 +162,9 @@ public sealed class DNC_Default : DancerRotation
     // Helper method to handle attack actions during GCD based on certain conditions
     private bool AttackGCD(out IAction? act, bool burst)
     {
-        act = null;
+       act = null;
 
-        if (IsDancing || Feathers > 3) return false;
+        if (IsDancing) return false;
 
         if (!DevilmentPvE.CanUse(out _, skipComboCheck: true))
         {
@@ -203,7 +199,7 @@ public sealed class DNC_Default : DancerRotation
         {
             if (HasHostilesInMaxRange && UseStandardStep(out act)) return true;
         }
-        if (!HoldStepForTargets)
+        else
         {
             if (UseStandardStep(out act)) return true;
         }
@@ -215,8 +211,8 @@ public sealed class DNC_Default : DancerRotation
 
         if (StarfallDancePvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-        bool standardReady = StandardStepPvE.Cooldown.ElapsedAfter(28);
-        bool technicalReady = TechnicalStepPvE.Cooldown.ElapsedAfter(118);
+        bool standardReady = StandardStepPvE.Cooldown.WillHaveOneCharge(2.5f);
+        bool technicalReady = TechnicalStepPvE.Cooldown.WillHaveOneCharge(2.5f);
 
         if (!(standardReady || technicalReady) &&
             (!shouldUseLastDance || !LastDancePvE.CanUse(out act, skipAoeCheck: true)))
@@ -238,11 +234,11 @@ public sealed class DNC_Default : DancerRotation
     {
         // Attempt to use Standard Step if available and certain conditions are met
         if (!StandardStepPvE.CanUse(out act, skipAoeCheck: true)) return false;
-        if (Player.WillStatusEndGCD(2, 0, true, StatusID.StandardFinish)) return true;
+        if (Player.WillStatusEnd(5f, true, StatusID.StandardFinish)) return true;
 
         // Check for hostiles in range and technical step conditions
         if (!HasHostilesInRange) return false;
-        if (Player.HasStatus(true, StatusID.TechnicalFinish) && Player.WillStatusEndGCD(2, 0, true, StatusID.TechnicalFinish) || TechnicalStepPvE.Cooldown.IsCoolingDown && TechnicalStepPvE.Cooldown.WillHaveOneChargeGCD(2)) return false;
+        if (Player.HasStatus(true, StatusID.TechnicalFinish) && Player.WillStatusEndGCD(2, 0, true, StatusID.TechnicalFinish) || (TechnicalStepPvE.Cooldown.IsCoolingDown && TechnicalStepPvE.Cooldown.WillHaveOneCharge(5))) return false;
 
         return true;
     }
