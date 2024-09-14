@@ -56,7 +56,7 @@ public sealed class DNC_Default : DancerRotation
         if (TechnicalStepPvE.Cooldown.ElapsedAfter(115)
             && UseBurstMedicine(out act)) return true;
 
-        //If dancing or about to dance avoid using abilities to avoid animation lock delaying the GCD, except for Devilment
+        //If dancing or about to dance avoid using abilities to avoid animation lock delaying the dance, except for Devilment
         if(!IsDancing && !(StandardStepPvE.Cooldown.ElapsedAfter(28) || TechnicalStepPvE.Cooldown.ElapsedAfter(118)))
             return base.EmergencyAbility(nextGCD, out act); // Fallback to base class method if none of the above conditions are met
 
@@ -69,7 +69,7 @@ public sealed class DNC_Default : DancerRotation
     {
         act = null;
 
-        //If dancing or about to dance avoid using abilities to avoid animation lock delaying the GCD
+        //If dancing or about to dance avoid using abilities to avoid animation lock delaying the dance
         if (IsDancing || StandardStepPvE.Cooldown.ElapsedAfter(28) || TechnicalStepPvE.Cooldown.ElapsedAfter(118)) return false;
 
         // Prevent triple weaving by checking if an action was just used
