@@ -163,7 +163,7 @@ public sealed class MCH_Default : MachinistRotation
     // Logic for Hypercharge
     private bool ToolChargeSoon(out IAction? act)
     {
-        float REST_TIME = 6f;
+        float REST_TIME = 8f;
         if
                      //Cannot AOE
                      (!SpreadShotPvE.CanUse(out _)
