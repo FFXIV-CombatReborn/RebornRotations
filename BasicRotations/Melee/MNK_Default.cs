@@ -15,6 +15,9 @@ public sealed class MNK_Default : MonkRotation
 
     [RotationConfig(CombatType.PvE, Name = "Auto Use Perfect Balance (aoe aggressive PB dump, turn me off if you don't want to waste PB in boss fight)")]
     public bool AutoPB_AOE { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Enable TEA Checker.")]
+    public bool EnableTEAChecker { get; set; } = false; 
     #endregion
 
     #region Countdown Logic
@@ -36,12 +39,18 @@ public sealed class MNK_Default : MonkRotation
     #region oGCD Logic
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (EnableTEAChecker && Target.Name.ToString() == "Jagd Doll" && Target.GetHealthRatio() < 0.25)
+        {
+            return false;
+        }
+        
         // PerfectBalancePvE after first gcd + TheForbiddenChakraPvE after second gcd
         // fail to weave both after first gcd - rsr doesn't have enough time to react to both spells
         // you pot -2s (real world -3s) prepull or after 2nd gcd!!! 
         // there is a small chance PB is not pressed in time if put in AttackAbility
         // start the fight 8 yarms away from boss for double weaving
-        // 'The form shift and meditation prepull are implied. Prepull pot should win out, but choosing to press it in the first few weave slots shouldn¡¯t result in more than a single digit loss'
+        // 'The form shift and meditation prepull are implied. Prepull pot should win out, but choosing to press it in the first few weave slots shouldnÂ¡Â¯t result in more than a single digit loss'
         // 'there may be a delay before it can be used. Pushing it to the 2nd weave slot should avoid this.'
         if (AutoPB_Boss && InCombat && CombatElapsedLess(3) && PerfectBalancePvE.CanUse(out act, usedUp: true)) return true;
         //if (CombatElapsedLessGCD(1) && TheForbiddenChakraPvE.CanUse(out act)) return true; // if it weaves one day in the future...
@@ -54,6 +63,12 @@ public sealed class MNK_Default : MonkRotation
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (EnableTEAChecker && Target.Name.ToString() == "Jagd Doll" && Target.GetHealthRatio() < 0.25)
+        {
+            return false;
+        }
+        
         // you need to position yourself in the centre of the mobs if they are large, that range is only 3 yarms
         if (AutoPB_AOE && NumberOfHostilesInRange >= 2)
         {
@@ -145,6 +160,12 @@ public sealed class MNK_Default : MonkRotation
 
     protected override bool GeneralGCD(out IAction? act)
     {
+        act = null;
+        if (EnableTEAChecker && Target.Name.ToString() == "Jagd Doll" && Target.GetHealthRatio() < 0.25)
+        {
+            return false;
+        }
+        
         // bullet proofed finisher - use when during burst
         // or if burst was missed, and next burst is not arriving in time, use it better than waste it, otherwise, hold it for next rof
         if (!BeastChakras.Contains(BeastChakra.NONE) && (Player.HasStatus(true, StatusID.RiddleOfFire) || RiddleOfFirePvE.Cooldown.JustUsedAfter(42)))
@@ -156,14 +177,14 @@ public sealed class MNK_Default : MonkRotation
             if (MasterfulBlitzPvE.CanUse(out act, skipAoeCheck: true)) return true;
         }
 
-        // 'Because Fire¡¯s Reply grants formless, we have an imposed restriction that we prefer not to use it while under PB, or if we have a formless already.' + 'Cast Fire's Reply after an opo gcd'
+        // 'Because FireÂ¡Â¯s Reply grants formless, we have an imposed restriction that we prefer not to use it while under PB, or if we have a formless already.' + 'Cast Fire's Reply after an opo gcd'
         // need to test and see if IsLastGCD(false, ...) is better
         if ((!Player.HasStatus(true, StatusID.PerfectBalance) && !Player.HasStatus(true, StatusID.FormlessFist) && IsLastGCD(true, DragonKickPvE, LeapingOpoPvE, BootshinePvE) || Player.WillStatusEnd(5, true, StatusID.FiresRumination)) && FiresReplyPvE.CanUse(out act, skipAoeCheck: true)) return true; // Fires Reply
         // 'Cast Wind's Reply literally anywhere in the window'
         if (!Player.HasStatus(true, StatusID.PerfectBalance) && WindsReplyPvE.CanUse(out act, skipAoeCheck: true)) return true; // Winds Reply
 
         // Opo needs to follow each PB
-        // 'This means ¡°bookending¡± any PB usage with opos and spending formless on opos.'
+        // 'This means Â¡Â°bookendingÂ¡Â± any PB usage with opos and spending formless on opos.'
         if (Player.HasStatus(true, StatusID.FormlessFist) && OpoOpoForm(out act)) return true;
         //if (Player.StatusStack(true, StatusID.PerfectBalance) == 3 && OpoOpoForm(out act)) return true;
 
