@@ -1,6 +1,6 @@
 namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
+[Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Melee/DRG_Default.cs")]
 [Api(3)]
 
@@ -9,6 +9,9 @@ public sealed class DRG_Default : DragoonRotation
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use Doom Spike for damage uptime if out of melee range even if it breaks combo")]
     public bool DoomSpikeWhenever { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Attempt to assign Stardiver to the first ogcd slot (Experimental)")]
+    public bool OGCDTimers { get; set; } = false;
     #endregion
 
     private static bool InBurstStatus => !Player.WillStatusEnd(0, true, StatusID.BattleLitany);
@@ -81,7 +84,7 @@ public sealed class DRG_Default : DragoonRotation
         if (JumpPvE.CanUse(out act)) return true;
         if (HighJumpPvE.CanUse(out act)) return true;
 
-        if (StardiverPvE.CanUse(out act, isFirstAbility: true)) return true;
+        if (StardiverPvE.CanUse(out act, isFirstAbility: OGCDTimers)) return true;
         if (MirageDivePvE.CanUse(out act)) return true;
         if (NastrondPvE.CanUse(out act)) return true;
         if (StarcrossPvE.CanUse(out act)) return true;

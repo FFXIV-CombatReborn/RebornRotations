@@ -5,6 +5,8 @@
 [Api(3)]
 public sealed class PCT_Default : PictomancerRotation
 {
+    private const float CountdownBuffer = 0.4f;
+
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use HolyInWhite or CometInBlack while moving")]
     public bool HolyCometMoving { get; set; } = true;
@@ -31,23 +33,14 @@ public sealed class PCT_Default : PictomancerRotation
         IAction act;
         if (!InCombat)
         {
-            if (!CreatureMotifDrawn)
-            {
-                if (PomMotifPvE.CanUse(out act, skipCastingCheck: true)) return act;
-            }
-            if (!WeaponMotifDrawn)
-            {
-                if (HammerMotifPvE.CanUse(out act, skipCastingCheck: true)) return act;
-            }
-            if (!LandscapeMotifDrawn)
-            {
-                if (StarrySkyMotifPvE.CanUse(out act, skipCastingCheck: true) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return act;
-            }
+            if (!CreatureMotifDrawn && PomMotifPvE.CanUse(out act, skipCastingCheck: true)) return act;
+            if (!WeaponMotifDrawn && HammerMotifPvE.CanUse(out act, skipCastingCheck: true)) return act;
+            if (!LandscapeMotifDrawn && StarrySkyMotifPvE.CanUse(out act, skipCastingCheck: true) && !Player.HasStatus(true, StatusID.Hyperphantasia)) return act;
         }
 
-        if (remainTime < RainbowDripPvE.Info.CastTime + 0.4f + CountDownAhead)
+        if (remainTime < RainbowDripPvE.Info.CastTime + CountdownBuffer + CountDownAhead && RainbowDripPvE.CanUse(out act, skipCastingCheck: true))
         {
-            if (RainbowDripPvE.CanUse(out act, skipCastingCheck: true)) return act;
+            return act;
         }
 
         return base.CountDownAction(remainTime);
@@ -60,70 +53,32 @@ public sealed class PCT_Default : PictomancerRotation
     {
         if (InCombat)
         {
-            if (RainbowDripSwift)
-            {
-                if (nextGCD == RainbowDripPvE)
-                {
-                    if (SwiftcastPvE.CanUse(out act)) return true;
-                }
-            }
-        }
+            if (RainbowDripSwift && nextGCD == RainbowDripPvE && SwiftcastPvE.CanUse(out act)) return true;
 
-        if (InCombat)
-        {
             if (MotifSwiftCastSwift)
             {
-                switch (MotifSwiftCast)
+                if (MotifSwiftCast switch
                 {
-                    case CanvasFlags.Pom:
-                        if (nextGCD == PomMotifPvE)
-                        {
-                            if (SwiftcastPvE.CanUse(out act)) return true;
-                        }
-                        break;
-                    case CanvasFlags.Wing:
-                        if (nextGCD == WingMotifPvE)
-                        {
-                            if (SwiftcastPvE.CanUse(out act)) return true;
-                        }
-                        break;
-                    case CanvasFlags.Claw:
-                        if (nextGCD == ClawMotifPvE)
-                        {
-                            if (SwiftcastPvE.CanUse(out act)) return true;
-                        }
-                        break;
-                    case CanvasFlags.Maw:
-                        if (nextGCD == MawMotifPvE)
-                        {
-                            if (SwiftcastPvE.CanUse(out act)) return true;
-                        }
-                        break;
-                    case CanvasFlags.Weapon:
-                        if (nextGCD == HammerMotifPvE)
-                        {
-                            if (SwiftcastPvE.CanUse(out act)) return true;
-                        }
-                        break;
-                    case CanvasFlags.Landscape:
-                        if (nextGCD == StarrySkyMotifPvE)
-                        {
-                            if (SwiftcastPvE.CanUse(out act)) return true;
-                        }
-                        break;
+                    CanvasFlags.Pom => nextGCD == PomMotifPvE,
+                    CanvasFlags.Wing => nextGCD == WingMotifPvE,
+                    CanvasFlags.Claw => nextGCD == ClawMotifPvE,
+                    CanvasFlags.Maw => nextGCD == MawMotifPvE,
+                    CanvasFlags.Weapon => nextGCD == HammerMotifPvE,
+                    CanvasFlags.Landscape => nextGCD == StarrySkyMotifPvE,
+                    _ => false
+                } && SwiftcastPvE.CanUse(out act))
+                {
+                    return true;
                 }
             }
         }
         return base.EmergencyAbility(nextGCD, out act);
     }
 
-
     [RotationDesc(ActionID.SmudgePvE)]
     protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
     {
-
         if (SmudgePvE.CanUse(out act)) return true;
-
         return base.MoveForwardAbility(nextGCD, out act);
     }
 
@@ -177,22 +132,13 @@ public sealed class PCT_Default : PictomancerRotation
         if (HammerBrushPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (HammerStampPvE.CanUse(out act, skipComboCheck: true)) return true;
 
-        if (HolyCometMoving && IsMoving)
-        {
-            if (HolyInWhitePvE.CanUse(out act)) return true;
-        }
+        if (HolyCometMoving && IsMoving && HolyInWhitePvE.CanUse(out act)) return true;
 
         //Use up paint if in Hyperphantasia
-        if (Player.HasStatus(true, StatusID.Hyperphantasia))
-        {
-            if (CometInBlackPvE.CanUse(out act)) return true;
-        }
+        if (Player.HasStatus(true, StatusID.Hyperphantasia) && CometInBlackPvE.CanUse(out act)) return true;
 
         //Paint overcap protection
-        if (Paint == HolyCometMax)
-        {
-            if (HolyInWhitePvE.CanUse(out act)) return true;
-        }
+        if (Paint == HolyCometMax && HolyInWhitePvE.CanUse(out act)) return true;
 
         // Landscape Paining Burst
         if (RainbowDripPvE.CanUse(out act)) return true;

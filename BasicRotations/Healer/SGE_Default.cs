@@ -325,7 +325,6 @@ public sealed class SGE_Default : SageRotation
 
         if (DiagnosisPvE.CanUse(out _) && !EukrasianDiagnosisPvE.CanUse(out _, skipCastingCheck: true) && InCombat)
         {
-            StatusHelper.StatusOff(StatusID.Eukrasia);
             if (DiagnosisPvE.CanUse(out act))
             {
                 return true;
@@ -391,7 +390,7 @@ public sealed class SGE_Default : SageRotation
 
         if (DyskrasiaPvE.CanUse(out _))
         {
-            if ((EukrasianDyskrasiaPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDyskrasiaPvE.Setting.TargetStatusProvide ?? []) ?? false) && InCombat)
+            if (EukrasianDyskrasiaPvE.EnoughLevel && (EukrasianDyskrasiaPvE.Target.Target?.WillStatusEnd(3, true, EukrasianDyskrasiaPvE.Setting.TargetStatusProvide ?? []) ?? false) && InCombat)
             {
                 StatusHelper.StatusOff(StatusID.Eukrasia);
             }

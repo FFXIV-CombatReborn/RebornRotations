@@ -128,7 +128,7 @@ public sealed class SAM_Default : SamuraiRotation
         if ((!IsTargetBoss || (HostileTarget?.HasStatus(true, StatusID.Higanbana) ?? false)) && HasMoon && HasFlower
             && OgiNamikiriPvE.CanUse(out act)) return true;
 
-        if (((HiganbanaTargets && NumberOfAllHostilesInRange >= 2) || !HiganbanaTargets) && HiganbanaPvE.CanUse(out act)) return true;
+        if ((!HiganbanaTargets || (HiganbanaTargets && NumberOfAllHostilesInRange < 2)) && HiganbanaPvE.CanUse(out act)) return true;
 
         if (TendoSetsugekkaPvE.CanUse(out act)) return true;
         if (MidareSetsugekkaPvE.CanUse(out act)) return true;
