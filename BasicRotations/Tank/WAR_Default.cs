@@ -12,6 +12,9 @@ public sealed class WAR_Default : WarriorRotation
     [RotationConfig(CombatType.PvE, Name = "Use Bloodwhetting/Raw intuition on single enemies")]
     public bool SoloIntuition { get; set; } = false;
 
+    [RotationConfig(CombatType.PvE, Name = "Use Primal Rend while moving (Danger)")]
+    public bool YEET { get; set; } = false;
+
     [Range(1, 20, ConfigUnitType.Yalms)]
     [RotationConfig(CombatType.PvE, Name = "Max distance you can be from the boss for Primal Rend use (Danger, setting too high will get you killed)")]
     public float PrimalRendDistance { get; set; } = 2;
@@ -50,7 +53,6 @@ public sealed class WAR_Default : WarriorRotation
             || !MythrilTempestPvE.EnoughLevel)
         {
             if (BerserkPvE.CanUse(out act)) return true;
-
         }
 
         if (IsBurstStatus && (InnerReleaseStacks == 0 || InnerReleaseStacks == 3))
@@ -74,7 +76,6 @@ public sealed class WAR_Default : WarriorRotation
         {
             return true;
         }
-
 
         if (MergedStatus.HasFlag(AutoStatus.MoveForward) && MoveForwardAbility(nextGCD, out act)) return true;
         return base.AttackAbility(nextGCD, out act);
@@ -149,7 +150,7 @@ public sealed class WAR_Default : WarriorRotation
 
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && InnerReleaseStacks == 0)
         {
-            if (!IsMoving && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
+            if ((YEET || (!YEET && !IsMoving)) && PrimalRendPvE.CanUse(out act, skipAoeCheck: true))
             {
                 if (PrimalRendPvE.Target.Target?.DistanceToPlayer() < PrimalRendDistance) return true;
             }
