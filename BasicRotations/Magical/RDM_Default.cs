@@ -2,7 +2,7 @@ namespace DefaultRotations.Magical;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Magical/RDM_Default.cs")]
-[Api(3)]
+[Api(4)]
 public sealed class RDM_Default : RedMageRotation
 {
     #region Config Options

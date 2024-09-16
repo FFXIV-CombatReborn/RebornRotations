@@ -2,7 +2,7 @@
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Magical/PCT_Default.cs")]
-[Api(3)]
+[Api(4)]
 public sealed class PCT_Default : PictomancerRotation
 {
     private const float CountdownBuffer = 0.4f;

@@ -2,7 +2,7 @@ namespace DefaultRotations.Healer;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Healer/AST_Default.cs")]
-[Api(3)]
+[Api(4)]
 public sealed class AST_Default : AstrologianRotation
 {
     #region Config Options

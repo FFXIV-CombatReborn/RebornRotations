@@ -2,7 +2,7 @@
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
 [SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/DRG_Default.PvP.cs")]
-[Api(3)]
+[Api(4)]
 public sealed class DRG_DefaultPvP : DragoonRotation
 {
     [RotationConfig(CombatType.PvP, Name = "Sprint")]
