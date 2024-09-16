@@ -2,7 +2,7 @@ namespace DefaultRotations.Ranged;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Ranged/DNC_Default.cs")]
-[Api(3)]
+[Api(4)]
 public sealed class DNC_Default : DancerRotation
 {
     #region Config Options

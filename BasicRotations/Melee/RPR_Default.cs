@@ -2,7 +2,7 @@
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.01", Description = "")]
 [SourceCode(Path = "main/DefaultRotations/Melee/RPR_Default.cs")]
-[Api(3)]
+[Api(4)]
 public sealed class RPR_Default : ReaperRotation
 {
     #region Config Options
