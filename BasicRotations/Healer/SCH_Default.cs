@@ -74,14 +74,18 @@ public sealed class SCH_Default : ScholarRotation
     {
         if (AccessionPvE.CanUse(out act)) return true;
         if (ConcitationPvE.CanUse(out act)) return true;
-        if (WhisperingDawnPvE_16537.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE_16538.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
+        if (!IsDissipated())
         {
-            if (SummonSeraphPvE.CanUse(out act)) return true;
-        }
-        if (ConsolationPvE.CanUse(out act, usedUp: true)) return true;
-        if (FeyBlessingPvE.CanUse(out act)) return true;
+            if (WhisperingDawnPvE_16537.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE_16538.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
+            {
+                if (SummonSeraphPvE.CanUse(out act)) return true;
+            }
+            if (ConsolationPvE.CanUse(out act, usedUp: true)) return true;
+            if (FeyBlessingPvE.CanUse(out act)) return true;
 
-        if (WhisperingDawnPvE_16537.CanUse(out act)) return true;
+            if (WhisperingDawnPvE_16537.CanUse(out act)) return true;
+        }
+
         if (SacredSoilPvE.CanUse(out act)) return true;
         if (IndomitabilityPvE.CanUse(out act)) return true;
 
@@ -93,11 +97,11 @@ public sealed class SCH_Default : ScholarRotation
     {
         var haveLink = PartyMembers.Any(p => p.HasStatus(true, StatusID.FeyUnion_1223));
         if (ManifestationPvE.CanUse(out act)) return true;
-        if (AetherpactPvE.CanUse(out act) && FairyGauge >= 70 && !haveLink) return true;
+        if (!IsDissipated() && FairyGauge >= 70 && !haveLink && AetherpactPvE.CanUse(out act)) return true;
         if (ProtractionPvE.CanUse(out act)) return true;
         if (ExcogitationPvE.CanUse(out act)) return true;
         if (LustratePvE.CanUse(out act)) return true;
-        if (AetherpactPvE.CanUse(out act) && !haveLink) return true;
+        if (!IsDissipated() && !haveLink && AetherpactPvE.CanUse(out act)) return true;
 
         return base.HealSingleAbility(nextGCD, out act);
     }
@@ -109,14 +113,14 @@ public sealed class SCH_Default : ScholarRotation
 
         if (SeraphismPvE.CanUse(out act)) return true;
 
-        if (FeyIlluminationPvE_16538.CanUse(out act)) return true;
+        if (!IsDissipated() && FeyIlluminationPvE_16538.CanUse(out act)) return true;
         if (ExpedientPvE.CanUse(out act)) return true;
 
-        if (WhisperingDawnPvE_16537.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE_16538.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
+        if (!IsDissipated() && WhisperingDawnPvE_16537.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyIlluminationPvE_16538.Cooldown.ElapsedOneChargeAfterGCD(1) || FeyBlessingPvE.Cooldown.ElapsedOneChargeAfterGCD(1))
         {
             if (SummonSeraphPvE.CanUse(out act)) return true;
         }
-        if (ConsolationPvE.CanUse(out act, usedUp: true)) return true;
+        if (!IsDissipated() && ConsolationPvE.CanUse(out act, usedUp: true)) return true;
         if (((!SacredMove && !IsMoving) || SacredMove) && SacredSoilPvE.CanUse(out act)) return true;
 
         return base.DefenseAreaAbility(nextGCD, out act);
@@ -233,5 +237,6 @@ public sealed class SCH_Default : ScholarRotation
     #region Extra Methods
     public override bool CanHealSingleSpell => base.CanHealSingleSpell && (GCDHeal || PartyMembers.GetJobCategory(JobRole.Healer).Count() < 2);
     public override bool CanHealAreaSpell => base.CanHealAreaSpell && (GCDHeal || PartyMembers.GetJobCategory(JobRole.Healer).Count() < 2);
+    public static bool IsDissipated () => Player.HasStatus(true, StatusID.Dissipation) || Player.HasStatus(true, StatusID.Dissipation_2069);
     #endregion
 }
