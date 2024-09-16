@@ -14,6 +14,8 @@ public sealed class SAM_Default : SamuraiRotation
     [RotationConfig(CombatType.PvE, Name = "Prevent Higanbana use if theres more than one target")]
     public bool HiganbanaTargets { get; set; } = false;
 
+    [RotationConfig(CombatType.PvE, Name = "Enable TEA Checker.")]
+    public bool EnableTEAChecker { get; set; } = false; 
     #endregion
 
     #region Countdown Logic
@@ -58,6 +60,12 @@ public sealed class SAM_Default : SamuraiRotation
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (EnableTEAChecker && Target.Name.ToString() == "Jagd Doll" && Target.GetHealthRatio() < 0.25)
+        {
+            return false;
+        }
+        
         var IsTargetBoss = HostileTarget?.IsBossFromTTK() ?? false;
         var IsTargetDying = HostileTarget?.IsDying() ?? false;
 
@@ -87,6 +95,12 @@ public sealed class SAM_Default : SamuraiRotation
 
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        act = null;
+        if (EnableTEAChecker && Target.Name.ToString() == "Jagd Doll" && Target.GetHealthRatio() < 0.25)
+        {
+            return false;
+        }
+        
         var IsTargetBoss = HostileTarget?.IsBossFromTTK() ?? false;
         var IsTargetDying = HostileTarget?.IsDying() ?? false;
 
@@ -105,6 +119,12 @@ public sealed class SAM_Default : SamuraiRotation
 
     protected override bool GeneralGCD(out IAction? act)
     {
+        act = null;
+        if (EnableTEAChecker && Target.Name.ToString() == "Jagd Doll" && Target.GetHealthRatio() < 0.25)
+        {
+            return false;
+        }
+        
         if (MidareSetsugekkaPvE.CanUse(out act)) return true;
 
         if (TenkaGokenPvE.CanUse(out act)) return true;
