@@ -1,8 +1,8 @@
 namespace DefaultRotations.Magical;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.00")]
+[Rotation("DOES NOT WORK", CombatType.PvE, GameVersion = "7.05")]
 [SourceCode(Path = "main/DefaultRotations/Limited Jobs/BLU_Default.cs")]
-[Api(1)]
+[Api(4)]
 public sealed class Blue_Default : BlueMageRotation
 {
     #region Countdown logic
@@ -46,22 +46,16 @@ public sealed class Blue_Default : BlueMageRotation
     protected override bool MoveForwardGCD(out IAction? act)
     {
         act = null;
-
+        
         return base.MoveForwardGCD(out act);
     }
 
     protected override bool GeneralGCD(out IAction? act)
     {
         act = null;
-
+        if (TinglePvE.CanUse(out act)) return true;
+        if (WaterCannonPvE.CanUse(out act)) return true;
         return base.GeneralGCD(out act);
-    }
-
-    private bool AttackGCD(out IAction? act, bool burst)
-    {
-        act = null;
-
-        return false;
     }
     #endregion
 
