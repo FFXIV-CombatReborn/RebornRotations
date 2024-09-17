@@ -117,6 +117,8 @@ public sealed class SAM_Default : SamuraiRotation
 
     #region GCD Logic
 
+    StatusID[] SamBuffs = [StatusID.Fugetsu, StatusID.Fuka];
+
     protected override bool GeneralGCD(out IAction? act)
     {
         act = null;
@@ -124,7 +126,10 @@ public sealed class SAM_Default : SamuraiRotation
         {
             return false;
         }
-        
+
+        if ((!HiganbanaTargets || (HiganbanaTargets && NumberOfAllHostilesInRange < 2)) && (HostileTarget?.WillStatusEnd(18, true, StatusID.Higanbana) ?? false) && HiganbanaPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+
+
         if (MidareSetsugekkaPvE.CanUse(out act)) return true;
 
         if (TenkaGokenPvE.CanUse(out act)) return true;
@@ -148,8 +153,6 @@ public sealed class SAM_Default : SamuraiRotation
         if ((!IsTargetBoss || (HostileTarget?.HasStatus(true, StatusID.Higanbana) ?? false)) && HasMoon && HasFlower
             && OgiNamikiriPvE.CanUse(out act)) return true;
 
-        if ((!HiganbanaTargets || (HiganbanaTargets && NumberOfAllHostilesInRange < 2)) && HiganbanaPvE.CanUse(out act)) return true;
-
         if (TendoSetsugekkaPvE.CanUse(out act)) return true;
         if (MidareSetsugekkaPvE.CanUse(out act)) return true;
 
@@ -157,7 +160,9 @@ public sealed class SAM_Default : SamuraiRotation
         if ((!HasMoon || IsMoonTimeLessThanFlower || !OkaPvE.EnoughLevel) && MangetsuPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasGetsu)) return true;
         if ((!HasFlower || !IsMoonTimeLessThanFlower) && OkaPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasKa)) return true;
 
-        if (!HasSetsu && YukikazePvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && HasGetsu && HasKa)) return true;
+        if (!HasSetsu && SamBuffs.All(SamBuffs => Player.HasStatus(true, SamBuffs)) && 
+            YukikazePvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && HasGetsu && HasKa)) return true;
+
         // single target 123 combo's 3 or used 3 directly during burst when MeikyoShisui is active
         if (GekkoPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasGetsu)) return true;
         if (KashaPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasKa)) return true;
