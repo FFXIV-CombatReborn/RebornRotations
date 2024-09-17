@@ -125,13 +125,13 @@ public sealed class MCH_Default : MachinistRotation
         if (!SpreadShotPvE.CanUse(out _))
         {
             // use AirAnchor if possible
-            if (AirAnchorPvE.CanUse(out act)) return true;
-            // or use HotShot if low level
-            if (!AirAnchorPvE.EnoughLevel && HotShotPvE.CanUse(out act)) return true;
+            if (HotShotMasteryTrait.EnoughLevel && AirAnchorPvE.CanUse(out act)) return true;
 
             // for opener: only use the first charge of Drill after AirAnchor when there are two
             if (EnhancedMultiweaponTrait.EnoughLevel && DrillPvE.CanUse(out act, usedUp: false)) return true;
             if (!EnhancedMultiweaponTrait.EnoughLevel && DrillPvE.CanUse(out act, usedUp: true)) return true;
+
+            if (!AirAnchorPvE.EnoughLevel && HotShotPvE.CanUse(out act)) return true;
         }
 
         // ChainSaw is always used after Drill
