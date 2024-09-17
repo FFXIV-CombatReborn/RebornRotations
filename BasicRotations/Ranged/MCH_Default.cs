@@ -34,10 +34,10 @@ public sealed class MCH_Default : MachinistRotation
         bool isReassembleUsable =
             //Reassemble current # of charges and double proc protection
             ReassemblePvE.Cooldown.CurrentCharges > 0 && !Player.HasStatus(true, StatusID.Reassembled) &&
-            (nextGCD.IsTheSameTo(true, [ChainSawPvE, ExcavatorPvE]) || nextGCD.IsTheSameTo(false, [AirAnchorPvE]) ||
+            (nextGCD.IsTheSameTo(true, [ChainSawPvE, ExcavatorPvE, AirAnchorPvE]) ||
              (!ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, DrillPvE)) ||
              (!DrillPvE.EnoughLevel && nextGCD.IsTheSameTo(true, CleanShotPvE)) ||
-             (!CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(false, HotShotPvE)));
+             (!CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(true, HotShotPvE)));
 
         // Keeps Ricochet and Gauss cannon Even
         bool isRicochetMore = RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.CurrentCharges <= RicochetPvE.Cooldown.CurrentCharges;
@@ -130,8 +130,7 @@ public sealed class MCH_Default : MachinistRotation
             if (!AirAnchorPvE.EnoughLevel && HotShotPvE.CanUse(out act)) return true;
 
             // for opener: only use the first charge of Drill after AirAnchor when there are two
-            if (EnhancedMultiweaponTrait.EnoughLevel && DrillPvE.CanUse(out act, usedUp: false)) return true;
-            if (!EnhancedMultiweaponTrait.EnoughLevel && DrillPvE.CanUse(out act, usedUp: true)) return true;
+            if (DrillPvE.CanUse(out act, usedUp: false)) return true;
         }
 
         // ChainSaw is always used after Drill
@@ -142,8 +141,7 @@ public sealed class MCH_Default : MachinistRotation
         if (FullMetalFieldPvE.CanUse(out act)) return true;
 
         // dont use the second charge of Drill if it's in opener, also save Drill for burst  --- need to combine this with the logic above!!!
-        if (EnhancedMultiweaponTrait.EnoughLevel && !CombatElapsedLessGCD(6) && !ChainSawPvE.Cooldown.WillHaveOneCharge(6) && DrillPvE.CanUse(out act, usedUp: true)) return true;
-
+        if (!CombatElapsedLessGCD(6) && !ChainSawPvE.Cooldown.WillHaveOneCharge(6) && DrillPvE.CanUse(out act, usedUp: true)) return true;
 
         // basic aoe
         if (SpreadShotPvE.CanUse(out act)) return true;
