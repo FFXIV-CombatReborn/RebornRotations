@@ -1,10 +1,12 @@
 ﻿namespace DefaultRotations.Melee;
 
-[Rotation("Default", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
-[SourceCode(Path = "main/DefaultRotations/PVPRotations/Melee/MNK_Default.PVP.cs")]
+[Rotation("Default PVP", CombatType.PvP, GameVersion = "7.05", Description = "Beta Rotation")]
+[SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/VPR_Default.PvP.cs")]
 [Api(4)]
-public sealed class MNK_DefaultPvP : MonkRotation
+public sealed class VPR_DefaultPvP : ViperRotation
 {
+    private const double HealthThreshold = 0.7;
+
     [RotationConfig(CombatType.PvP, Name = "Sprint")]
     public bool UseSprintPvP { get; set; } = false;
 
@@ -72,54 +74,65 @@ public sealed class MNK_DefaultPvP : MonkRotation
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
         act = null;
-        if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
-        if (TryPurify(out act)) return true;
-        if (UseRecuperatePvP && Player.CurrentHp / Player.MaxHp * 100 < RCValue && RecuperatePvP.CanUse(out act)) return true;
+        if (ShouldCancelGuard()) return false;
+
+        if (Player.GetHealthRatio() < HealthThreshold && RecuperatePvP.CanUse(out act)) return true;
+
+        if (SnakeScalesPvP.Cooldown.IsCoolingDown && UncoiledFuryPvP.Cooldown.IsCoolingDown && RattlingCoilPvP.CanUse(out act)) return true;
 
         return base.EmergencyAbility(nextGCD, out act);
+    }
+
+    protected override bool AttackAbility(IAction nextGCD, out IAction? act)
+    {
+        act = null;
+        if (ShouldCancelGuard()) return false;
+
+        if (IsLastGCD((ActionID)UncoiledFuryPvP.ID) && UncoiledTwinfangPvP.CanUse(out act, skipAoeCheck: true)) return true;
+        if (IsLastGCD((ActionID)HuntersSnapPvP.ID) && TwinfangBitePvP.CanUse(out act)) return true;
+        if (IsLastGCD((ActionID)SwiftskinsCoilPvP.ID) && TwinbloodBitePvP.CanUse(out act)) return true;
+        if (IsLastGCD((ActionID)BarbarousBitePvP.ID, (ActionID)RavenousBitePvP.ID) && DeathRattlePvP.CanUse(out act)) return true;
+
+        return base.AttackAbility(nextGCD, out act);
+    }
+
+    protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
+    {
+        act = null;
+        if (ShouldCancelGuard()) return false;
+
+        return base.GeneralAbility(nextGCD, out act);
     }
 
     protected override bool GeneralGCD(out IAction? act)
     {
         act = null;
-        // Early exits for Guard status or Sprint usage
-        if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
+        if (ShouldCancelGuard()) return false;
+
         if (!Player.HasStatus(true, StatusID.Guard) && UseSprintPvP && !Player.HasStatus(true, StatusID.Sprint) && !InCombat && SprintPvP.CanUse(out act)) return true;
 
-        if (RisingPhoenixPvP.CanUse(out act)) return true;
-        if (EnlightenmentPvP.CanUse(out act)) return true;
-        if (RisingPhoenixPvP.CanUse(out act)) return true;
-        if (PhantomRushPvP.CanUse(out act)) return true;
-        if (SixsidedStarPvP.CanUse(out act)) return true;
-        if (EnlightenmentPvP.CanUse(out act, usedUp: true)) return true;
+        if (Player.HasStatus(true, StatusID.HardenedScales)) return false;
 
-        if (InCombat)
+        if (!Player.HasStatus(true, StatusID.Reawakened_4094))
         {
-            if (RisingPhoenixPvP.CanUse(out act)) return true;
-        }
-        if (InCombat)
-        {
-            if (ThunderclapPvP.CanUse(out act)) return true;
-        }
-        if (InCombat)
-        {
-            if (RiddleOfEarthPvP.CanUse(out act)) return true;
+            if (SwiftskinsCoilPvP.CanUse(out act, usedUp: true)) return true;
+            if (HuntersSnapPvP.CanUse(out act, usedUp: true)) return true;
         }
 
-        if (Player.HasStatus(true, StatusID.EarthResonance))
-        {
-            if (EarthsReplyPvP.CanUse(out act)) return true;
-        }
+        if (UncoiledFuryPvP.CanUse(out act, skipAoeCheck: true)) return true;
 
-        if (PhantomRushPvP.CanUse(out act)) return true;
-        if (DemolishPvP.CanUse(out act)) return true;
-        if (TwinSnakesPvP.CanUse(out act)) return true;
-        if (DragonKickPvP.CanUse(out act)) return true;
-        if (SnapPunchPvP.CanUse(out act)) return true;
-        if (TrueStrikePvP.CanUse(out act)) return true;
-        if (BootshinePvP.CanUse(out act)) return true;
+        if (RavenousBitePvP.CanUse(out act)) return true;
+        if (SwiftskinsStingPvP.CanUse(out act)) return true;
+        if (PiercingFangsPvP.CanUse(out act)) return true;
+        if (BarbarousBitePvP.CanUse(out act)) return true;
+        if (HuntersStingPvP.CanUse(out act)) return true;
+        if (SteelFangsPvP.CanUse(out act)) return true;
 
+        return base.GeneralGCD(out act);
+    }
 
-        return false;
+    private bool ShouldCancelGuard()
+    {
+        return GuardCancel && Player.HasStatus(true, StatusID.Guard);
     }
 }
