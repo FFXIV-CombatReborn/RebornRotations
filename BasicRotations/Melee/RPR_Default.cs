@@ -9,6 +9,12 @@ public sealed class RPR_Default : ReaperRotation
     [RotationConfig(CombatType.PvE, Name = "[Beta Option] Pool Shroud for Arcane Circle.")]
     public bool EnshroudPooling { get; set; } = false;
 
+    [RotationConfig(CombatType.PvE, Name = "Use custom timing to refresh Death's Design")]
+    public bool UseCustomDDTiming { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Refresh Death's Design with this many seconds remaining")]
+    public int RefreshDDSecondsRemaining { get; set; } = 10;
+
     public static bool ExecutionerReady => Player.HasStatus(true, StatusID.Executioner);
     #endregion
 
@@ -83,8 +89,15 @@ public sealed class RPR_Default : ReaperRotation
         }
 
         if (WhorlOfDeathPvE.CanUse(out act)) return true;
-        if (ShadowOfDeathPvE.CanUse(out act)) return true;
-
+        if (UseCustomDDTiming && ((!HostileTarget?.HasStatus(true, StatusID.DeathsDesign) ?? false) || (HostileTarget?.WillStatusEnd(RefreshDDSecondsRemaining, true, StatusID.DeathsDesign) ?? false)))
+        {
+            if (ShadowOfDeathPvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        }
+        else
+        {
+            if (ShadowOfDeathPvE.CanUse(out act)) return true;
+        }
+        
         if (HasEnshrouded)
         {
             if (ShadowOfDeathPvE.CanUse(out act)) return true;
