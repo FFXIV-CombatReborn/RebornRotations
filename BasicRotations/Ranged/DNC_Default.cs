@@ -11,6 +11,9 @@ public sealed class DNC_Default : DancerRotation
 
     [RotationConfig(CombatType.PvE, Name = "Holds Standard Step if no targets in range (Warning, will drift & Buff may fall off)")]
     public bool HoldStepForTargets { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Dance Partner Name (If empty or not found uses default dance partner priority)")]
+    public string DancePartnerName { get; set; } = "";
     #endregion
     bool shouldUseLastDance = true;
 
@@ -115,6 +118,12 @@ public sealed class DNC_Default : DancerRotation
         // Attempt to use Closed Position if applicable
         if (!InCombat && !Player.HasStatus(true, StatusID.ClosedPosition) && ClosedPositionPvE.CanUse(out act))
         {
+
+            if (DancePartnerName != "")
+                foreach (var player in PartyMembers)
+                    if (player.Name.ToString() == DancePartnerName)
+                        ClosedPositionPvE.Target = new TargetResult(player, [player], player.Position);
+
             return true;
         }
 
