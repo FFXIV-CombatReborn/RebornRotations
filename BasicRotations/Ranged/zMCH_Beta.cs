@@ -12,8 +12,8 @@ public sealed class zMCH_Beta : MachinistRotation
     [RotationConfig(CombatType.PvE, Name = "Prioritize Barrel Stabilizer use")]
     private bool BSPrio { get; set; } = true;
 
-    [RotationConfig(CombatType.PvE, Name = "Pool Drill to preserve 123 combo (this is probably a slight DPS loss but it will make xivanalysis happy)")]
-    private bool PoolDrillForCombo { get; set; } = false;
+    [RotationConfig(CombatType.PvE, Name = "Delay Drill for combo GCD if have one charge and about to break combo")]
+    private bool HoldDrillForCombo { get; set; } = true;
     #endregion
 
     #region Countdown logic
@@ -141,7 +141,7 @@ public sealed class zMCH_Beta : MachinistRotation
         if (EnhancedMultiweaponTrait.EnoughLevel 
             && !CombatElapsedLessGCD(6) 
             && !ChainSawPvE.Cooldown.WillHaveOneCharge(6) 
-            && (!PoolDrillForCombo || (!CleanShotPvE.CanUse(out _) && !SlugShotPvE.CanUse(out _)))
+            && (!HoldDrillForCombo || !(LiveComboTime <= 5) || (!CleanShotPvE.CanUse(out _) && !SlugShotPvE.CanUse(out _)))
             && DrillPvE.CanUse(out act, usedUp: true)) return true;
 
         // basic aoe
