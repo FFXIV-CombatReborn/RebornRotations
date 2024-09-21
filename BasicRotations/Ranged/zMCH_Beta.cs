@@ -12,8 +12,8 @@ public sealed class zMCH_Beta : MachinistRotation
     [RotationConfig(CombatType.PvE, Name = "Prioritize Barrel Stabilizer use")]
     private bool BSPrio { get; set; } = true;
 
-    [RotationConfig(CombatType.PvE, Name = "Pool Drill to preserve 123 combo (this is probably a DPS loss but it will make xivanalysis happy)")]
-    private bool PoolDrillForCombo { get; set; } = true;
+    [RotationConfig(CombatType.PvE, Name = "Pool Drill to preserve 123 combo (this is probably a slight DPS loss but it will make xivanalysis happy)")]
+    private bool PoolDrillForCombo { get; set; } = false;
     #endregion
 
     #region Countdown logic
