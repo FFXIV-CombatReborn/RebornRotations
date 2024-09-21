@@ -10,7 +10,7 @@ public sealed class zMCH_Beta : MachinistRotation
     private bool NewQueenLogic { get; set; } = true;
 
     [RotationConfig(CombatType.PvE, Name = "Prioritize Barrel Stabilizer use")]
-    private bool BSPrio { get; set; } = false;
+    private bool BSPrio { get; set; } = true;
 
     [RotationConfig(CombatType.PvE, Name = "Pool Drill to preserve 123 combo (this is probably a DPS loss but it will make xivanalysis happy)")]
     private bool PoolDrillForCombo { get; set; } = true;
