@@ -9,6 +9,12 @@ public sealed class AST_Default : AstrologianRotation
     [RotationConfig(CombatType.PvE, Name = "Enable Swiftcast Restriction Logic to attempt to prevent actions other than Raise when you have swiftcast")]
     public bool SwiftLogic { get; set; } = true;
 
+    [RotationConfig(CombatType.PvE, Name = "Use both stacks of Lightspeed while moving")]
+    public bool LightspeedMove { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Use experimental card logic to pool for divination buff if possible")]
+    public bool SmartCard { get; set; } = true;
+
     [RotationConfig(CombatType.PvE, Name = "Use spells with cast times to heal. (Ignored if you are the only healer in party)")]
     public bool GCDHeal { get; set; } = false;
 
@@ -33,6 +39,8 @@ public sealed class AST_Default : AstrologianRotation
     [RotationConfig(CombatType.PvE, Name = "Use DOT while moving even if it does not need refresh (disabling is a damage down)")]
     public bool DOTUpkeep { get; set; } = true;
     #endregion
+
+    private static bool InBurstStatus => !Player.WillStatusEnd(0, true, StatusID.Divination);
 
     #region Countdown Logic
     protected override IAction? CountDownAction(float remainTime)
@@ -161,8 +169,8 @@ public sealed class AST_Default : AstrologianRotation
 
         if (AstralDrawPvE.CanUse(out act)) return true;
         if (UmbralDrawPvE.CanUse(out act)) return true;
-        if (InCombat && TheBalancePvE.CanUse(out act)) return true;
-        if (InCombat && TheSpearPvE.CanUse(out act)) return true;
+        if (((Player.HasStatus(true, StatusID.Divination) || !DivinationPvE.Cooldown.WillHaveOneCharge(45) || !DivinationPvE.EnoughLevel || UmbralDrawPvE.Cooldown.WillHaveOneCharge(3)) && SmartCard || (!SmartCard)) && InCombat && TheBalancePvE.CanUse(out act)) return true;
+        if (((Player.HasStatus(true, StatusID.Divination) || !DivinationPvE.Cooldown.WillHaveOneCharge(45) || !DivinationPvE.EnoughLevel || UmbralDrawPvE.Cooldown.WillHaveOneCharge(3)) && SmartCard || (!SmartCard)) && InCombat && TheSpearPvE.CanUse(out act)) return true;
         return base.GeneralAbility(nextGCD, out act);
     }
 
@@ -171,14 +179,18 @@ public sealed class AST_Default : AstrologianRotation
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
 
+        if (InCombat && DivinationPvE.Cooldown.ElapsedAfter(115) && LightspeedPvE.CanUse(out act, usedUp: true)) return true;
+
         if (IsBurst && !IsMoving
             && DivinationPvE.CanUse(out act)) return true;
 
         if (AstralDrawPvE.CanUse(out act, usedUp: IsBurst)) return true;
 
+        if ((InBurstStatus || DivinationPvE.Cooldown.ElapsedAfter(115)) && InCombat && LightspeedPvE.CanUse(out act, usedUp: true)) return true;
+
         if (InCombat)
         {
-            if (IsMoving && LightspeedPvE.CanUse(out act)) return true;
+            if (IsMoving && LightspeedPvE.CanUse(out act, usedUp: LightspeedMove)) return true;
 
             if (!IsMoving)
             {
@@ -189,7 +201,7 @@ public sealed class AST_Default : AstrologianRotation
             }
 
             {
-                if (LordOfCrownsPvE.CanUse(out act)) return true;
+                if (((Player.HasStatus(true, StatusID.Divination) || !DivinationPvE.Cooldown.WillHaveOneCharge(45) || !DivinationPvE.EnoughLevel || UmbralDrawPvE.Cooldown.WillHaveOneCharge(3)) && SmartCard || (!SmartCard)) && LordOfCrownsPvE.CanUse(out act)) return true;
             }
         }
         return base.AttackAbility(nextGCD, out act);
