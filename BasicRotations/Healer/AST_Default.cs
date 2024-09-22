@@ -179,18 +179,24 @@ public sealed class AST_Default : AstrologianRotation
         act = null;
         if (BubbleProtec && Player.HasStatus(true, StatusID.CollectiveUnconscious_848)) return false;
 
-        if (InCombat && DivinationPvE.Cooldown.ElapsedAfter(115) && LightspeedPvE.CanUse(out act, usedUp: true)) return true;
+        if (!Player.HasStatus(true, StatusID.Lightspeed) 
+            && InCombat 
+            && DivinationPvE.Cooldown.ElapsedAfter(115) 
+            && LightspeedPvE.CanUse(out act, usedUp: true)) return true;
 
         if (IsBurst && !IsMoving
             && DivinationPvE.CanUse(out act)) return true;
 
         if (AstralDrawPvE.CanUse(out act, usedUp: IsBurst)) return true;
 
-        if ((InBurstStatus || DivinationPvE.Cooldown.ElapsedAfter(115)) && InCombat && LightspeedPvE.CanUse(out act, usedUp: true)) return true;
+        if (!Player.HasStatus(true, StatusID.Lightspeed) 
+            && (InBurstStatus || DivinationPvE.Cooldown.ElapsedAfter(115)) 
+            && InCombat 
+            && LightspeedPvE.CanUse(out act, usedUp: true)) return true;
 
         if (InCombat)
         {
-            if (IsMoving && LightspeedPvE.CanUse(out act, usedUp: LightspeedMove)) return true;
+            if (!Player.HasStatus(true, StatusID.Lightspeed) && IsMoving && LightspeedPvE.CanUse(out act, usedUp: LightspeedMove)) return true;
 
             if (!IsMoving)
             {
