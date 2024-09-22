@@ -38,7 +38,12 @@ public sealed class zMCH_Beta_2 : MachinistRotation
                     && WildfirePvE.CanUse(out act, isLastAbility: true)) return true;
             }
             // Legacy logic for <100
-            else if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
+            else if ((IsLastAbility(false, HyperchargePvE) 
+                    || Heat >= 50 
+                    || Player.HasStatus(true, StatusID.Hypercharged)) 
+                && ToolChargeSoon(out _) 
+                && !LowLevelHyperCheck 
+                && WildfirePvE.CanUse(out act)) return true;
         }
 
         // Reassemble Logic
