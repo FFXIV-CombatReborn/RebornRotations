@@ -164,9 +164,16 @@ public sealed class VPR_Default : ViperRotation
             if (VicepitPvE.CanUse(out act, usedUp: true)) return true;
         }
         if (VicepitPvE.CanUse(out act, usedUp: true)) return true;
+
         ////Single Target Dread Combo
+        // Try using Coil that player is in position for extra damage first
+        if (HuntersCoilPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Flank, HuntersCoilPvE.Target.Target)) return true;
+        if (SwiftskinsCoilPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Rear, SwiftskinsCoilPvE.Target.Target)) return true;
+
         if (HuntersCoilPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (SwiftskinsCoilPvE.CanUse(out act, skipComboCheck: true)) return true;
+        
+
         if (VicewinderPvE.Cooldown.CurrentCharges == 1 && VicewinderPvE.Cooldown.RecastTimeRemainOneCharge < 10)
         {
             if (VicewinderPvE.CanUse(out act, usedUp: true)) return true;
