@@ -6,7 +6,8 @@ namespace DefaultRotations.Ranged;
 public sealed class zMCH_Beta_2 : MachinistRotation
 {
     #region Config Options
-
+    [RotationConfig(CombatType.PvE, Name = "Use hardcoded Queen timings\nSlight DPS gain if uninterrupted but possibly loses more from drift or death.")]
+    private bool UseBalanceQueenTimings { get; set; }
     #endregion
 
     private const float HYPERCHARGE_DURATION = 8f;
@@ -200,7 +201,27 @@ public sealed class zMCH_Beta_2 : MachinistRotation
 
     private bool CanUseQueenMeow(out IAction? act, IAction nextGCD)
     {
-        if (
+        bool QueenOne = Battery >= 60 && CombatElapsedLess(25f);
+        bool QueenTwo = Battery >= 90 && !CombatElapsedLess(58f) && CombatElapsedLess(78f);
+        bool QueenThree = Battery >= 100 && !CombatElapsedLess(111f) && CombatElapsedLess(131f);
+        bool QueenFour = Battery >= 50 && !CombatElapsedLess(148f) && CombatElapsedLess(168f);
+        bool QueenFive = Battery >= 60 && !CombatElapsedLess(178f) && CombatElapsedLess(198f);
+        bool QueenSix = Battery >= 100 && !CombatElapsedLess(230f) && CombatElapsedLess(250f);
+        bool QueenSeven = Battery >= 50 && !CombatElapsedLess(268f) && CombatElapsedLess(288f);
+        bool QueenEight = Battery >= 70 && !CombatElapsedLess(296f) && CombatElapsedLess(316f);
+        bool QueenNine = Battery >= 100 && !CombatElapsedLess(350f) && CombatElapsedLess(370f);
+        bool QueenTen = Battery >= 50 && !CombatElapsedLess(388f) && CombatElapsedLess(408f);
+        bool QueenEleven = Battery >= 80 && !CombatElapsedLess(416f) && CombatElapsedLess(436f);
+        bool QueenTwelve = Battery >= 100 && !CombatElapsedLess(470f) && CombatElapsedLess(490f);
+        bool QueenThirteen = Battery >= 50 && !CombatElapsedLess(505f) && CombatElapsedLess(525f);
+        bool QueenFourteen = Battery >= 60 && !CombatElapsedLess(538f) && CombatElapsedLess(558f);
+        bool QueenFifteen = Battery >= 100 && !CombatElapsedLess(590f) && CombatElapsedLess(610f);
+
+        if (UseBalanceQueenTimings && (QueenOne || QueenTwo || QueenThree || QueenFour || QueenFive || QueenSix || QueenSeven || QueenEight || QueenNine || QueenTen || QueenEleven || QueenTwelve || QueenThirteen || QueenFourteen || QueenFifteen))
+        {
+            if (RookAutoturretPvE.CanUse(out act)) return true;
+        }
+        else if (
             // ASAP in opener
             (CombatElapsedLessGCD(10))
             // In first 10 seconds of 2 minute window
