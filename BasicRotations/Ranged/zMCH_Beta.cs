@@ -14,6 +14,9 @@ public sealed class zMCH_Beta : MachinistRotation
 
     [RotationConfig(CombatType.PvE, Name = "Delay Drill for combo GCD if have one charge and about to break combo")]
     private bool HoldDrillForCombo { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Delay Hypercharge for combo GCD if about to break combo")]
+    private bool HoldHCForCombo { get; set; } = true;
     #endregion
 
     #region Countdown logic
@@ -53,7 +56,7 @@ public sealed class zMCH_Beta : MachinistRotation
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         // Keeps Ricochet and Gauss cannon Even
-        bool isRicochetMore = RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.CurrentCharges <= RicochetPvE.Cooldown.CurrentCharges;
+        bool isRicochetMore = RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.RecastTimeElapsed <= RicochetPvE.Cooldown.RecastTimeElapsed;
 
         // Start Ricochet/Gauss cooldowns rolling
         if (!RicochetPvE.Cooldown.IsCoolingDown && RicochetPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -75,7 +78,7 @@ public sealed class zMCH_Beta : MachinistRotation
         {
             if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
         }
-        // Use Hypercharge if if wildfire will not be up in 30 seconds or if you hit 100 heat
+        // Use Hypercharge if wildfire will not be up in 30 seconds or if you hit 100 heat
         if (!LowLevelHyperCheck && !Player.HasStatus(true, StatusID.Reassembled) && (!WildfirePvE.Cooldown.WillHaveOneCharge(30) || (Heat == 100)))
         {
             if (ToolChargeSoon(out act)) return true;
@@ -84,16 +87,12 @@ public sealed class zMCH_Beta : MachinistRotation
         // Use Ricochet and Gauss if have pooled charges or is burst window
         if (isRicochetMore)
         {
-            if ((IsLastGCD(true, BlazingShotPvE, HeatBlastPvE) 
-                || RicochetPvE.Cooldown.CurrentCharges >= RicochetPvE.Cooldown.MaxCharges - 1 
-                || !WildfirePvE.Cooldown.ElapsedAfter(20)) 
+            if (IsLastGCD(true, BlazingShotPvE, HeatBlastPvE)
                 && RicochetPvE.CanUse(out act, skipAoeCheck: true, usedUp: true))
                 return true;
         }
 
-        if ((IsLastGCD(true, BlazingShotPvE, HeatBlastPvE) 
-            || GaussRoundPvE.Cooldown.CurrentCharges >= GaussRoundPvE.Cooldown.MaxCharges - 1 
-            || !WildfirePvE.Cooldown.ElapsedAfter(20)) 
+        if (IsLastGCD(true, BlazingShotPvE, HeatBlastPvE)
             && GaussRoundPvE.CanUse(out act, usedUp: true, skipAoeCheck: true)) 
             return true;
 
@@ -177,7 +176,9 @@ public sealed class zMCH_Beta : MachinistRotation
                      (DrillPvE.EnoughLevel && (!DrillPvE.Cooldown.IsCoolingDown))
                      ||
                      // Chainsaw Charge Detection
-                     (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME))))
+                     (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME)))
+                     ||
+                     (!HoldHCForCombo || !(LiveComboTime <= REST_TIME)))
         {
             act = null;
             return false;

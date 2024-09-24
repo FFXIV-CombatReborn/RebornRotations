@@ -97,15 +97,15 @@ public sealed class zMCH_Beta_2 : MachinistRotation
         if (isRicochetMore)
         {
             if ((IsLastGCD(true, BlazingShotPvE, HeatBlastPvE)
-                || RicochetPvE.Cooldown.RecastTimeElapsed >= 55
-                || !WildfirePvE.Cooldown.ElapsedAfter(20))
+                || RicochetPvE.Cooldown.RecastTimeElapsed >= 45
+                || !BarrelStabilizerPvE.Cooldown.ElapsedAfter(20))
                 && RicochetPvE.CanUse(out act, skipAoeCheck: true, usedUp: true))
                 return true;
         }
             
         if ((IsLastGCD(true, BlazingShotPvE, HeatBlastPvE)
-            || GaussRoundPvE.Cooldown.RecastTimeElapsed >= 55
-            || !WildfirePvE.Cooldown.ElapsedAfter(20))
+            || GaussRoundPvE.Cooldown.RecastTimeElapsed >= 45
+            || !BarrelStabilizerPvE.Cooldown.ElapsedAfter(20))
             && GaussRoundPvE.CanUse(out act, usedUp: true, skipAoeCheck: true))
             return true;
 
