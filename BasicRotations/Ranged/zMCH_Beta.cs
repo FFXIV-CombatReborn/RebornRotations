@@ -81,7 +81,7 @@ public sealed class zMCH_Beta : MachinistRotation
         // Use Hypercharge if wildfire will not be up in 30 seconds or if you hit 100 heat
         if (!LowLevelHyperCheck && !Player.HasStatus(true, StatusID.Reassembled) && (!WildfirePvE.Cooldown.WillHaveOneCharge(30) || (Heat == 100)))
         {
-            if (!HoldHCForCombo || !(LiveComboTime <= 8f) && ToolChargeSoon(out act)) return true;
+            if (!HoldHCForCombo || !(LiveComboTime <= 8f && LiveComboTime > 0f) && ToolChargeSoon(out act)) return true;
         }
 
         // Use Ricochet and Gauss if have pooled charges or is burst window
@@ -168,7 +168,7 @@ public sealed class zMCH_Beta : MachinistRotation
                      (DrillPvE.EnoughLevel && (!DrillPvE.Cooldown.IsCoolingDown))
                      ||
                      // Chainsaw Charge Detection
-                     (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME)))
+                     (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME))))
         {
             act = null;
             return false;

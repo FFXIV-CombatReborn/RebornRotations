@@ -90,7 +90,7 @@ public sealed class zMCH_Beta_2 : MachinistRotation
         if (!LowLevelHyperCheck
             && !Player.HasStatus(true, StatusID.Reassembled) 
             && (!WildfirePvE.Cooldown.WillHaveOneCharge(30) || Heat == 100) 
-            && !(LiveComboTime <= HYPERCHARGE_DURATION)
+            && !(LiveComboTime <= HYPERCHARGE_DURATION && LiveComboTime > 0f)
             && ToolChargeSoon(out act)) return true;
 
         // Use Ricochet and Gauss if have pooled charges or is burst window
