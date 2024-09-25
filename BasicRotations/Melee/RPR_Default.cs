@@ -148,7 +148,6 @@ public sealed class RPR_Default : ReaperRotation
             }
 
             // Try using Gallows/Gibbet that player is in position for when without Enchanced status
-
             else if (CanHitPositional(EnemyPositional.Rear, GallowsPvE.Target.Target))
             {
                 if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
@@ -214,7 +213,6 @@ public sealed class RPR_Default : ReaperRotation
             }
 
             // Try using Executioners Gallows/Gibbet that player is in position for when without Enchanced status
-
             else if (CanHitPositional(EnemyPositional.Rear, ExecutionersGallowsPvE.Target.Target))
             {
                 if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
