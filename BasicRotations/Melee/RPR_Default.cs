@@ -137,12 +137,29 @@ public sealed class RPR_Default : ReaperRotation
         if (HasSoulReaver)
         {
             if (GuillotinePvE.CanUse(out act)) return true;
+
             if (Player.HasStatus(true, StatusID.EnhancedGallows))
             {
                 if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
+            else if (Player.HasStatus(true, StatusID.EnhancedGibbet))
+            {
+                if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+
+            // Try using Gallows/Gibbet that player is in position for when without Enchanced status
+
+            else if (CanHitPositional(EnemyPositional.Rear, GallowsPvE.Target.Target))
+            {
+                if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+            else if (CanHitPositional(EnemyPositional.Flank, GibbetPvE.Target.Target))
+            {
+                if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
             else
             {
+                if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
                 if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
         }
@@ -186,12 +203,29 @@ public sealed class RPR_Default : ReaperRotation
         if (ExecutionerReady)
         {
             if (ExecutionersGuillotinePvE.CanUse(out act)) return true;
+
             if (Player.HasStatus(true, StatusID.EnhancedGallows))
             {
                 if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
+            else if (Player.HasStatus(true, StatusID.EnhancedGibbet))
+            {
+                if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+
+            // Try using Executioners Gallows/Gibbet that player is in position for when without Enchanced status
+
+            else if (CanHitPositional(EnemyPositional.Rear, ExecutionersGallowsPvE.Target.Target))
+            {
+                if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
+            else if (CanHitPositional(EnemyPositional.Flank, ExecutionersGibbetPvE.Target.Target))
+            {
+                if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
+            }
             else
             {
+                if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
                 if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
         }
