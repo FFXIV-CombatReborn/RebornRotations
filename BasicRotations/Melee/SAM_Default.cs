@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Melee/SAM_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Melee/SAM_Default.cs")]
 [Api(4)]
 public sealed class SAM_Default : SamuraiRotation
 {

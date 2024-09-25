@@ -1,7 +1,7 @@
 namespace DefaultRotations.Magical;
 
 [Rotation("DOES NOT WORK", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Limited Jobs/BLU_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Limited Jobs/BLU_Default.cs")]
 [Api(4)]
 public sealed class Blue_Default : BlueMageRotation
 {
