@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
-[SourceCode(Path = "main/DefaultRotations/PVPRotations/Melee/MNK_Default.PVP.cs")]
+[SourceCode(Path = "main/BasicRotations/PVPRotations/Melee/MNK_Default.PVP.cs")]
 [Api(4)]
 public sealed class MNK_DefaultPvP : MonkRotation
 {

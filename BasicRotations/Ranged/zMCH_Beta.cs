@@ -1,7 +1,7 @@
 namespace DefaultRotations.Ranged;
 
 [Rotation("zMCH Beta", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Ranged/zMCH_Beta.cs")]
+[SourceCode(Path = "main/BasicRotations/Ranged/zMCH_Beta.cs")]
 [Api(4)]
 public sealed class zMCH_Beta : MachinistRotation
 {
@@ -14,6 +14,9 @@ public sealed class zMCH_Beta : MachinistRotation
 
     [RotationConfig(CombatType.PvE, Name = "Delay Drill for combo GCD if have one charge and about to break combo")]
     private bool HoldDrillForCombo { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Delay Hypercharge for combo GCD if about to break combo")]
+    private bool HoldHCForCombo { get; set; } = true;
     #endregion
 
     #region Countdown logic
@@ -53,7 +56,7 @@ public sealed class zMCH_Beta : MachinistRotation
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         // Keeps Ricochet and Gauss cannon Even
-        bool isRicochetMore = RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.CurrentCharges <= RicochetPvE.Cooldown.CurrentCharges;
+        bool isRicochetMore = RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.RecastTimeElapsed <= RicochetPvE.Cooldown.RecastTimeElapsed;
 
         // Start Ricochet/Gauss cooldowns rolling
         if (!RicochetPvE.Cooldown.IsCoolingDown && RicochetPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -68,39 +71,24 @@ public sealed class zMCH_Beta : MachinistRotation
         // Rook Autoturret/Queen Logic
         if (CanUseQueenMeow(out act, nextGCD)) return true;
 
-        if (BSPrio && BarrelStabilizerPvE.CanUse(out act)) return true;
+        if (IsBurst && BSPrio && BarrelStabilizerPvE.CanUse(out act)) return true;
 
         // Burst
         if (IsBurst)
         {
             if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
         }
-        // Use Hypercharge if if wildfire will not be up in 30 seconds or if you hit 100 heat
+        // Use Hypercharge if wildfire will not be up in 30 seconds or if you hit 100 heat
         if (!LowLevelHyperCheck && !Player.HasStatus(true, StatusID.Reassembled) && (!WildfirePvE.Cooldown.WillHaveOneCharge(30) || (Heat == 100)))
         {
-            if (ToolChargeSoon(out act)) return true;
+            if (!HoldHCForCombo || !(LiveComboTime <= 8f && LiveComboTime > 0f) && ToolChargeSoon(out act)) return true;
         }
 
         // Use Ricochet and Gauss if have pooled charges or is burst window
-        if (isRicochetMore)
-        {
-            if ((IsLastGCD(true, BlazingShotPvE, HeatBlastPvE) 
-                || RicochetPvE.Cooldown.CurrentCharges >= RicochetPvE.Cooldown.MaxCharges - 1 
-                || !WildfirePvE.Cooldown.ElapsedAfter(20)) 
-                && RicochetPvE.CanUse(out act, skipAoeCheck: true, usedUp: true))
-                return true;
-        }
+        if (isRicochetMore && RicochetPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
+        if (GaussRoundPvE.CanUse(out act, usedUp: true, skipAoeCheck: true)) return true;
 
-        if ((IsLastGCD(true, BlazingShotPvE, HeatBlastPvE) 
-            || GaussRoundPvE.Cooldown.CurrentCharges >= GaussRoundPvE.Cooldown.MaxCharges - 1 
-            || !WildfirePvE.Cooldown.ElapsedAfter(20)) 
-            && GaussRoundPvE.CanUse(out act, usedUp: true, skipAoeCheck: true)) 
-            return true;
-
-        if (IsBurst)
-        {
-            if (BarrelStabilizerPvE.CanUse(out act)) return true;
-        }
+        if (IsBurst && BarrelStabilizerPvE.CanUse(out act)) return true;
 
         return base.AttackAbility(nextGCD, out act);
     }
@@ -174,7 +162,7 @@ public sealed class zMCH_Beta : MachinistRotation
                      (!AirAnchorPvE.EnoughLevel && HotShotPvE.EnoughLevel && HotShotPvE.Cooldown.WillHaveOneCharge(REST_TIME))
                      ||
                      // Drill Charge Detection
-                     (DrillPvE.EnoughLevel && (!DrillPvE.Cooldown.IsCoolingDown))
+                     (DrillPvE.EnoughLevel && (!DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, REST_TIME)))
                      ||
                      // Chainsaw Charge Detection
                      (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME))))
@@ -208,12 +196,12 @@ public sealed class zMCH_Beta : MachinistRotation
         bool QueenFifteen = Battery >= 100 && !CombatElapsedLess(590f) && CombatElapsedLess(610f);
 
         if (
-            (NewQueenLogic && 
-                (WildfirePvE.Cooldown.WillHaveOneChargeGCD(1) 
+             (NewQueenLogic && 
+                (WildfirePvE.Cooldown.WillHaveOneChargeGCD(4) 
                 || !WildfirePvE.Cooldown.ElapsedAfter(10)
-                || nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100) 
-                || (nextGCD.IsTheSameTo(true, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && (Battery == 90 || Battery == 100))) 
-            || !NewQueenLogic && (QueenOne || QueenTwo || QueenThree || QueenFour || QueenFive || QueenSix || QueenSeven || QueenEight || QueenNine || QueenTen || QueenEleven || QueenTwelve || QueenThirteen || QueenFourteen || QueenFifteen))
+                || (nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100) 
+                || (nextGCD.IsTheSameTo(true, HotShotPvE, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && (Battery == 90 || Battery == 100))) 
+            || !NewQueenLogic && (QueenOne || QueenTwo || QueenThree || QueenFour || QueenFive || QueenSix || QueenSeven || QueenEight || QueenNine || QueenTen || QueenEleven || QueenTwelve || QueenThirteen || QueenFourteen || QueenFifteen)))
         {
             if (RookAutoturretPvE.CanUse(out act)) return true;
         }

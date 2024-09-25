@@ -3,7 +3,7 @@
 namespace DefaultRotations.Magical;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Magical/SMN_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Magical/SMN_Default.cs")]
 [Api(4)]
 public sealed class SMN_Default : SummonerRotation
 {
