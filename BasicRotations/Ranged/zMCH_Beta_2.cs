@@ -81,7 +81,7 @@ public sealed class zMCH_Beta_2 : MachinistRotation
         if (!RicochetPvE.Cooldown.IsCoolingDown && RicochetPvE.CanUse(out act, skipAoeCheck: true)) return true;
         if (!GaussRoundPvE.Cooldown.IsCoolingDown && GaussRoundPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
-        if (IsLastGCD(true, DrillPvE) && BarrelStabilizerPvE.CanUse(out act)) return true;
+        if (IsBurst && IsLastGCD(true, DrillPvE) && BarrelStabilizerPvE.CanUse(out act)) return true;
 
         // Rook Autoturret/Queen Logic
         if (CanUseQueenMeow(out act, nextGCD)) return true;
@@ -94,7 +94,7 @@ public sealed class zMCH_Beta_2 : MachinistRotation
             && ToolChargeSoon(out act)) return true;
 
         // Use Ricochet and Gauss if have pooled charges or is burst window
-        if (isRicochetMore)
+        if (IsRicochetMore)
         {
             if ((IsLastGCD(true, BlazingShotPvE, HeatBlastPvE)
                 || RicochetPvE.Cooldown.RecastTimeElapsed >= 45
@@ -185,7 +185,7 @@ public sealed class zMCH_Beta_2 : MachinistRotation
                      (!AirAnchorPvE.EnoughLevel && HotShotPvE.EnoughLevel && HotShotPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))
                      ||
                      // Drill Charge Detection
-                     (DrillPvE.EnoughLevel && (!DrillPvE.Cooldown.IsCoolingDown))
+                     (DrillPvE.EnoughLevel && !DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, HYPERCHARGE_DURATION))
                      ||
                      // Chainsaw Charge Detection
                      (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))))
@@ -221,15 +221,16 @@ public sealed class zMCH_Beta_2 : MachinistRotation
         {
             if (RookAutoturretPvE.CanUse(out act)) return true;
         }
-        else if (
+        // take over with normal logic after queen timings run out in long fights
+        else if ((!UseBalanceQueenTimings || !CombatElapsedLess(610f)) &&
             // ASAP in opener
-            (CombatElapsedLessGCD(10))
-            // In first 10 seconds of 2 minute window
-            || (!AirAnchorPvE.Cooldown.ElapsedAfter(10) && (Player.HasStatus(true, StatusID.FullMetalMachinist) || BarrelStabilizerPvE.Cooldown.WillHaveOneChargeGCD(4)))
+            (CombatElapsedLessGCD(10)
+            // In first ~10 seconds of 2 minute window
+            || (!AirAnchorPvE.Cooldown.ElapsedAfter(10) && (BarrelStabilizerPvE.Cooldown.WillHaveOneChargeGCD(4) || !BarrelStabilizerPvE.Cooldown.ElapsedAfter(5))
             // or if about to overcap
-            || nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100
+            || (nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100)
             || (nextGCD.IsTheSameTo(true, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && (Battery == 90 || Battery == 100))
-            )
+            )))
         {
             if (RookAutoturretPvE.CanUse(out act)) return true;
         }
@@ -241,6 +242,6 @@ public sealed class zMCH_Beta_2 : MachinistRotation
     private bool LowLevelHyperCheck => !AutoCrossbowPvE.EnoughLevel && SpreadShotPvE.CanUse(out _);
 
     // Keeps Ricochet and Gauss Cannon Even
-    private bool isRicochetMore => RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.RecastTimeElapsed <= RicochetPvE.Cooldown.RecastTimeElapsed;
+    private bool IsRicochetMore => RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.RecastTimeElapsed <= RicochetPvE.Cooldown.RecastTimeElapsed;
     #endregion
 }
