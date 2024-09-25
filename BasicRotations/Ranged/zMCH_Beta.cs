@@ -162,7 +162,7 @@ public sealed class zMCH_Beta : MachinistRotation
                      (!AirAnchorPvE.EnoughLevel && HotShotPvE.EnoughLevel && HotShotPvE.Cooldown.WillHaveOneCharge(REST_TIME))
                      ||
                      // Drill Charge Detection
-                     (DrillPvE.EnoughLevel && (!DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, REST_TIME)))
+                     (DrillPvE.EnoughLevel && !DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, REST_TIME))
                      ||
                      // Chainsaw Charge Detection
                      (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME))))
@@ -197,7 +197,8 @@ public sealed class zMCH_Beta : MachinistRotation
 
         if (
              (NewQueenLogic && 
-                (WildfirePvE.Cooldown.WillHaveOneChargeGCD(4) 
+                (!CombatElapsedLess(610f)
+                || WildfirePvE.Cooldown.WillHaveOneChargeGCD(4) 
                 || !WildfirePvE.Cooldown.ElapsedAfter(10)
                 || (nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100) 
                 || (nextGCD.IsTheSameTo(true, HotShotPvE, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && (Battery == 90 || Battery == 100))) 
