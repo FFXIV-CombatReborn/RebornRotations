@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Magical;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Magical/PCT_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Magical/PCT_Default.cs")]
 [Api(4)]
 public sealed class PCT_Default : PictomancerRotation
 {

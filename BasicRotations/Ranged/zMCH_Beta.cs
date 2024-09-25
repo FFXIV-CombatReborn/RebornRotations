@@ -1,7 +1,7 @@
 namespace DefaultRotations.Ranged;
 
 [Rotation("zMCH Beta", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Ranged/zMCH_Beta.cs")]
+[SourceCode(Path = "main/BasicRotations/Ranged/zMCH_Beta.cs")]
 [Api(4)]
 public sealed class zMCH_Beta : MachinistRotation
 {

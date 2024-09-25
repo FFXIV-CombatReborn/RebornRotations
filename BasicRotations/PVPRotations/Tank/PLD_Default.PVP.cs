@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Tank;
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.00", Description = "Beta Rotation")]
-[SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/PLD_Default.PvP.cs")]
+[SourceCode(Path = "main/BasicRotations/PVPRotations/Tank/PLD_Default.PvP.cs")]
 [Api(4)]
 public sealed class PLD_DefaultPvP : PaladinRotation
 {

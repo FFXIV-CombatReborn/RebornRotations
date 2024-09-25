@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Melee;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.01", Description = "")]
-[SourceCode(Path = "main/DefaultRotations/Melee/RPR_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Melee/RPR_Default.cs")]
 [Api(4)]
 public sealed class RPR_Default : ReaperRotation
 {
@@ -137,14 +137,22 @@ public sealed class RPR_Default : ReaperRotation
         if (HasSoulReaver)
         {
             if (GuillotinePvE.CanUse(out act)) return true;
+
             if (Player.HasStatus(true, StatusID.EnhancedGallows))
             {
                 if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
-            else
+            else if (Player.HasStatus(true, StatusID.EnhancedGibbet))
             {
                 if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
+
+            // Try using Gallows/Gibbet that player is in position for when without Enchanced status
+            if (GallowsPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Rear, GallowsPvE.Target.Target)) return true;
+            if (GibbetPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Flank, GibbetPvE.Target.Target)) return true;
+
+            if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
+            if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
         }
 
         if (!CombatElapsedLessGCD(2) && PlentifulHarvestPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -186,14 +194,22 @@ public sealed class RPR_Default : ReaperRotation
         if (ExecutionerReady)
         {
             if (ExecutionersGuillotinePvE.CanUse(out act)) return true;
+
             if (Player.HasStatus(true, StatusID.EnhancedGallows))
             {
                 if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
-            else
+            else if (Player.HasStatus(true, StatusID.EnhancedGibbet))
             {
                 if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
             }
+
+            // Try using Executioners Gallows/Gibbet that player is in position for when without Enchanced status
+            if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Rear, ExecutionersGallowsPvE.Target.Target)) return true;
+            if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Flank, ExecutionersGibbetPvE.Target.Target)) return true;
+
+            if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
+            if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
         }
         act = null;
         return false;
