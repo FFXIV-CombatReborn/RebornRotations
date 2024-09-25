@@ -3,7 +3,7 @@
 namespace DefaultRotations.Magical;
 
 [Rotation("IcWa PCT BETA", CombatType.PvE, GameVersion = "7.05", Description = "Kindly created and donated by Rabbs and further update made by IcWa")]
-[SourceCode(Path = "main/DefaultRotations/Magical/ICWA_PCT_BETA.cs")]
+[SourceCode(Path = "main/BasicRotations/Magical/ICWA_PCT_BETA.cs")]
 [Api(4)]
 public sealed class IcWaPctBeta : PictomancerRotation
 {

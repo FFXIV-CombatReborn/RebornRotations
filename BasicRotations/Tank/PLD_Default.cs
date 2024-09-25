@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Tank;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Tank/PLD_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Tank/PLD_Default.cs")]
 [Api(4)]
 public class PLD_Default : PaladinRotation
 {
