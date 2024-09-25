@@ -175,20 +175,20 @@ public sealed class zMCH_Beta_2 : MachinistRotation
     private bool ToolChargeSoon(out IAction? act)
     {
         if
-                     //Cannot AOE
-                     (!SpreadShotPvE.CanUse(out _)
-                     &&
-                     // AirAnchor Enough Level % AirAnchor 
-                     ((AirAnchorPvE.EnoughLevel && AirAnchorPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))
-                     ||
-                     // HotShot Charge Detection
-                     (!AirAnchorPvE.EnoughLevel && HotShotPvE.EnoughLevel && HotShotPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))
-                     ||
-                     // Drill Charge Detection
-                     (DrillPvE.EnoughLevel && !DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, HYPERCHARGE_DURATION))
-                     ||
-                     // Chainsaw Charge Detection
-                     (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))))
+            //Cannot AOE
+            (!SpreadShotPvE.CanUse(out _)
+            &&
+            // AirAnchor Enough Level % AirAnchor 
+            ((AirAnchorPvE.EnoughLevel && AirAnchorPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))
+            ||
+            // HotShot Charge Detection
+            (!AirAnchorPvE.EnoughLevel && HotShotPvE.EnoughLevel && HotShotPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))
+            ||
+            // Drill Charge Detection
+            (DrillPvE.EnoughLevel && DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, HYPERCHARGE_DURATION))
+            ||
+            // Chainsaw Charge Detection
+            (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(HYPERCHARGE_DURATION))))
         {
             act = null;
             return false;
