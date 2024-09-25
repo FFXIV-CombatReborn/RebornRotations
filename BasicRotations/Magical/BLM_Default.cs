@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Magical;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.01")]
-[SourceCode(Path = "main/DefaultRotations/Magical/BLM_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Magical/BLM_Default.cs")]
 [Api(4)]
 public class BLM_Default : BlackMageRotation
 {

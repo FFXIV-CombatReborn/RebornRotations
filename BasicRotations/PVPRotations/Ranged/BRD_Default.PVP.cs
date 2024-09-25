@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Ranged;
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.05", Description = "Beta Rotation")]
-[SourceCode(Path = "main/DefaultRotations/PVPRotations/Ranged/BRD_Default.PvP.cs")]
+[SourceCode(Path = "main/BasicRotations/PVPRotations/Ranged/BRD_Default.PvP.cs")]
 [Api(4)]
 public sealed class BRD_DefaultPvP : BardRotation
 {

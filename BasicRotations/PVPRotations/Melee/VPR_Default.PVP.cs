@@ -1,7 +1,7 @@
 ﻿namespace DefaultRotations.Melee;
 
 [Rotation("Default PVP", CombatType.PvP, GameVersion = "7.05", Description = "Beta Rotation")]
-[SourceCode(Path = "main/DefaultRotations/PVPRotations/Tank/VPR_Default.PvP.cs")]
+[SourceCode(Path = "main/BasicRotations/PVPRotations/Tank/VPR_Default.PvP.cs")]
 [Api(4)]
 public sealed class VPR_DefaultPvP : ViperRotation
 {

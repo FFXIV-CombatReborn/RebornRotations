@@ -1,7 +1,7 @@
 namespace DefaultRotations.Tank;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
-[SourceCode(Path = "main/DefaultRotations/Tank/WAR_Default.cs")]
+[SourceCode(Path = "main/BasicRotations/Tank/WAR_Default.cs")]
 [Api(4)]
 public sealed class WAR_Default : WarriorRotation
 {
