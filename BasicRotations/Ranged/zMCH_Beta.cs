@@ -57,6 +57,9 @@ public sealed class zMCH_Beta : MachinistRotation
     {
         // Keeps Ricochet and Gauss cannon Even
         bool isRicochetMore = RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.RecastTimeElapsed <= RicochetPvE.Cooldown.RecastTimeElapsed;
+        
+        // If Wildfire is active, use Hypercharge.....Period
+        if (Player.HasStatus(true, StatusID.Wildfire_1946) && HyperchargePvE.CanUse(out act)) return true;
 
         // Start Ricochet/Gauss cooldowns rolling
         if (!RicochetPvE.Cooldown.IsCoolingDown && RicochetPvE.CanUse(out act, skipAoeCheck: true)) return true;
@@ -64,9 +67,6 @@ public sealed class zMCH_Beta : MachinistRotation
 
         // Check for not burning Hypercharge below level 52 on AOE
         bool LowLevelHyperCheck = !AutoCrossbowPvE.EnoughLevel && SpreadShotPvE.CanUse(out _);
-
-        // If Wildfire is active, use Hypercharge.....Period
-        if (Player.HasStatus(true, StatusID.Wildfire_1946) && HyperchargePvE.CanUse(out act)) return true;
 
         // Rook Autoturret/Queen Logic
         if (CanUseQueenMeow(out act, nextGCD)) return true;
@@ -152,20 +152,20 @@ public sealed class zMCH_Beta : MachinistRotation
     {
         float REST_TIME = 8f;
         if
-                     //Cannot AOE
-                     (!SpreadShotPvE.CanUse(out _)
-                     &&
-                     // AirAnchor Enough Level % AirAnchor 
-                     ((AirAnchorPvE.EnoughLevel && AirAnchorPvE.Cooldown.WillHaveOneCharge(REST_TIME))
-                     ||
-                     // HotShot Charge Detection
-                     (!AirAnchorPvE.EnoughLevel && HotShotPvE.EnoughLevel && HotShotPvE.Cooldown.WillHaveOneCharge(REST_TIME))
-                     ||
-                     // Drill Charge Detection
-                     (DrillPvE.EnoughLevel && !DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, REST_TIME))
-                     ||
-                     // Chainsaw Charge Detection
-                     (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME))))
+            //Cannot AOE
+            (!SpreadShotPvE.CanUse(out _)
+            &&
+            // AirAnchor Enough Level % AirAnchor 
+            ((AirAnchorPvE.EnoughLevel && AirAnchorPvE.Cooldown.WillHaveOneCharge(REST_TIME))
+            ||
+            // HotShot Charge Detection
+            (!AirAnchorPvE.EnoughLevel && HotShotPvE.EnoughLevel && HotShotPvE.Cooldown.WillHaveOneCharge(REST_TIME))
+            ||
+            // Drill Charge Detection
+            (DrillPvE.EnoughLevel && DrillPvE.Cooldown.WillHaveXCharges(DrillPvE.Cooldown.MaxCharges, REST_TIME))
+            ||
+            // Chainsaw Charge Detection
+            (ChainSawPvE.EnoughLevel && ChainSawPvE.Cooldown.WillHaveOneCharge(REST_TIME))))
         {
             act = null;
             return false;
