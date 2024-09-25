@@ -196,9 +196,8 @@ public sealed class zMCH_Beta : MachinistRotation
         bool QueenFifteen = Battery >= 100 && !CombatElapsedLess(590f) && CombatElapsedLess(610f);
 
         if (
-             (NewQueenLogic && 
-                (!CombatElapsedLess(610f)
-                || WildfirePvE.Cooldown.WillHaveOneChargeGCD(4) 
+             ((!CombatElapsedLess(610f) || NewQueenLogic) && 
+                (WildfirePvE.Cooldown.WillHaveOneChargeGCD(4) 
                 || !WildfirePvE.Cooldown.ElapsedAfter(10)
                 || (nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100) 
                 || (nextGCD.IsTheSameTo(true, HotShotPvE, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && (Battery == 90 || Battery == 100))) 
