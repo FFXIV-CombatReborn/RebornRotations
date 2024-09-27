@@ -6,9 +6,6 @@ namespace DefaultRotations.Ranged;
 public sealed class zMCH_Beta : MachinistRotation
 {
     #region Config Options
-    [RotationConfig(CombatType.PvE, Name = "Use new beta Queen logic (attempt to align with burst and otherwise avoid overcap). \nUnchecking this will use the 'experimental' hardcoded timings from the default rotation.")]
-    private bool NewQueenLogic { get; set; } = true;
-
     [RotationConfig(CombatType.PvE, Name = "Prioritize Barrel Stabilizer use")]
     private bool BSPrio { get; set; } = true;
 
@@ -17,6 +14,12 @@ public sealed class zMCH_Beta : MachinistRotation
 
     [RotationConfig(CombatType.PvE, Name = "Delay Hypercharge for combo GCD if about to break combo")]
     private bool HoldHCForCombo { get; set; } = true;
+
+    [RotationConfig(CombatType.PvE, Name = "Use burst medicine in countdown (requires auto burst option on)")]
+    private bool OpenerBurstMeds { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Use burst medicine when available for midfight burst phase (requires auto burst option on)")]
+    private bool MidfightBurstMeds { get; set; } = false;
     #endregion
 
     #region Countdown logic
@@ -25,8 +28,7 @@ public sealed class zMCH_Beta : MachinistRotation
     {
         // ReassemblePvE's duration is 5s, need to fire the first GCD before it ends
         if (remainTime < 5 && ReassemblePvE.CanUse(out var act)) return act;
-        // tincture needs to be used on -2s exactly
-        if (remainTime <= 2 && UseBurstMedicine(out act)) return act;
+        if (IsBurst && OpenerBurstMeds && remainTime <= 1f && UseBurstMedicine(out act)) return act;
         return base.CountDownAction(remainTime);
     }
     #endregion
@@ -35,6 +37,8 @@ public sealed class zMCH_Beta : MachinistRotation
     // Determines emergency actions to take based on the next planned GCD action.
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        if (IsBurst && MidfightBurstMeds && !CombatElapsedLessGCD(10) && TimeForBurstMeds(out act, nextGCD)) return true;
+
         // Reassemble Logic
         // Check next GCD action and conditions for Reassemble.
         bool isReassembleUsable =
@@ -68,23 +72,29 @@ public sealed class zMCH_Beta : MachinistRotation
         // Check for not burning Hypercharge below level 52 on AOE
         bool LowLevelHyperCheck = !AutoCrossbowPvE.EnoughLevel && SpreadShotPvE.CanUse(out _);
 
-        // Rook Autoturret/Queen Logic
-        if (CanUseQueenMeow(out act, nextGCD)) return true;
-
         if (IsBurst && BSPrio && BarrelStabilizerPvE.CanUse(out act)) return true;
 
         // Burst
         if (IsBurst)
         {
-            if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
+            if (WildfirePvE.Cooldown.WillHaveOneChargeGCD(1) && (IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck)
+            {
+                if (WeaponRemain < 1.25f && WildfirePvE.CanUse(out act)) return true;
+                act = null;
+                return false;
+            }
+
         }
         // Use Hypercharge if wildfire will not be up in 30 seconds or if you hit 100 heat
         if (!LowLevelHyperCheck && !Player.HasStatus(true, StatusID.Reassembled) && (!WildfirePvE.Cooldown.WillHaveOneCharge(30) || (Heat == 100)))
         {
-            if (!HoldHCForCombo || !(LiveComboTime <= 8f && LiveComboTime > 0f) && ToolChargeSoon(out act)) return true;
+            if ((!HoldHCForCombo || !(LiveComboTime <= 8f && LiveComboTime > 0f)) && ToolChargeSoon(out act)) return true;
         }
 
-        // Use Ricochet and Gauss if have pooled charges or is burst window
+        // Rook Autoturret/Queen Logic
+        if (CanUseQueenMeow(out act, nextGCD)) return true;
+
+        // Use Ricochet and Gauss
         if (isRicochetMore && RicochetPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
         if (GaussRoundPvE.CanUse(out act, usedUp: true, skipAoeCheck: true)) return true;
 
@@ -176,33 +186,19 @@ public sealed class zMCH_Beta : MachinistRotation
         }
     }
 
+    private bool TimeForBurstMeds(out IAction? act, IAction nextGCD) 
+    {
+        if (AirAnchorPvE.Cooldown.WillHaveOneChargeGCD(1) && BarrelStabilizerPvE.Cooldown.WillHaveOneChargeGCD(6) && WildfirePvE.Cooldown.WillHaveOneChargeGCD(6)) return UseBurstMedicine(out act);
+        act = null;
+        return false;
+    }
+
     private bool CanUseQueenMeow(out IAction? act, IAction nextGCD)
     {
-        // Define conditions under which the Rook Autoturret/Queen can be used.
-        bool QueenOne = Battery >= 60 && CombatElapsedLess(25f);
-        bool QueenTwo = Battery >= 90 && !CombatElapsedLess(58f) && CombatElapsedLess(78f);
-        bool QueenThree = Battery >= 100 && !CombatElapsedLess(111f) && CombatElapsedLess(131f);
-        bool QueenFour = Battery >= 50 && !CombatElapsedLess(148f) && CombatElapsedLess(168f);
-        bool QueenFive = Battery >= 60 && !CombatElapsedLess(178f) && CombatElapsedLess(198f);
-        bool QueenSix = Battery >= 100 && !CombatElapsedLess(230f) && CombatElapsedLess(250f);
-        bool QueenSeven = Battery >= 50 && !CombatElapsedLess(268f) && CombatElapsedLess(288f);
-        bool QueenEight = Battery >= 70 && !CombatElapsedLess(296f) && CombatElapsedLess(316f);
-        bool QueenNine = Battery >= 100 && !CombatElapsedLess(350f) && CombatElapsedLess(370f);
-        bool QueenTen = Battery >= 50 && !CombatElapsedLess(388f) && CombatElapsedLess(408f);
-        bool QueenEleven = Battery >= 80 && !CombatElapsedLess(416f) && CombatElapsedLess(436f);
-        bool QueenTwelve = Battery >= 100 && !CombatElapsedLess(470f) && CombatElapsedLess(490f);
-        bool QueenThirteen = Battery >= 50 && !CombatElapsedLess(505f) && CombatElapsedLess(525f);
-        bool QueenFourteen = Battery >= 60 && !CombatElapsedLess(538f) && CombatElapsedLess(558f);
-        bool QueenFifteen = Battery >= 100 && !CombatElapsedLess(590f) && CombatElapsedLess(610f);
-
-        if (
-             (NewQueenLogic && 
-                (!CombatElapsedLess(610f)
-                || WildfirePvE.Cooldown.WillHaveOneChargeGCD(4) 
-                || !WildfirePvE.Cooldown.ElapsedAfter(10)
-                || (nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100) 
-                || (nextGCD.IsTheSameTo(true, HotShotPvE, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && (Battery == 90 || Battery == 100))) 
-            || !NewQueenLogic && (QueenOne || QueenTwo || QueenThree || QueenFour || QueenFive || QueenSix || QueenSeven || QueenEight || QueenNine || QueenTen || QueenEleven || QueenTwelve || QueenThirteen || QueenFourteen || QueenFifteen)))
+        if (WildfirePvE.Cooldown.WillHaveOneChargeGCD(4) 
+            || !WildfirePvE.Cooldown.ElapsedAfter(10)
+            || (nextGCD.IsTheSameTo(true, CleanShotPvE) && Battery == 100) 
+            || (nextGCD.IsTheSameTo(true, HotShotPvE, AirAnchorPvE, ChainSawPvE, ExcavatorPvE) && (Battery == 90 || Battery == 100)))
         {
             if (RookAutoturretPvE.CanUse(out act)) return true;
         }
