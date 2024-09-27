@@ -75,9 +75,6 @@ public sealed class zMCH_Beta : MachinistRotation
 
         if (IsBurst && BSPrio && BarrelStabilizerPvE.CanUse(out act)) return true;
 
-        // Rook Autoturret/Queen Logic
-        if (CanUseQueenMeow(out act, nextGCD)) return true;
-
         // Burst
         if (IsBurst)
         {
@@ -94,6 +91,9 @@ public sealed class zMCH_Beta : MachinistRotation
         {
             if ((!HoldHCForCombo || !(LiveComboTime <= 8f && LiveComboTime > 0f)) && ToolChargeSoon(out act)) return true;
         }
+
+        // Rook Autoturret/Queen Logic
+        if (CanUseQueenMeow(out act, nextGCD)) return true;
 
         // Use Ricochet and Gauss
         if (isRicochetMore && RicochetPvE.CanUse(out act, skipAoeCheck: true, usedUp: true)) return true;
