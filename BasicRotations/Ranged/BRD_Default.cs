@@ -148,7 +148,7 @@ public sealed class BRD_Default : BardRotation
         }
 
         // Bloodletter Overcap protection
-        if (RainOfDeathPvE.Cooldown.WillHaveXCharges(BloodletterMax, 3f))
+        if (BloodletterPvE.Cooldown.WillHaveXCharges(BloodletterMax, 3f))
         {
             if (BloodletterPvE.CanUse(out act, usedUp: true)) return true;
 
