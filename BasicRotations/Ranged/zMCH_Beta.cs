@@ -28,8 +28,7 @@ public sealed class zMCH_Beta : MachinistRotation
     {
         // ReassemblePvE's duration is 5s, need to fire the first GCD before it ends
         if (remainTime < 5 && ReassemblePvE.CanUse(out var act)) return act;
-        // tincture needs to be used on -2s exactly
-        if (IsBurst && OpenerBurstMeds && remainTime <= 2 && UseBurstMedicine(out act)) return act;
+        if (IsBurst && OpenerBurstMeds && remainTime <= 1f && UseBurstMedicine(out act)) return act;
         return base.CountDownAction(remainTime);
     }
     #endregion
@@ -78,7 +77,7 @@ public sealed class zMCH_Beta : MachinistRotation
         // Burst
         if (IsBurst)
         {
-            if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck)
+            if (WildfirePvE.Cooldown.WillHaveOneChargeGCD(1) && (IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck)
             {
                 if (WeaponRemain < 1.25f && WildfirePvE.CanUse(out act)) return true;
                 act = null;
@@ -189,7 +188,7 @@ public sealed class zMCH_Beta : MachinistRotation
 
     private bool TimeForBurstMeds(out IAction? act, IAction nextGCD) 
     {
-        if (AirAnchorPvE.Cooldown.WillHaveOneChargeGCD(2) && BarrelStabilizerPvE.Cooldown.WillHaveOneChargeGCD(6) && WildfirePvE.Cooldown.WillHaveOneChargeGCD(6)) return UseBurstMedicine(out act);
+        if (AirAnchorPvE.Cooldown.WillHaveOneCharge(2) && BarrelStabilizerPvE.Cooldown.WillHaveOneChargeGCD(6) && WildfirePvE.Cooldown.WillHaveOneChargeGCD(6)) return UseBurstMedicine(out act);
         act = null;
         return false;
     }
