@@ -8,6 +8,12 @@ public sealed class zMCH_Beta_2 : MachinistRotation
     #region Config Options
     [RotationConfig(CombatType.PvE, Name = "Use hardcoded Queen timings\nSlight DPS gain if uninterrupted but possibly loses more from drift or death.")]
     private bool UseBalanceQueenTimings { get; set; }
+
+    [RotationConfig(CombatType.PvE, Name = "Use burst medicine in countdown")]
+    private bool OpenerBurstMeds { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Use burst medicine when available for midfight burst phase")]
+    private bool MidfightBurstMeds { get; set; } = false;
     #endregion
 
     private const float HYPERCHARGE_DURATION = 8f;
@@ -19,7 +25,7 @@ public sealed class zMCH_Beta_2 : MachinistRotation
         // ReassemblePvE's duration is 5s, need to fire the first GCD before it ends
         if (remainTime < 5 && ReassemblePvE.CanUse(out var act)) return act;
         // tincture needs to be used on -2s exactly
-        if (remainTime <= 2 && UseBurstMedicine(out act)) return act;
+        if (OpenerBurstMeds && remainTime <= 2 && UseBurstMedicine(out act)) return act;
         return base.CountDownAction(remainTime);
     }
     #endregion
@@ -28,6 +34,7 @@ public sealed class zMCH_Beta_2 : MachinistRotation
     // Determines emergency actions to take based on the next planned GCD action.
     protected override bool EmergencyAbility(IAction nextGCD, out IAction? act)
     {
+        if (IsBurst && MidfightBurstMeds && !CombatElapsedLessGCD(10) && TimeForBurstMeds(out act, nextGCD)) return true;
         if (IsBurst)
         {
             
@@ -240,6 +247,13 @@ public sealed class zMCH_Beta_2 : MachinistRotation
 
     // Check for not burning Hypercharge below level 52 on AOE
     private bool LowLevelHyperCheck => !AutoCrossbowPvE.EnoughLevel && SpreadShotPvE.CanUse(out _);
+
+    private bool TimeForBurstMeds(out IAction? act, IAction nextGCD)
+    {
+        if (AirAnchorPvE.Cooldown.WillHaveOneChargeGCD(2) && BarrelStabilizerPvE.Cooldown.WillHaveOneChargeGCD(6) && WildfirePvE.Cooldown.WillHaveOneChargeGCD(6)) return UseBurstMedicine(out act);
+        act = null;
+        return false;
+    }
 
     // Keeps Ricochet and Gauss Cannon Even
     private bool IsRicochetMore => RicochetPvE.EnoughLevel && GaussRoundPvE.Cooldown.RecastTimeElapsed <= RicochetPvE.Cooldown.RecastTimeElapsed;
