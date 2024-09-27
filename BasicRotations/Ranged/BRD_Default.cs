@@ -148,21 +148,21 @@ public sealed class BRD_Default : BardRotation
         }
 
         // Bloodletter Overcap protection
-        if (RagingStrikesPvE.Cooldown.IsCoolingDown && BloodletterMax == BloodletterPvE.Cooldown.CurrentCharges)
+        if (BloodletterPvE.Cooldown.WillHaveXCharges(BloodletterMax, 3f))
         {
-            if (HeartbreakShotPvE.CanUse(out act)) return true;
+            if (RainOfDeathPvE.CanUse(out act, usedUp: true)) return true;
 
-            if (RainOfDeathPvE.CanUse(out act)) return true;
+            if (HeartbreakShotPvE.CanUse(out act, usedUp: true)) return true;
 
-            if (BloodletterPvE.CanUse(out act)) return true;
+            if (BloodletterPvE.CanUse(out act, usedUp: true)) return true;
         }
 
         // Prevents Bloodletter bumpcapping when MAGE is the song due to Repetoire procs
-        if ((BloodletterPvE.Cooldown.CurrentCharges > 1) && Song == Song.MAGE)
+        if (BloodletterPvE.Cooldown.WillHaveXCharges(BloodletterMax, 7.5f) && Song == Song.MAGE)
         {
-            if (HeartbreakShotPvE.CanUse(out act, usedUp: true)) return true;
-
             if (RainOfDeathPvE.CanUse(out act, usedUp: true)) return true;
+
+            if (HeartbreakShotPvE.CanUse(out act, usedUp: true)) return true;
 
             if (BloodletterPvE.CanUse(out act, usedUp: true)) return true;
         }
