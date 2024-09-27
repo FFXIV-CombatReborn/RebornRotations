@@ -81,7 +81,12 @@ public sealed class zMCH_Beta : MachinistRotation
         // Burst
         if (IsBurst)
         {
-            if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck && WildfirePvE.CanUse(out act)) return true;
+            if ((IsLastAbility(false, HyperchargePvE) || Heat >= 50 || Player.HasStatus(true, StatusID.Hypercharged)) && ToolChargeSoon(out _) && !LowLevelHyperCheck)
+            {
+                if (WeaponRemain < 1.25f && WildfirePvE.CanUse(out act)) return true;
+            }
+            act = null;
+            return false;
         }
         // Use Hypercharge if wildfire will not be up in 30 seconds or if you hit 100 heat
         if (!LowLevelHyperCheck && !Player.HasStatus(true, StatusID.Reassembled) && (!WildfirePvE.Cooldown.WillHaveOneCharge(30) || (Heat == 100)))
