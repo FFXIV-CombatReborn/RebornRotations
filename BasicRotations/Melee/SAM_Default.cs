@@ -164,15 +164,15 @@ public sealed class SAM_Default : SamuraiRotation
             YukikazePvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && HasGetsu && HasKa)) return true;
 
         // single target 123 combo's 3 or used 3 directly during burst when MeikyoShisui is active, while also trying to start with the one that player is in position for extra DMG
-        if (GekkoPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasGetsu) && CanHitPositional(EnemyPositional.Rear, GekkoPvE.Target.Target)) return true;
-        if (KashaPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasKa) && CanHitPositional(EnemyPositional.Flank, KashaPvE.Target.Target)) return true;
+        if (GekkoPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasGetsu) && GekkoPvE.Target.Target != null && CanHitPositional(EnemyPositional.Rear, GekkoPvE.Target.Target)) return true;
+        if (KashaPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasKa) && KashaPvE.Target.Target != null && CanHitPositional(EnemyPositional.Flank, KashaPvE.Target.Target)) return true;
 
         if (GekkoPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasGetsu)) return true;
         if (KashaPvE.CanUse(out act, skipComboCheck: HaveMeikyoShisui && !HasKa)) return true;
 
         // single target 123 combo's 2, while also trying to start with the one that player is in position for extra DMG
-        if (!HasGetsu && JinpuPvE.CanUse(out act) && (CanHitPositional(EnemyPositional.Rear, JinpuPvE.Target.Target) || (!HasMoon && HasFlower))) return true;
-        if (!HasKa && ShifuPvE.CanUse(out act) && (CanHitPositional(EnemyPositional.Flank, ShifuPvE.Target.Target) || (!HasFlower && HasMoon))) return true;
+        if (!HasGetsu && JinpuPvE.CanUse(out act) && JinpuPvE.Target.Target != null && (CanHitPositional(EnemyPositional.Rear, JinpuPvE.Target.Target) || (!HasMoon && HasFlower))) return true;
+        if (!HasKa && ShifuPvE.CanUse(out act) && ShifuPvE.Target.Target != null && (CanHitPositional(EnemyPositional.Flank, ShifuPvE.Target.Target) || (!HasFlower && HasMoon))) return true;
 
         if ((!HasMoon || IsMoonTimeLessThanFlower || !ShifuPvE.EnoughLevel) && JinpuPvE.CanUse(out act)) return true;
         if ((!HasFlower || !IsMoonTimeLessThanFlower) && ShifuPvE.CanUse(out act)) return true;
