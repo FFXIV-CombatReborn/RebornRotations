@@ -148,8 +148,8 @@ public sealed class RPR_Default : ReaperRotation
             }
 
             // Try using Gallows/Gibbet that player is in position for when without Enchanced status
-            if (GallowsPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Rear, GallowsPvE.Target.Target)) return true;
-            if (GibbetPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Flank, GibbetPvE.Target.Target)) return true;
+            if (GallowsPvE.CanUse(out act, skipComboCheck: true) && GallowsPvE.Target.Target != null && CanHitPositional(EnemyPositional.Rear, GallowsPvE.Target.Target)) return true;
+            if (GibbetPvE.CanUse(out act, skipComboCheck: true) && GibbetPvE.Target.Target != null && CanHitPositional(EnemyPositional.Flank, GibbetPvE.Target.Target)) return true;
 
             if (GallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
             if (GibbetPvE.CanUse(out act, skipComboCheck: true)) return true;
@@ -205,8 +205,8 @@ public sealed class RPR_Default : ReaperRotation
             }
 
             // Try using Executioners Gallows/Gibbet that player is in position for when without Enchanced status
-            if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Rear, ExecutionersGallowsPvE.Target.Target)) return true;
-            if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Flank, ExecutionersGibbetPvE.Target.Target)) return true;
+            if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true) && ExecutionersGallowsPvE.Target.Target != null && CanHitPositional(EnemyPositional.Rear, ExecutionersGallowsPvE.Target.Target)) return true;
+            if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true) && ExecutionersGibbetPvE.Target.Target != null && CanHitPositional(EnemyPositional.Flank, ExecutionersGibbetPvE.Target.Target)) return true;
 
             if (ExecutionersGallowsPvE.CanUse(out act, skipComboCheck: true)) return true;
             if (ExecutionersGibbetPvE.CanUse(out act, skipComboCheck: true)) return true;

@@ -68,6 +68,27 @@ public sealed class BRD_Default : BardRotation
         return base.EmergencyAbility(nextGCD, out act);
     }
 
+    [RotationDesc(ActionID.TheWardensPaeanPvE)]
+    protected override bool DispelGCD(out IAction? act)
+    {
+        if (TheWardensPaeanPvE.CanUse(out act)) return true;
+        return base.DispelGCD(out act);
+    }
+
+    [RotationDesc(ActionID.NaturesMinnePvE)]
+    protected override bool HealSingleAbility(IAction nextGCD, out IAction? act)
+    {
+        if (NaturesMinnePvE.CanUse(out act)) return true;
+        return base.HealSingleAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.TroubadourPvE)]
+    protected override bool DefenseAreaAbility(IAction nextGCD, out IAction act)
+    {
+        if (TroubadourPvE.CanUse(out act)) return true;
+        return false;
+    }
+
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         act = null;

@@ -67,6 +67,28 @@ public sealed class DNC_Default : DancerRotation
         return false;
     }
 
+    [RotationDesc(ActionID.CuringWaltzPvE, ActionID.ImprovisationPvE)]
+    protected override bool HealAreaAbility(IAction nextGCD, out IAction act)
+    {
+        if (CuringWaltzPvE.CanUse(out act, usedUp: true)) return true;
+        if (ImprovisationPvE.CanUse(out act, usedUp: true)) return true;
+        return false;
+    }
+
+    [RotationDesc(ActionID.ShieldSambaPvE)]
+    protected override bool DefenseAreaAbility(IAction nextGCD, out IAction act)
+    {
+        if (ShieldSambaPvE.CanUse(out act, usedUp: true)) return true;
+        return false;
+    }
+
+    [RotationDesc(ActionID.EnAvantPvE)]
+    protected override bool MoveForwardAbility(IAction nextGCD, out IAction act)
+    {
+        if (EnAvantPvE.CanUse(out act, usedUp: true)) return true;
+        return false;
+    }
+
     // Override the method for handling attack abilities
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {

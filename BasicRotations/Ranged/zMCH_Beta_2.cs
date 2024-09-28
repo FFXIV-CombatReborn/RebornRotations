@@ -71,6 +71,14 @@ public sealed class zMCH_Beta_2 : MachinistRotation
         return base.EmergencyAbility(nextGCD, out act);
     }
 
+    [RotationDesc(ActionID.TacticianPvE, ActionID.DismantlePvE)]
+    protected override bool DefenseAreaAbility(IAction nextGCD, out IAction act)
+    {
+        if (TacticianPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if (DismantlePvE.CanUse(out act, skipAoeCheck: true)) return true;
+        return false;
+    }
+
     // Logic for using attack abilities outside of GCD, focusing on burst windows and cooldown management.
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {

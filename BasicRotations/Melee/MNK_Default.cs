@@ -61,6 +61,34 @@ public sealed class MNK_Default : MonkRotation
         return base.EmergencyAbility(nextGCD, out act);
     }
 
+    [RotationDesc(ActionID.ThunderclapPvE)]
+    protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
+    {
+        if (ThunderclapPvE.CanUse(out act)) return true;
+        return base.MoveForwardAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.FeintPvE)]
+    protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
+    {
+        if (FeintPvE.CanUse(out act)) return true;
+        return base.DefenseAreaAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.MantraPvE)]
+    protected override bool HealAreaAbility(IAction nextGCD, out IAction? act)
+    {
+        if (MantraPvE.CanUse(out act)) return true;
+        return base.HealAreaAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.RiddleOfEarthPvE)]
+    protected override bool DefenseSingleAbility(IAction nextGCD, out IAction? act)
+    {
+        if (RiddleOfEarthPvE.CanUse(out act, usedUp: true)) return true;
+        return base.DefenseSingleAbility(nextGCD, out act);
+    }
+
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         act = null;
@@ -68,7 +96,7 @@ public sealed class MNK_Default : MonkRotation
         {
             return false;
         }
-        
+
         // you need to position yourself in the centre of the mobs if they are large, that range is only 3 yarms
         if (AutoPB_AOE && NumberOfHostilesInRange >= 2)
         {

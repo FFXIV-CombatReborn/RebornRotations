@@ -20,6 +20,9 @@ public sealed class zMCH_Beta : MachinistRotation
 
     [RotationConfig(CombatType.PvE, Name = "Use burst medicine when available for midfight burst phase (requires auto burst option on)")]
     private bool MidfightBurstMeds { get; set; } = false;
+
+    [RotationConfig(CombatType.PvE, Name = "Prevent the use of defense abilties during hypercharge burst")]
+    private bool BurstDefense { get; set; } = false;
     #endregion
 
     #region Countdown logic
@@ -56,6 +59,15 @@ public sealed class zMCH_Beta : MachinistRotation
             if (ReassemblePvE.CanUse(out act, skipComboCheck: true, usedUp: true)) return true;
         }
         return base.EmergencyAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.TacticianPvE, ActionID.DismantlePvE)]
+    protected override bool DefenseAreaAbility(IAction nextGCD, out IAction? act)
+    {
+        if ((!BurstDefense || (BurstDefense && !IsOverheated)) && TacticianPvE.CanUse(out act, skipAoeCheck: true)) return true;
+        if ((!BurstDefense || (BurstDefense && !IsOverheated)) && DismantlePvE.CanUse(out act, skipAoeCheck: true)) return true;
+
+        return base.DefenseAreaAbility(nextGCD, out act);
     }
 
     // Logic for using attack abilities outside of GCD, focusing on burst windows and cooldown management.

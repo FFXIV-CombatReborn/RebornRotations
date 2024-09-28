@@ -83,6 +83,9 @@ public class PLD_Default : PaladinRotation
         {
             if (Player.HasStatus(true, StatusID.Cover) && HallowedWithCover && HallowedGroundPvE.CanUse(out act)) return true;
 
+            if (HallowedGroundPvE.CanUse(out act)
+            && Player.GetHealthRatio() <= HealthForDyingTanks) return true;
+
             if ((Player.HasStatus(true, StatusID.Rampart) || Player.HasStatus(true, StatusID.Sentinel)) &&
                 InterventionPvE.CanUse(out act) &&
                 InterventionPvE.Target.Target?.GetHealthRatio() < 0.6) return true;
@@ -91,6 +94,13 @@ public class PLD_Default : PaladinRotation
                 CoverPvE.Target.Target?.GetHealthRatio() < CoverRatio) return true;
         }
         return base.EmergencyAbility(nextGCD, out act);
+    }
+
+    [RotationDesc(ActionID.IntervenePvE)]
+    protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
+    {
+        if (IntervenePvE.CanUse(out act)) return true;
+        return base.MoveForwardAbility(nextGCD, out act);
     }
 
     [RotationDesc(ActionID.SentinelPvE, ActionID.RampartPvE, ActionID.BulwarkPvE, ActionID.SheltronPvE, ActionID.ReprisalPvE)]
@@ -217,6 +227,13 @@ public class PLD_Default : PaladinRotation
         if (UseShieldLob && ShieldLobPvE.CanUse(out act)) return true;
 
         return base.GeneralGCD(out act);
+    }
+
+    [RotationDesc(ActionID.ClemencyPvE)]
+    protected override bool HealSingleGCD(out IAction? act)
+    {
+        if (ClemencyPvE.CanUse(out act)) return true;
+        return base.HealSingleGCD(out act);
     }
     #endregion
 

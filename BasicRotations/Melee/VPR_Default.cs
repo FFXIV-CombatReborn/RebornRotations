@@ -167,8 +167,8 @@ public sealed class VPR_Default : ViperRotation
 
         ////Single Target Dread Combo
         // Try using Coil that player is in position for extra damage first
-        if (HuntersCoilPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Flank, HuntersCoilPvE.Target.Target)) return true;
-        if (SwiftskinsCoilPvE.CanUse(out act, skipComboCheck: true) && CanHitPositional(EnemyPositional.Rear, SwiftskinsCoilPvE.Target.Target)) return true;
+        if (HuntersCoilPvE.CanUse(out act, skipComboCheck: true) && HuntersCoilPvE.Target.Target != null && CanHitPositional(EnemyPositional.Flank, HuntersCoilPvE.Target.Target)) return true;
+        if (SwiftskinsCoilPvE.CanUse(out act, skipComboCheck: true) && SwiftskinsCoilPvE.Target.Target != null && CanHitPositional(EnemyPositional.Rear, SwiftskinsCoilPvE.Target.Target)) return true;
 
         if (HuntersCoilPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (SwiftskinsCoilPvE.CanUse(out act, skipComboCheck: true)) return true;
