@@ -44,10 +44,12 @@ public sealed class zMCH_Beta : MachinistRotation
         bool isReassembleUsable =
             //Reassemble current # of charges and double proc protection
             ReassemblePvE.Cooldown.CurrentCharges > 0 && !Player.HasStatus(true, StatusID.Reassembled) &&
-            (nextGCD.IsTheSameTo(true, [ChainSawPvE, ExcavatorPvE]) || nextGCD.IsTheSameTo(false, [AirAnchorPvE]) ||
-             (!ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, DrillPvE)) ||
-             (!DrillPvE.EnoughLevel && nextGCD.IsTheSameTo(true, CleanShotPvE)) ||
-             (!CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(false, HotShotPvE)));
+            (nextGCD.IsTheSameTo(true, [ChainSawPvE, ExcavatorPvE]) 
+            || (!ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, SpreadShotPvE) && ((IBaseAction)nextGCD).Target.AffectedTargets.Length >= (SpreadShotMasteryTrait.EnoughLevel ? 4 : 5))
+            || nextGCD.IsTheSameTo(false, [AirAnchorPvE]) 
+            || (!ChainSawPvE.EnoughLevel && nextGCD.IsTheSameTo(true, DrillPvE)) 
+            || (!DrillPvE.EnoughLevel && nextGCD.IsTheSameTo(true, CleanShotPvE)) 
+            || (!CleanShotPvE.EnoughLevel && nextGCD.IsTheSameTo(false, HotShotPvE)));
         // Attempt to use Reassemble if it's ready
         if (isReassembleUsable)
         {
