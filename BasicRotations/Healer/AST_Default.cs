@@ -254,8 +254,12 @@ public sealed class AST_Default : AstrologianRotation
 
         if (GravityPvE.CanUse(out act)) return true;
 
+        if (CombustIiiPvE.CanUse(out act)) return true;
+        if (CombustIiPvE.CanUse(out act)) return true;
         if (CombustPvE.CanUse(out act)) return true;
         if (MaleficPvE.CanUse(out act)) return true;
+        if (CombustIiiPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
+        if (CombustIiPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
         if (CombustPvE.CanUse(out act, skipStatusProvideCheck: DOTUpkeep)) return true;
 
         return base.GeneralGCD(out act);
