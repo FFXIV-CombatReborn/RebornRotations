@@ -46,6 +46,8 @@ public sealed class WAR_Default : WarriorRotation
     {
         if (InfuriatePvE.CanUse(out act, gcdCountForAbility: 3)) return true;
 
+        if (!InnerReleasePvE.EnoughLevel && Player.HasStatus(true, StatusID.Berserk) && InfuriatePvE.CanUse(out act, usedUp: true)) return true;
+
         if (CombatElapsedLessGCD(1)) return false;
 
         if (Player.HasStatus(false, StatusID.SurgingTempest)
