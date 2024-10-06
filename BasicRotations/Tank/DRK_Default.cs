@@ -136,26 +136,27 @@ public sealed class DRK_Default : DarkKnightRotation
     #region GCD Logic
     protected override bool GeneralGCD(out IAction? act)
     {
+        if (ImpalementPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (QuietusPvE.CanUse(out act, skipComboCheck: true)) return true;
+
+        if (IsLastGCD(true, ComeuppancePvE) && TorcleaverPvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (IsLastGCD(true, ScarletDeliriumPvE) && ComeuppancePvE.CanUse(out act, skipComboCheck: true)) return true;
+        if (ScarletDeliriumPvE.CanUse(out act, skipComboCheck: true)) return true;
+
         if (DisesteemPvE.CanUse(out act)) return true;
 
-        if (QuietusPvE.CanUse(out act, skipComboCheck: true)) return true;
-        if (ImpalementPvE.CanUse(out act, skipComboCheck: true)) return true;
-        if (ScarletDeliriumPvE.CanUse(out act, skipComboCheck: true)) return true;
-        if (ComeuppancePvE.CanUse(out act, skipComboCheck: true)) return true;
-        if (TorcleaverPvE.CanUse(out act, skipComboCheck: true)) return true;
         if (BloodspillerPvE.CanUse(out act, skipComboCheck: true)) return true;
+
+
 
         //AOE
         if (StalwartSoulPvE.CanUse(out act)) return true;
         if (UnleashPvE.CanUse(out act)) return true;
 
         //Single Target
-        if (!Player.HasStatus(true, StatusID.Delirium_1972) && !Player.HasStatus(true, StatusID.Delirium_3836))
-        {
-            if (SouleaterPvE.CanUse(out act)) return true;
-            if (SyphonStrikePvE.CanUse(out act)) return true;
-            if (HardSlashPvE.CanUse(out act)) return true;
-        }
+        if (SouleaterPvE.CanUse(out act)) return true;
+        if (SyphonStrikePvE.CanUse(out act)) return true;
+        if (HardSlashPvE.CanUse(out act)) return true;
 
         if (UnmendPvE.CanUse(out act)) return true;
 
