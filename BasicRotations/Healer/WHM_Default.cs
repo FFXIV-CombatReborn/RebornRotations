@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace DefaultRotations.Healer;
 
 [Rotation("Default", CombatType.PvE, GameVersion = "7.05")]
@@ -39,6 +41,21 @@ public sealed class WHM_Default : WhiteMageRotation
     [RotationConfig(CombatType.PvE, Name = "Casting cost requirement for Thin Air to be used")]
 
     public float ThinAirNeed { get; set; } = 1000;
+
+    [RotationConfig(CombatType.PvE, Name = "How to manage the last thin air charge")]
+    public ThinAirUsageStrategy ThinAirLastChargeUsage { get; set; } = ThinAirUsageStrategy.ReserveLastChargeForRaise;
+
+    public enum ThinAirUsageStrategy : byte
+    {
+        [Description("Use all thin air charges on expensive spells")]
+        UseAllCharges,
+
+        [Description("Reserve the last charge for raise")]
+        ReserveLastChargeForRaise,
+
+        [Description("Reserve the last charge")]
+        ReserveLastCharge,
+    }
     #endregion
 
     #region Countdown Logic
@@ -61,8 +78,9 @@ public sealed class WHM_Default : WhiteMageRotation
     {
         if (Player.WillStatusEndGCD(0, 3, true, StatusID.DivineGrace) && DivineCaressPvE.CanUse(out act)) return true;
 
+        bool useLastThinAirCharge = ThinAirLastChargeUsage == ThinAirUsageStrategy.UseAllCharges || (ThinAirLastChargeUsage == ThinAirUsageStrategy.ReserveLastChargeForRaise && nextGCD == RaisePvE);
         if (nextGCD is IBaseAction action && action.Info.MPNeed >= ThinAirNeed &&
-            ThinAirPvE.CanUse(out act)) return true;
+            ThinAirPvE.CanUse(out act, usedUp: useLastThinAirCharge)) return true;
 
         if (nextGCD.IsTheSameTo(true, AfflatusRapturePvE, MedicaPvE, MedicaIiPvE, CureIiiPvE)
             && (MergedStatus.HasFlag(AutoStatus.HealAreaSpell) || MergedStatus.HasFlag(AutoStatus.HealSingleSpell)))
