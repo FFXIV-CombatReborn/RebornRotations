@@ -50,9 +50,8 @@ public sealed class WAR_Default : WarriorRotation
 
         if (CombatElapsedLessGCD(1)) return false;
 
-        if (Player.HasStatus(false, StatusID.SurgingTempest)
-            && !Player.WillStatusEndGCD(2, 0, true, StatusID.SurgingTempest)
-            || !MythrilTempestPvE.EnoughLevel)
+        if (!Player.WillStatusEndGCD(2, 0, true, StatusID.SurgingTempest)
+            || !StormsEyePvE.EnoughLevel)
         {
             if (BerserkPvE.CanUse(out act)) return true;
         }
@@ -159,19 +158,15 @@ public sealed class WAR_Default : WarriorRotation
             if (PrimalRuinationPvE.CanUse(out act)) return true;
         }
 
-        if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && !Player.HasStatus(true, StatusID.NascentChaos) && Player.Level <= 60)
-        {
-            if (SteelCyclonePvE.CanUse(out act)) return true;
-            if (InnerBeastPvE.CanUse(out act)) return true;
-        }
-
         // AOE
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && DecimatePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (!SteelCycloneMasteryTrait.IsEnabled && !Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && SteelCyclonePvE.CanUse(out act)) return true;
         if (MythrilTempestPvE.CanUse(out act)) return true;
         if (OverpowerPvE.CanUse(out act)) return true;
 
         // Single Target
         if (!Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest) && FellCleavePvE.CanUse(out act, skipStatusProvideCheck: true)) return true;
+        if (!InnerBeastMasteryTrait.IsEnabled && (!StormsEyePvE.EnoughLevel || !Player.WillStatusEndGCD(3, 0, true, StatusID.SurgingTempest)) && InnerBeastPvE.CanUse(out act)) return true;
         if (StormsEyePvE.CanUse(out act)) return true;
         if (StormsPathPvE.CanUse(out act)) return true;
         if (MaimPvE.CanUse(out act)) return true;
