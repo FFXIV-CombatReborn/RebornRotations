@@ -84,7 +84,7 @@ public sealed class SAM_Default : SamuraiRotation
         }
 
         if (ZanshinPvE.CanUse(out act)) return true; // need to check rsr code for upgrade and remove aoecheck here !!! check later !!!
-        if (HissatsuGurenPvE.CanUse(out act)) return true;
+        if (HissatsuGurenPvE.CanUse(out act, skipAoeCheck: !HissatsuSeneiPvE.EnoughLevel)) return true;
         if (HissatsuSeneiPvE.CanUse(out act)) return true;
 
         if (HissatsuKyutenPvE.CanUse(out act)) return true;
