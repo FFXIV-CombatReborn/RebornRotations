@@ -76,11 +76,18 @@ public class AST_DefaultPVP : AstrologianRotation
         if (TryPurify(out act)) return true;
         if (UseRecuperatePvP && Player.CurrentHp / Player.MaxHp * 100 < RCValue && RecuperatePvP.CanUse(out act)) return true;
 
-        if (TheBolePvP.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.BoleDrawn_3403)) return true;
-        if (TheArrowPvP.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.ArrowDrawn_3404)) return true;
-        if (TheBalancePvP.CanUse(out act, skipAoeCheck: true) && Player.HasStatus(true, StatusID.BalanceDrawn_3101)) return true;
 
         return base.EmergencyAbility(nextGCD, out act);
+    }
+
+    protected override bool MoveForwardAbility(IAction nextGCD, out IAction? act)
+    {
+        act = null;
+
+        if (EpicyclePvP.CanUse(out act)) return true;
+
+        return base.MoveForwardAbility(nextGCD, out act);
+
     }
 
     protected override bool AttackAbility(IAction nextGCD, out IAction? act)
@@ -88,17 +95,24 @@ public class AST_DefaultPVP : AstrologianRotation
         act = null;
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
 
+        if (OraclePvP.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (LordOfCrownsPvP.CanUse(out act, skipAoeCheck: true)) return true;
+
         if (GravityIiPvP_29248.CanUse(out act, skipAoeCheck: true)) return true;
 
         return base.AttackAbility(nextGCD, out act);
 
     }
+
     protected override bool GeneralAbility(IAction nextGCD, out IAction? act)
     {
         act = null;
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
 
-        if (DrawPvP.CanUse(out act)) return true;
+        if (MinorArcanaPvP.CanUse(out act)) return true;
+
+        if (LadyOfCrownsPvE.CanUse(out act, skipAoeCheck: true)) return true;
 
         if (AspectedBeneficPvP_29247.CanUse(out act)) return true;
 

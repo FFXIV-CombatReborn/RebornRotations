@@ -89,9 +89,11 @@ public sealed class VPR_DefaultPvP : ViperRotation
         if (ShouldCancelGuard()) return false;
 
         if (IsLastGCD((ActionID)UncoiledFuryPvP.ID) && UncoiledTwinfangPvP.CanUse(out act, skipAoeCheck: true)) return true;
-        if (IsLastGCD((ActionID)HuntersSnapPvP.ID) && TwinfangBitePvP.CanUse(out act)) return true;
-        if (IsLastGCD((ActionID)SwiftskinsCoilPvP.ID) && TwinbloodBitePvP.CanUse(out act)) return true;
-        if (IsLastGCD((ActionID)BarbarousBitePvP.ID, (ActionID)RavenousBitePvP.ID) && DeathRattlePvP.CanUse(out act)) return true;
+        if (IsLastGCD((ActionID)UncoiledFuryPvP.ID) && UncoiledTwinbloodPvP.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (BacklashPvP_39187.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (DeathRattlePvP.CanUse(out act, skipAoeCheck: true)) return true;
 
         return base.AttackAbility(nextGCD, out act);
     }
@@ -113,13 +115,11 @@ public sealed class VPR_DefaultPvP : ViperRotation
 
         if (Player.HasStatus(true, StatusID.HardenedScales)) return false;
 
-        if (!Player.HasStatus(true, StatusID.Reawakened_4094))
-        {
-            if (SwiftskinsCoilPvP.CanUse(out act, usedUp: true)) return true;
-            if (HuntersSnapPvP.CanUse(out act, usedUp: true)) return true;
-        }
 
         if (UncoiledFuryPvP.CanUse(out act, skipAoeCheck: true)) return true;
+
+        if (SanguineFeastPvP.CanUse(out act)) return true;
+        if (BloodcoilPvP.CanUse(out act)) return true;
 
         if (RavenousBitePvP.CanUse(out act)) return true;
         if (SwiftskinsStingPvP.CanUse(out act)) return true;

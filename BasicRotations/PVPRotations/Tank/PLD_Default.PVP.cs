@@ -86,7 +86,6 @@ public sealed class PLD_DefaultPvP : PaladinRotation
         act = null;
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
 
-        if (ShieldBashPvP.CanUse(out act)) return true;
         if (IntervenePvP.CanUse(out act)) return true;
 
         return base.AttackAbility(nextGCD, out act);

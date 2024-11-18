@@ -1,6 +1,6 @@
 namespace DefaultRotations.Ranged;
 
-[Rotation("Default", CombatType.PvE, GameVersion = "7.05",
+[Rotation("Default", CombatType.PvE, GameVersion = "7.10",
     Description = "Please make sure that the three song times add up to 120 seconds, Wanderers default first song for now.")]
 [SourceCode(Path = "main/BasicRotations/Ranged/BRD_Default.cs")]
 [Api(4)]

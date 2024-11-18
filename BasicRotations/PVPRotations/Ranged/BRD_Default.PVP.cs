@@ -95,7 +95,7 @@ public sealed class BRD_DefaultPvP : BardRotation
 
         if (SilentNocturnePvP.CanUse(out act)) return true;
 
-        if (EmpyrealArrowPvP.CanUse(out act)) return true;
+        if (HarmonicArrowPvP_41964.CanUse(out act)) return true;
 
         if (RepellingShotPvP.CanUse(out act)) return true;
 
