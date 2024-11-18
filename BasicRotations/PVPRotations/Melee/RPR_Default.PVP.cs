@@ -112,7 +112,6 @@ public sealed class RPR_DefaultPvP : ReaperRotation
         //if (CrossReapingPvP.CanUse(out act, usedUp: true)) return true;
         //if (CommunioPvP.CanUse(out act, usedUp: true)) return true;
 
-        if (SoulSlicePvP.CanUse(out act, usedUp: true)) return true;
 
         if (PlentifulHarvestPvP.CanUse(out act)) return true;
 

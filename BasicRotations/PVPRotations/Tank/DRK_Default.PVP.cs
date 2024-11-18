@@ -104,7 +104,6 @@ public sealed class DRK_DefaultPvP : DarkKnightRotation
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
         if (!Player.HasStatus(true, StatusID.Guard) && UseSprintPvP && !Player.HasStatus(true, StatusID.Sprint) && !InCombat && SprintPvP.CanUse(out act)) return true;
 
-        if (QuietusPvP.CanUse(out act)) return true;
 
         if (SouleaterPvP.CanUse(out act)) return true;
         if (SyphonStrikePvP.CanUse(out act)) return true;

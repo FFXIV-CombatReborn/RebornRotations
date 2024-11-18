@@ -87,7 +87,6 @@ public class SCH_DefaultPVP : ScholarRotation
 
         // Early exits for Guard status or Sprint usage
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
-        if (MummificationPvP.CanUse(out act, skipAoeCheck: true)) return true;
 
         return base.AttackAbility(nextGCD, out act);
     }

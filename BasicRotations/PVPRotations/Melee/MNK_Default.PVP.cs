@@ -79,19 +79,9 @@ public sealed class MNK_DefaultPvP : MonkRotation
         return base.EmergencyAbility(nextGCD, out act);
     }
 
-    protected override bool GeneralGCD(out IAction? act)
+    protected override bool AttackAbility(IAction nextGCD, out IAction? act)
     {
         act = null;
-        // Early exits for Guard status or Sprint usage
-        if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
-        if (!Player.HasStatus(true, StatusID.Guard) && UseSprintPvP && !Player.HasStatus(true, StatusID.Sprint) && !InCombat && SprintPvP.CanUse(out act)) return true;
-
-        if (RisingPhoenixPvP.CanUse(out act)) return true;
-        if (EnlightenmentPvP.CanUse(out act)) return true;
-        if (RisingPhoenixPvP.CanUse(out act)) return true;
-        if (PhantomRushPvP.CanUse(out act)) return true;
-        if (SixsidedStarPvP.CanUse(out act)) return true;
-        if (EnlightenmentPvP.CanUse(out act, usedUp: true)) return true;
 
         if (InCombat)
         {
@@ -105,20 +95,33 @@ public sealed class MNK_DefaultPvP : MonkRotation
         {
             if (RiddleOfEarthPvP.CanUse(out act)) return true;
         }
+        if (EarthsReplyPvP.CanUse(out act)) return true;
+        if (WindsReplyPvP.CanUse(out act)) return true;
+        if (FiresReplyPvP.CanUse(out act)) return true;
+
+        return base.AttackAbility(nextGCD, out act);
+    }
+
+    protected override bool GeneralGCD(out IAction? act)
+    {
+        act = null;
+        // Early exits for Guard status or Sprint usage
+        if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
+        if (!Player.HasStatus(true, StatusID.Guard) && UseSprintPvP && !Player.HasStatus(true, StatusID.Sprint) && !InCombat && SprintPvP.CanUse(out act)) return true;
+
+        if (FlintsReplyPvP.CanUse(out act)) return true;
 
         if (Player.HasStatus(true, StatusID.EarthResonance))
         {
             if (EarthsReplyPvP.CanUse(out act)) return true;
         }
-
         if (PhantomRushPvP.CanUse(out act)) return true;
+        if (PouncingCoeurlPvP.CanUse(out act)) return true;
+        if (RisingRaptorPvP.CanUse(out act)) return true;
+        if (LeapingOpoPvP.CanUse(out act)) return true;
         if (DemolishPvP.CanUse(out act)) return true;
         if (TwinSnakesPvP.CanUse(out act)) return true;
         if (DragonKickPvP.CanUse(out act)) return true;
-        if (SnapPunchPvP.CanUse(out act)) return true;
-        if (TrueStrikePvP.CanUse(out act)) return true;
-        if (BootshinePvP.CanUse(out act)) return true;
-
 
         return false;
     }
