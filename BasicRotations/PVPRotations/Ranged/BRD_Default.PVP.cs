@@ -1,6 +1,6 @@
 ﻿namespace DefaultRotations.Ranged;
 
-[Rotation("Default PVP", CombatType.PvP, GameVersion = "7.05", Description = "Beta Rotation")]
+[Rotation("Default PVP", CombatType.PvP, GameVersion = "7.1", Description = "Beta Rotation")]
 [SourceCode(Path = "main/BasicRotations/PVPRotations/Ranged/BRD_Default.PvP.cs")]
 [Api(4)]
 public sealed class BRD_DefaultPvP : BardRotation
@@ -93,9 +93,9 @@ public sealed class BRD_DefaultPvP : BardRotation
         act = null;
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
 
-        if (SilentNocturnePvP.CanUse(out act)) return true;
+        if (EncoreOfLightPvP.CanUse(out act, skipAoeCheck: true)) return true;
 
-        if (HarmonicArrowPvP_41964.CanUse(out act)) return true;
+        if (SilentNocturnePvP.CanUse(out act)) return true;
 
         if (RepellingShotPvP.CanUse(out act)) return true;
 
@@ -116,6 +116,8 @@ public sealed class BRD_DefaultPvP : BardRotation
         // Early exits for Guard status or Sprint usage
         if (GuardCancel && Player.HasStatus(true, StatusID.Guard)) return false;
         if (!Player.HasStatus(true, StatusID.Guard) && UseSprintPvP && !Player.HasStatus(true, StatusID.Sprint) && !InCombat && SprintPvP.CanUse(out act)) return true;
+
+        if (HarmonicArrowPvP_41964.CanUse(out act)) return true;
 
         if (BlastArrowPvP.CanUse(out act)) return true;
         if (ApexArrowPvP.CanUse(out act)) return true;
