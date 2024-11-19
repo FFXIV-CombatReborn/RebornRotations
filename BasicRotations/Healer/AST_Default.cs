@@ -50,7 +50,7 @@ public sealed class AST_Default : AstrologianRotation
         if (remainTime < 3 && UseBurstMedicine(out act)) return act;
         if (remainTime is < 4 and > 3 && AspectedBeneficPvE.CanUse(out act)) return act;
         if (remainTime < UseEarthlyStarTime
-            && EarthlyStarPvE.CanUse(out act)) return act;
+            && EarthlyStarPvE.CanUse(out act, skipTTKCheck: true)) return act;
         if (remainTime < 30 && AstralDrawPvE.CanUse(out act)) return act;
 
         return base.CountDownAction(remainTime);
@@ -265,6 +265,8 @@ public sealed class AST_Default : AstrologianRotation
         return base.GeneralGCD(out act);
     }
     #endregion
+
+    
 
     #region Extra Methods
     public override bool CanHealSingleSpell => base.CanHealSingleSpell && (GCDHeal || PartyMembers.GetJobCategory(JobRole.Healer).Count() < 2);
